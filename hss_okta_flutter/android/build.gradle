@@ -1,4 +1,4 @@
-group 'com.example.hss_okta_flutter'
+group 'com.hss.hss_okta_flutter'
 version '1.0-SNAPSHOT'
 
 buildscript {

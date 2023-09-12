@@ -1,4 +1,4 @@
-package com.example.hss_okta_flutter
+package com.hss.hss_okta_flutter
 
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel

@@ -35,7 +35,7 @@ flutter:
   plugin:
     platforms:
       android:
-        package: com.example.hss_okta_flutter
+        package: com.hss.hss_okta_flutter
         pluginClass: HssOktaFlutterPlugin
       ios:
         pluginClass: HssOktaFlutterPlugin

@@ -1,4 +1,4 @@
-package com.example.hss_okta_flutter_example
+package com.hss.hss_okta_flutter_example
 
 import io.flutter.embedding.android.FlutterActivity
 
