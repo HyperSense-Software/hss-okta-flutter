@@ -25,7 +25,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion 31
+    compileSdkVersion 33
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -42,12 +42,22 @@ android {
     }
 
     defaultConfig {
-        minSdkVersion 16
+        minSdkVersion 21
     }
 
     dependencies {
         testImplementation 'org.jetbrains.kotlin:kotlin-test'
         testImplementation 'org.mockito:mockito-core:5.0.0'
+
+        // Okta dependencies
+        // Ensure all dependencies are compatible using the Bill of Materials (BOM).
+        implementation(platform('com.okta.kotlin:bom:1.1.5'))
+
+        // Add the dependencies to your project.
+        implementation('com.okta.kotlin:auth-foundation')
+        implementation('com.okta.kotlin:auth-foundation-bootstrap')
+        implementation('com.okta.kotlin:oauth2')
+        implementation('com.okta.kotlin:web-authentication-ui')
     }
 
     testOptions {
