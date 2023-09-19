@@ -45,10 +45,33 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin {
         if case let .success(token) = token {
             Credential.default = try Credential.store(token)
             print("Success")
+            }
         }
-            
+    
+    public func signInWithOTP  (username : String, code : String) async throws{
+        
+        if config == nil{
+            throw HssOktaError.configError("Config Error")
         }
+        
+        if config!.issuer.absoluteString.isEmpty {
+            throw HssOktaError.configError("Issuer Error")
+        }
+
+        
+        let flow = DirectAuthenticationFlow(issuer: config!.issuer, clientId: config!.clientId, scopes: config!.scopes)
+        
+        let token = try await flow.start(username, with: DirectAuthenticationFlow.PrimaryFactor.otp(code: code))
+        
+        if case let .success(token) = token {
+            Credential.default = try Credential.store(token)
+            print("Success")
+            }
+        }
+    
     }
+
+
 
 
 
