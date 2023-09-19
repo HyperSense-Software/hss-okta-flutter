@@ -23,17 +23,4 @@ abstract class HssOktaFlutterInterfacePlatform extends PlatformInterface {
     throw UnimplementedError(
         'signInWithCredentials() has not been implemented.');
   }
-
-  // Future<String?> getPlatformVersion() {
-  //   throw UnimplementedError('platformVersion() has not been implemented.');
-  // }
-
-  // Future<List<UsedApp>> get apps async {
-  //   throw UnimplementedError('apps has not been implemented.');
-  // }
-
-  // Future<TimeLimitResult> setAppTimeLimit(
-  //     String appId, Duration duration) async {
-  //   throw UnimplementedError('setAppTimeLimit() has not been implemented.');
-  // }
 }

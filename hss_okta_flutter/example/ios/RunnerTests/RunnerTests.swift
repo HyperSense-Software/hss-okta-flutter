@@ -2,7 +2,7 @@
 import UIKit
 import XCTest
 
-@testable import hss_okta_flutter
+//@testable import hss_okta_flutter
 
 // This demonstrates a simple unit test of the Swift portion of this plugin's implementation.
 //
