@@ -17,6 +17,11 @@ A new Flutter plugin project.
   s.dependency 'Flutter'
   # Okta OIDC dependency
   s.dependency 'OktaWebAuthenticationUI'
+  s.dependency 'OktaOAuth2'
+  s.dependency 'OktaOidc'
+  s.dependency 'OktaJWT'
+  s.dependency 'OktaDirectAuth'
+  # s.dependency 'OktaAuthNative'
   s.platform = :ios, '13.0'
   
   # Flutter.framework does not contain a i386 slice.

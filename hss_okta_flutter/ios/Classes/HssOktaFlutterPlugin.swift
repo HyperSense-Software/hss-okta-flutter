@@ -1,9 +1,14 @@
 import Flutter
 import UIKit
-import WebAuthenticationUI
+import OktaOAuth2
+//import WebAuthenticationUI
+import AuthFoundation
+import OktaDirectAuth
 
 public class HssOktaFlutterPlugin: NSObject, FlutterPlugin {
-  
+    let config = try? OAuth2Client.PropertyListConfiguration()
+
+
   
   public static func register(with registrar: FlutterPluginRegistrar) {
     let channel = FlutterMethodChannel(name: "hss_okta_flutter", binaryMessenger: registrar.messenger())
@@ -21,9 +26,32 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin {
       result(FlutterMethodNotImplemented)
     }
   }
+    
+    public func signInWithCredentials  (username : String,password : String) async throws{
+        
+        if config == nil{
+            throw HssOktaError.configError("Config Error")
+        }
+        
+        if config!.issuer.absoluteString.isEmpty {
+            throw HssOktaError.configError("Issuer Error")
+        }
+    
+        
+        let flow = DirectAuthenticationFlow(issuer: config!.issuer, clientId: config!.clientId, scopes: config!.scopes)
+        
+        let token = try await flow.start(username, with: DirectAuthenticationFlow.PrimaryFactor.password(password))
+        
+        if case let .success(token) = token {
+            Credential.default = try Credential.store(token)
+            print("Success")
+        }
+            
+        }
+    }
 
-// func signIn() async {
-//     let token = try await WebAuthentication.signIn()
-//     let credential = try Credential.store(token)
-// }
+
+
+enum HssOktaError: Error {
+    case configError(String)
 }
