@@ -1,7 +1,11 @@
-import 'hss_okta_flutter_platform_interface.dart';
+import 'package:hss_okta_flutter/hss_okta_flutter_interface.dart';
+import 'package:hss_okta_flutter/pigeon/direct_auth_generated.g.dart';
 
 class HssOktaFlutter {
-  Future<String?> getPlatformVersion() {
-    return HssOktaFlutterPlatform.instance.getPlatformVersion();
+  Future<void> signInWithCredentials(HSSOktaNativeAuthRequest request) async {
+    var rest =
+        HssOktaFlutterInterfacePlatform.instance.signInWithCredentials(request);
+
+    print(rest);
   }
 }

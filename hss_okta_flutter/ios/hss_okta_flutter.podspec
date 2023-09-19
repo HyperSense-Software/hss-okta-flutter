@@ -14,6 +14,7 @@ A new Flutter plugin project.
   s.author           = { 'Your Company' => 'email@example.com' }
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'
+  # s.source_files = 'pigeon/**/*'
   s.dependency 'Flutter'
   # Okta OIDC dependency
   s.dependency 'OktaWebAuthenticationUI'
