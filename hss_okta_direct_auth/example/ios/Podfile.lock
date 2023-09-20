@@ -1,0 +1,57 @@
+PODS:
+  - Flutter (1.0.0)
+  - hss_okta_direct_auth (0.0.1):
+    - Flutter
+    - OktaDirectAuth
+    - OktaJWT
+    - OktaOAuth2
+    - OktaOidc
+  - integration_test (0.0.1):
+    - Flutter
+  - OktaAuthFoundation (1.4.3)
+  - OktaDirectAuth (1.4.3):
+    - OktaAuthFoundation (= 1.4.3)
+  - OktaJWT (2.0.1)
+  - OktaOAuth2 (1.4.3):
+    - OktaAuthFoundation (= 1.4.3)
+  - OktaOidc (3.11.2):
+    - OktaOidc/AppAuth (= 3.11.2)
+    - OktaOidc/Okta (= 3.11.2)
+  - OktaOidc/AppAuth (3.11.2)
+  - OktaOidc/Okta (3.11.2):
+    - OktaOidc/AppAuth
+
+DEPENDENCIES:
+  - Flutter (from `Flutter`)
+  - hss_okta_direct_auth (from `.symlinks/plugins/hss_okta_direct_auth/ios`)
+  - integration_test (from `.symlinks/plugins/integration_test/ios`)
+
+SPEC REPOS:
+  trunk:
+    - OktaAuthFoundation
+    - OktaDirectAuth
+    - OktaJWT
+    - OktaOAuth2
+    - OktaOidc
+
+EXTERNAL SOURCES:
+  Flutter:
+    :path: Flutter
+  hss_okta_direct_auth:
+    :path: ".symlinks/plugins/hss_okta_direct_auth/ios"
+  integration_test:
+    :path: ".symlinks/plugins/integration_test/ios"
+
+SPEC CHECKSUMS:
+  Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
+  hss_okta_direct_auth: ae6969e1232c1e9e4340a095f8fb313466960baf
+  integration_test: 13825b8a9334a850581300559b8839134b124670
+  OktaAuthFoundation: 5ac1fd93cf428078d82d4fda08cbbe3f4979c6ce
+  OktaDirectAuth: 86b9ab4b1f6b1a4c72288ac5a2c388a2e8a3b1bf
+  OktaJWT: 81e532a244e5cf3d83693bd3760b1f2f6c1c82fd
+  OktaOAuth2: d063c4e91ab2ad7927fdf95a8f9454019d91eb47
+  OktaOidc: 15fb3d494103d4f07ba8a523b3347d02c4d30486
+
+PODFILE CHECKSUM: a57f30d18f102dd3ce366b1d62a55ecbef2158e5
+
+COCOAPODS: 1.12.1
