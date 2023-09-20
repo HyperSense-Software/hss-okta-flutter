@@ -55,8 +55,8 @@ class HssOktaDirectAuthResult {
   }
 }
 
-class _HssOktaDirectAuthPluginCodec extends StandardMessageCodec {
-  const _HssOktaDirectAuthPluginCodec();
+class _HssOktaDirectAuthPluginApiCodec extends StandardMessageCodec {
+  const _HssOktaDirectAuthPluginApiCodec();
   @override
   void writeValue(WriteBuffer buffer, Object? value) {
     if (value is HssOktaDirectAuthRequest) {
@@ -73,9 +73,9 @@ class _HssOktaDirectAuthPluginCodec extends StandardMessageCodec {
   @override
   Object? readValueOfType(int type, ReadBuffer buffer) {
     switch (type) {
-      case 128:
+      case 128: 
         return HssOktaDirectAuthRequest.decode(readValue(buffer)!);
-      case 129:
+      case 129: 
         return HssOktaDirectAuthResult.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
@@ -83,21 +83,19 @@ class _HssOktaDirectAuthPluginCodec extends StandardMessageCodec {
   }
 }
 
-class HssOktaDirectAuthPlugin {
-  /// Constructor for [HssOktaDirectAuthPlugin].  The [binaryMessenger] named argument is
+class HssOktaDirectAuthPluginApi {
+  /// Constructor for [HssOktaDirectAuthPluginApi].  The [binaryMessenger] named argument is
   /// available for dependency injection.  If it is left null, the default
   /// BinaryMessenger will be used which routes to the host platform.
-  HssOktaDirectAuthPlugin({BinaryMessenger? binaryMessenger})
+  HssOktaDirectAuthPluginApi({BinaryMessenger? binaryMessenger})
       : _binaryMessenger = binaryMessenger;
   final BinaryMessenger? _binaryMessenger;
 
-  static const MessageCodec<Object?> codec = _HssOktaDirectAuthPluginCodec();
+  static const MessageCodec<Object?> codec = _HssOktaDirectAuthPluginApiCodec();
 
-  Future<HssOktaDirectAuthResult> signInWithCredentials(
-      HssOktaDirectAuthRequest arg_request) async {
+  Future<HssOktaDirectAuthResult> signInWithCredentials(HssOktaDirectAuthRequest arg_request) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
-        'dev.flutter.pigeon.hss_okta_direct_auth.HssOktaDirectAuthPlugin.signInWithCredentials',
-        codec,
+        'dev.flutter.pigeon.hss_okta_direct_auth.HssOktaDirectAuthPluginApi.signInWithCredentials', codec,
         binaryMessenger: _binaryMessenger);
     final List<Object?>? replyList =
         await channel.send(<Object?>[arg_request]) as List<Object?>?;

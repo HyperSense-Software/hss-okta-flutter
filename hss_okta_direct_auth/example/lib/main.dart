@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 
-import 'package:flutter/services.dart';
 import 'package:hss_okta_direct_auth/hss_okta_direct_auth.dart';
 
 void main() {
@@ -17,15 +16,21 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   final _hssOktaDirectAuthPlugin = HssOktaDirectAuth();
+  String res = 'None';
 
   @override
   void initState() {
     super.initState();
-    initPlatformState();
+    initSigninToOktaTest().then((value) => res = value);
+    // WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+    //   res = await initSigninToOktaTest().whenComplete(() => setState(() {}));
+    // });
   }
 
-  Future<void> initPlatformState() async {
-    await _hssOktaDirectAuthPlugin.signIn();
+  Future<String> initSigninToOktaTest() async {
+    var result = await _hssOktaDirectAuthPlugin.signIn() ?? 'Fail';
+    print('RESULT : $result');
+    return result;
   }
 
   @override
@@ -35,8 +40,8 @@ class _MyAppState extends State<MyApp> {
         appBar: AppBar(
           title: const Text('Plugin example app'),
         ),
-        body: const Center(
-          child: Text('Hypersense software'),
+        body: Center(
+          child: Text('Hypersense software - Okta Sign in result : $res'),
         ),
       ),
     );

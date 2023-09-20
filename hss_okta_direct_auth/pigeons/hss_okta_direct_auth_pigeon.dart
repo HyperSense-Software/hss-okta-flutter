@@ -3,7 +3,7 @@ import 'package:pigeon/pigeon.dart';
 @ConfigurePigeon(PigeonOptions(
   input: 'pigeons/hss_okta_direct_auth_pigeon.dart',
   dartOut: 'lib/generated/hss_okta_direct_auth.g.dart',
-  swiftOut: 'ios/Classes/HssOktaDirectAuthPlugin.g.swift',
+  swiftOut: 'ios/Classes/HssOktaDirectAuthPluginApi.g.swift',
   // cppHeaderOut: 'ios/Classes/HssOktaDirectAuthPlugin.h',
   // cppSourceOut: 'ios/Classes/HssOktaDirectAuthPlugin.m',
 ))
@@ -21,7 +21,7 @@ class HssOktaDirectAuthResult {
 }
 
 @HostApi()
-abstract class HssOktaDirectAuthPlugin {
+abstract class HssOktaDirectAuthPluginApi {
   @async
   HssOktaDirectAuthResult signInWithCredentials(
       HssOktaDirectAuthRequest request);

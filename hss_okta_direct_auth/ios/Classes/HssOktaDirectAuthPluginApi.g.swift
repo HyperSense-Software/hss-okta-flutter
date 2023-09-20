@@ -78,7 +78,7 @@ struct HssOktaDirectAuthResult {
   }
 }
 
-private class HssOktaDirectAuthPluginCodecReader: FlutterStandardReader {
+private class HssOktaDirectAuthPluginApiCodecReader: FlutterStandardReader {
   override func readValue(ofType type: UInt8) -> Any? {
     switch type {
       case 128:
@@ -91,7 +91,7 @@ private class HssOktaDirectAuthPluginCodecReader: FlutterStandardReader {
   }
 }
 
-private class HssOktaDirectAuthPluginCodecWriter: FlutterStandardWriter {
+private class HssOktaDirectAuthPluginApiCodecWriter: FlutterStandardWriter {
   override func writeValue(_ value: Any) {
     if let value = value as? HssOktaDirectAuthRequest {
       super.writeByte(128)
@@ -105,32 +105,32 @@ private class HssOktaDirectAuthPluginCodecWriter: FlutterStandardWriter {
   }
 }
 
-private class HssOktaDirectAuthPluginCodecReaderWriter: FlutterStandardReaderWriter {
+private class HssOktaDirectAuthPluginApiCodecReaderWriter: FlutterStandardReaderWriter {
   override func reader(with data: Data) -> FlutterStandardReader {
-    return HssOktaDirectAuthPluginCodecReader(data: data)
+    return HssOktaDirectAuthPluginApiCodecReader(data: data)
   }
 
   override func writer(with data: NSMutableData) -> FlutterStandardWriter {
-    return HssOktaDirectAuthPluginCodecWriter(data: data)
+    return HssOktaDirectAuthPluginApiCodecWriter(data: data)
   }
 }
 
-class HssOktaDirectAuthPluginCodec: FlutterStandardMessageCodec {
-  static let shared = HssOktaDirectAuthPluginCodec(readerWriter: HssOktaDirectAuthPluginCodecReaderWriter())
+class HssOktaDirectAuthPluginApiCodec: FlutterStandardMessageCodec {
+  static let shared = HssOktaDirectAuthPluginApiCodec(readerWriter: HssOktaDirectAuthPluginApiCodecReaderWriter())
 }
 
 /// Generated protocol from Pigeon that represents a handler of messages from Flutter.
-protocol HssOktaDirectAuthPlugin {
+protocol HssOktaDirectAuthPluginApi {
   func signInWithCredentials(request: HssOktaDirectAuthRequest, completion: @escaping (Result<HssOktaDirectAuthResult, Error>) -> Void)
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
-class HssOktaDirectAuthPluginSetup {
-  /// The codec used by HssOktaDirectAuthPlugin.
-  static var codec: FlutterStandardMessageCodec { HssOktaDirectAuthPluginCodec.shared }
-  /// Sets up an instance of `HssOktaDirectAuthPlugin` to handle messages through the `binaryMessenger`.
-  static func setUp(binaryMessenger: FlutterBinaryMessenger, api: HssOktaDirectAuthPlugin?) {
-    let signInWithCredentialsChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_direct_auth.HssOktaDirectAuthPlugin.signInWithCredentials", binaryMessenger: binaryMessenger, codec: codec)
+class HssOktaDirectAuthPluginApiSetup {
+  /// The codec used by HssOktaDirectAuthPluginApi.
+  static var codec: FlutterStandardMessageCodec { HssOktaDirectAuthPluginApiCodec.shared }
+  /// Sets up an instance of `HssOktaDirectAuthPluginApi` to handle messages through the `binaryMessenger`.
+  static func setUp(binaryMessenger: FlutterBinaryMessenger, api: HssOktaDirectAuthPluginApi?) {
+    let signInWithCredentialsChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_direct_auth.HssOktaDirectAuthPluginApi.signInWithCredentials", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       signInWithCredentialsChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]

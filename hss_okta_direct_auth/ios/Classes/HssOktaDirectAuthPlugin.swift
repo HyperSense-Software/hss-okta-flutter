@@ -8,30 +8,37 @@ enum HssOktaError: Error {
 case configError(String)
 }
 
-class HssOktaDirectAuthPluginApi :NSObject, FlutterPlugin, HssOktaDirectAuthPlugin
+
+open class HssOktaDirectAuthPlugin :NSObject, FlutterPlugin,HssOktaDirectAuthPluginApi
 {
-    static func register(with registrar: FlutterPluginRegistrar) {
+  
+    
+    public static func register(with registrar: FlutterPluginRegistrar) {
         let messenger : FlutterBinaryMessenger = registrar.messenger()
-        let api : HssOktaDirectAuthPlugin & NSObjectProtocol = HssOktaDirectAuthPluginApi.init()
-        HssOktaDirectAuthPluginSetup.setUp(binaryMessenger: messenger, api: api)
+        let api : HssOktaDirectAuthPluginApi & NSObjectProtocol = HssOktaDirectAuthPlugin.init()
+        HssOktaDirectAuthPluginApiSetup.setUp(binaryMessenger: messenger, api: api)
     }
     
    
     func signInWithCredentials(request: HssOktaDirectAuthRequest, completion: @escaping (Result<HssOktaDirectAuthResult, Error>) -> Void) {
-    
+        let config = try? OAuth2Client.PropertyListConfiguration()
     Task{
       
-           let config = try? OAuth2Client.PropertyListConfiguration()
-           
-           let flow = DirectAuthenticationFlow(issuer: config!.issuer, clientId: config!.clientId, scopes: config!.scopes)
+              
+        let flow = DirectAuthenticationFlow(issuer: config!.issuer, clientId: config!.clientId, scopes: config!.scopes)
            
         let token = try await flow.start(request.username, with: DirectAuthenticationFlow.PrimaryFactor.password(request.password))
+        
+        
            
            if case let .success(token) = token {
+               
                Credential.default = try Credential.store(token)
-               return("Success")
+               return HssOktaDirectAuthResult(result: token.accessToken)
+               
            }
-           return("Fail")
+        return HssOktaDirectAuthResult(result: "Failure to Sign in")
+
     }
 }
     

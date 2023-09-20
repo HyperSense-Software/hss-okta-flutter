@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+   okta.plist
+   Runner
+
+   Created by aldrin francisco on 9/19/23.
+   Copyright (c) 2023 . All rights reserved.
+-->
+<plist version="1.0">
+   <dict>
+      <key>issuer</key>
+      <string>https://dev-88611703.okta.com/oauth2/default</string>
+      <key>clientId</key>
+      <string>0oa6o42r20pZcgHUX5d7</string>
+      <key>redirectUri</key>
+      <string>com.okta.dev-88611703:/callback</string>
+      <key>logoutRedirectUri</key>
+      <string>com.okta.dev-88611703:/logout</string>
+      <key>scopes</key>
+      <string>openid profile offline_access</string>
+    </dict>
+</plist>
