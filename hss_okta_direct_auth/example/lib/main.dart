@@ -21,15 +21,11 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    initSigninToOktaTest().then((value) => res = value);
-    // WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
-    //   res = await initSigninToOktaTest().whenComplete(() => setState(() {}));
-    // });
   }
 
   Future<String> initSigninToOktaTest() async {
     var result = await _hssOktaDirectAuthPlugin.signIn() ?? 'Fail';
-    print('RESULT : $result');
+
     return result;
   }
 
@@ -40,9 +36,19 @@ class _MyAppState extends State<MyApp> {
         appBar: AppBar(
           title: const Text('Plugin example app'),
         ),
-        body: Center(
-          child: Text('Hypersense software - Okta Sign in result : $res'),
-        ),
+        body: FutureBuilder<String>(
+            future: initSigninToOktaTest(),
+            initialData: '',
+            builder: (context, snapshot) {
+              if (snapshot.data?.isNotEmpty ?? false) {
+                return Center(
+                  child: Text(
+                      'Hypersense software - Okta Sign in result : ${snapshot.data}'),
+                );
+              }
+
+              return const Center(child: CircularProgressIndicator());
+            }),
       ),
     );
   }
