@@ -28,8 +28,9 @@ open class HssOktaDirectAuthPlugin :NSObject, FlutterPlugin,HssOktaDirectAuthPlu
             do{
                 try await startSignInFlow(request : request,flow: flow)
                 
-            }catch{
-                
+            }catch let error{
+                debugPrint(error)
+                completion(.failure(error))
             }
         }
        
@@ -44,8 +45,11 @@ open class HssOktaDirectAuthPlugin :NSObject, FlutterPlugin,HssOktaDirectAuthPlu
     
     func startSignInFlow(request : HssOktaDirectAuthRequest, flow : DirectAuthenticationFlow) async throws {
         let token =  try await flow.start(request.username, with: DirectAuthenticationFlow.PrimaryFactor.password(request.password))
-        print(token)
-        if case let .success(token) = token {
-            Credential.default = try Credential.store(token)
-        }
-    }}
+
+        switch try await flow.start(request.username, with: .password(request.password)) {
+    case .success(let token):
+        Credential.default = try Credential.store(token)
+        case .mfaRequired(_):
+            debugPrint("Something something")
+        }}
+}
