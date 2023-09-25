@@ -64,24 +64,24 @@ struct HssOktaDirectAuthRequest {
 struct HssOktaDirectAuthResult {
   var success: Bool
   var error: String? = nil
-  var id: String
-  var token: String
-  var issuedAt: Int64
-  var tokenType: String
-  var accessToken: String
-  var scope: String
-  var refreshToken: String
+  var id: String? = nil
+  var token: String? = nil
+  var issuedAt: Int64? = nil
+  var tokenType: String? = nil
+  var accessToken: String? = nil
+  var scope: String? = nil
+  var refreshToken: String? = nil
 
   static func fromList(_ list: [Any?]) -> HssOktaDirectAuthResult? {
     let success = list[0] as! Bool
     let error: String? = nilOrValue(list[1])
-    let id = list[2] as! String
-    let token = list[3] as! String
-    let issuedAt = list[4] is Int64 ? list[4] as! Int64 : Int64(list[4] as! Int32)
-    let tokenType = list[5] as! String
-    let accessToken = list[6] as! String
-    let scope = list[7] as! String
-    let refreshToken = list[8] as! String
+    let id: String? = nilOrValue(list[2])
+    let token: String? = nilOrValue(list[3])
+    let issuedAt: Int64? = isNullish(list[4]) ? nil : (list[4] is Int64? ? list[4] as! Int64? : Int64(list[4] as! Int32))
+    let tokenType: String? = nilOrValue(list[5])
+    let accessToken: String? = nilOrValue(list[6])
+    let scope: String? = nilOrValue(list[7])
+    let refreshToken: String? = nilOrValue(list[8])
 
     return HssOktaDirectAuthResult(
       success: success,

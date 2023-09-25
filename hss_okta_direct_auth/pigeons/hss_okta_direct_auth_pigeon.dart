@@ -18,13 +18,13 @@ class HssOktaDirectAuthResult {
   final bool success;
   final String? error;
 
-  final String id;
-  final String token;
-  final int issuedAt;
-  final String tokenType;
-  final String accessToken;
-  final String scope;
-  final String refreshToken;
+  final String? id;
+  final String? token;
+  final int? issuedAt;
+  final String? tokenType;
+  final String? accessToken;
+  final String? scope;
+  final String? refreshToken;
   // final String idToken;
   // final String context;
 

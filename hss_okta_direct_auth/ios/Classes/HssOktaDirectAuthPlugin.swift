@@ -22,29 +22,30 @@ open class HssOktaDirectAuthPlugin :NSObject, FlutterPlugin,HssOktaDirectAuthPlu
     
     
     func signInWithCredentials(request: HssOktaDirectAuthRequest, completion: @escaping (Result<HssOktaDirectAuthResult?, Error>) -> Void)  {
-        let config = try? OAuth2Client.PropertyListConfiguration()
-        let flow = DirectAuthenticationFlow(issuer: config!.issuer, clientId: config!.clientId, scopes: config!.scopes)
         
-        Task{
-            do{
-                try await startSignInFlow(request : request,flow: flow)
-                
-            }catch let error{
-                debugPrint(error)
-                completion(.failure(error))
+        if let config = try? OAuth2Client.PropertyListConfiguration(){
+            let flow = DirectAuthenticationFlow(issuer: config.issuer, clientId: config.clientId, scopes: config.scopes)
+            
+            Task{
+                do{
+                    try await startSignInFlow(request : request,flow: flow)
+                    
+                }catch let error{
+                    debugPrint(error)
+                    completion(.failure(error))
+                }
             }
-        }
-       
-        if let result : Credential = Credential.default {
+            
+            if let result : Credential = Credential.default {
 
-            completion(.success(HssOktaDirectAuthResult(
-                success: true, id: result.token.id, token: result.token.idToken?.rawValue ?? "", issuedAt: Int64(((result.token.issuedAt?.timeIntervalSince1970 ?? 0) * 1000.0).rounded()), tokenType: result.token.tokenType, accessToken: result.token.accessToken, scope: result.token.scope ?? "", refreshToken: result.token.refreshToken ?? ""))) }else{
-            completion(.success(HssOktaDirectAuthResult(
-                success: false,error: "Failed to Login : Server did not provide result", id: "", token: "", issuedAt: 0,
-                tokenType: "", accessToken: "", scope: "", refreshToken: ""
-            )))
+                completion(.success(HssOktaDirectAuthResult(
+                    success: true, id: result.token.id, token: result.token.idToken?.rawValue ?? "", issuedAt: Int64(((result.token.issuedAt?.timeIntervalSince1970 ?? 0) * 1000.0).rounded()), tokenType: result.token.tokenType, accessToken: result.token.accessToken, scope: result.token.scope ?? "", refreshToken: result.token.refreshToken ?? ""))) }else{
+                completion(.success(HssOktaDirectAuthResult(success: false,error: "Failed to Login : Server did not provide result")))
+            }
+
+        }else{
+            completion(.failure(HssOktaError.configError("Configuration Error, Check okta.plist")))
         }
-       
     }
     
     func startSignInFlow(request : HssOktaDirectAuthRequest, flow : DirectAuthenticationFlow) async throws {

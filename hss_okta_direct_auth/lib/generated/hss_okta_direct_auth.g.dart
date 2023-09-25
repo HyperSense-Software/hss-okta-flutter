@@ -38,32 +38,32 @@ class HssOktaDirectAuthResult {
   HssOktaDirectAuthResult({
     required this.success,
     this.error,
-    required this.id,
-    required this.token,
-    required this.issuedAt,
-    required this.tokenType,
-    required this.accessToken,
-    required this.scope,
-    required this.refreshToken,
+    this.id,
+    this.token,
+    this.issuedAt,
+    this.tokenType,
+    this.accessToken,
+    this.scope,
+    this.refreshToken,
   });
 
   bool success;
 
   String? error;
 
-  String id;
+  String? id;
 
-  String token;
+  String? token;
 
-  int issuedAt;
+  int? issuedAt;
 
-  String tokenType;
+  String? tokenType;
 
-  String accessToken;
+  String? accessToken;
 
-  String scope;
+  String? scope;
 
-  String refreshToken;
+  String? refreshToken;
 
   Object encode() {
     return <Object?>[
@@ -84,13 +84,13 @@ class HssOktaDirectAuthResult {
     return HssOktaDirectAuthResult(
       success: result[0]! as bool,
       error: result[1] as String?,
-      id: result[2]! as String,
-      token: result[3]! as String,
-      issuedAt: result[4]! as int,
-      tokenType: result[5]! as String,
-      accessToken: result[6]! as String,
-      scope: result[7]! as String,
-      refreshToken: result[8]! as String,
+      id: result[2] as String?,
+      token: result[3] as String?,
+      issuedAt: result[4] as int?,
+      tokenType: result[5] as String?,
+      accessToken: result[6] as String?,
+      scope: result[7] as String?,
+      refreshToken: result[8] as String?,
     );
   }
 }
