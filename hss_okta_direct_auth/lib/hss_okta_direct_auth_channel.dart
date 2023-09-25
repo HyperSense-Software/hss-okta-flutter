@@ -12,4 +12,18 @@ class HssOktaDirectAuthChannel extends HssOktaDirectAuthPlatform {
     if (res == null) throw Exception("Null result from signInWithCredentials");
     return res;
   }
+
+  @override
+  Future<bool> revokeDefaultToken() async {
+    var res = await _api.revokeDefaultToken();
+    if (res == null) throw Exception("Null result from revokeDefaultToken");
+    return res;
+  }
+
+  @override
+  Future<bool> refreshDefaultToken() async {
+    var res = await _api.refreshDefaultToken();
+    if (res == null) throw Exception("Null result from refreshDefaultToken");
+    return res;
+  }
 }

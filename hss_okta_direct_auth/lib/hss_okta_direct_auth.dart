@@ -10,4 +10,16 @@ class HssOktaDirectAuth {
 
     return result;
   }
+
+  Future<bool> revokeDefaultToken() async {
+    var result = await HssOktaDirectAuthPlatform.instance.revokeDefaultToken();
+
+    return result;
+  }
+
+  Future<bool> refreshDefaultToken() async {
+    var result = await HssOktaDirectAuthPlatform.instance.refreshDefaultToken();
+
+    return result;
+  }
 }
