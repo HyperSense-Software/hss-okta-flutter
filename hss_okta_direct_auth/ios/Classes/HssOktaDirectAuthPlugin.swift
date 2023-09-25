@@ -48,7 +48,7 @@ open class HssOktaDirectAuthPlugin :NSObject, FlutterPlugin,HssOktaDirectAuthPlu
         }
     }
     
-    func refreshToken(completion: @escaping (Result<Bool?, Error>) -> Void){
+    func refreshDefaultToken(completion: @escaping (Result<Bool?, Error>) -> Void){
         if let credential = Credential.default{
             Task{
                 do{
@@ -66,7 +66,7 @@ open class HssOktaDirectAuthPlugin :NSObject, FlutterPlugin,HssOktaDirectAuthPlu
         
     }
     
-    func logout(completion: @escaping (Result<Bool?, Error>) -> Void){
+    func revokeDefaultToken(completion: @escaping (Result<Bool?, Error>) -> Void){
         if let credential = Credential.default{
             Task{
                 do{

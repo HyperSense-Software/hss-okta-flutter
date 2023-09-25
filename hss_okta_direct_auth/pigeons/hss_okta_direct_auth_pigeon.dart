@@ -48,10 +48,10 @@ abstract class HssOktaDirectAuthPluginApi {
       HssOktaDirectAuthRequest request);
 
   @async
-  bool? refreshToken();
+  bool? refreshDefaultToken();
 
   @async
-  bool? logout();
+  bool? revokeDefaultToken();
 
   //TODO:
   // find token by id

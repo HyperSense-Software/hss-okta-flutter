@@ -155,9 +155,9 @@ class HssOktaDirectAuthPluginApi {
     }
   }
 
-  Future<bool?> refreshToken() async {
+  Future<bool?> refreshDefaultToken() async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
-        'dev.flutter.pigeon.hss_okta_direct_auth.HssOktaDirectAuthPluginApi.refreshToken', codec,
+        'dev.flutter.pigeon.hss_okta_direct_auth.HssOktaDirectAuthPluginApi.refreshDefaultToken', codec,
         binaryMessenger: _binaryMessenger);
     final List<Object?>? replyList =
         await channel.send(null) as List<Object?>?;
@@ -177,9 +177,9 @@ class HssOktaDirectAuthPluginApi {
     }
   }
 
-  Future<bool?> logout() async {
+  Future<bool?> revokeDefaultToken() async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
-        'dev.flutter.pigeon.hss_okta_direct_auth.HssOktaDirectAuthPluginApi.logout', codec,
+        'dev.flutter.pigeon.hss_okta_direct_auth.HssOktaDirectAuthPluginApi.revokeDefaultToken', codec,
         binaryMessenger: _binaryMessenger);
     final List<Object?>? replyList =
         await channel.send(null) as List<Object?>?;

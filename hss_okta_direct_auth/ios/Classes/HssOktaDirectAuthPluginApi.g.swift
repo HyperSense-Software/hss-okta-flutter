@@ -154,8 +154,8 @@ class HssOktaDirectAuthPluginApiCodec: FlutterStandardMessageCodec {
 /// Generated protocol from Pigeon that represents a handler of messages from Flutter.
 protocol HssOktaDirectAuthPluginApi {
   func signInWithCredentials(request: HssOktaDirectAuthRequest, completion: @escaping (Result<HssOktaDirectAuthResult?, Error>) -> Void)
-  func refreshToken(completion: @escaping (Result<Bool?, Error>) -> Void)
-  func logout(completion: @escaping (Result<Bool?, Error>) -> Void)
+  func refreshDefaultToken(completion: @escaping (Result<Bool?, Error>) -> Void)
+  func revokeDefaultToken(completion: @escaping (Result<Bool?, Error>) -> Void)
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -181,10 +181,10 @@ class HssOktaDirectAuthPluginApiSetup {
     } else {
       signInWithCredentialsChannel.setMessageHandler(nil)
     }
-    let refreshTokenChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_direct_auth.HssOktaDirectAuthPluginApi.refreshToken", binaryMessenger: binaryMessenger, codec: codec)
+    let refreshDefaultTokenChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_direct_auth.HssOktaDirectAuthPluginApi.refreshDefaultToken", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
-      refreshTokenChannel.setMessageHandler { _, reply in
-        api.refreshToken() { result in
+      refreshDefaultTokenChannel.setMessageHandler { _, reply in
+        api.refreshDefaultToken() { result in
           switch result {
             case .success(let res):
               reply(wrapResult(res))
@@ -194,12 +194,12 @@ class HssOktaDirectAuthPluginApiSetup {
         }
       }
     } else {
-      refreshTokenChannel.setMessageHandler(nil)
+      refreshDefaultTokenChannel.setMessageHandler(nil)
     }
-    let logoutChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_direct_auth.HssOktaDirectAuthPluginApi.logout", binaryMessenger: binaryMessenger, codec: codec)
+    let revokeDefaultTokenChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_direct_auth.HssOktaDirectAuthPluginApi.revokeDefaultToken", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
-      logoutChannel.setMessageHandler { _, reply in
-        api.logout() { result in
+      revokeDefaultTokenChannel.setMessageHandler { _, reply in
+        api.revokeDefaultToken() { result in
           switch result {
             case .success(let res):
               reply(wrapResult(res))
@@ -209,7 +209,7 @@ class HssOktaDirectAuthPluginApiSetup {
         }
       }
     } else {
-      logoutChannel.setMessageHandler(nil)
+      revokeDefaultTokenChannel.setMessageHandler(nil)
     }
   }
 }
