@@ -48,6 +48,41 @@ open class HssOktaDirectAuthPlugin :NSObject, FlutterPlugin,HssOktaDirectAuthPlu
         }
     }
     
+    func refreshToken(completion: @escaping (Result<Bool?, Error>) -> Void){
+        if let credential = Credential.default{
+            Task{
+                do{
+                    try await credential.refresh()
+                }catch let error{
+                    debugPrint(error)
+                    completion(.failure(error))
+                }
+            }
+            completion(.success(true))
+        }else{
+            completion(.failure("Missing credential"))
+        }
+        
+        
+    }
+    
+    func logout(completion: @escaping (Result<Bool?, Error>) -> Void){
+        if let credential = Credential.default{
+            Task{
+                do{
+                    try await credential.revoke()
+                }catch let error{
+                    debugPrint(error)
+                    completion(.success(false))
+                }
+            }
+            completion(.success(true))
+        }else{
+            completion(.failure("Missing credential"))
+        }
+    }
+
+    
     func startSignInFlow(request : HssOktaDirectAuthRequest, flow : DirectAuthenticationFlow) async throws {
         let token =  try await flow.start(request.username, with: DirectAuthenticationFlow.PrimaryFactor.password(request.password))
 

@@ -25,8 +25,6 @@ class HssOktaDirectAuthResult {
   final String? accessToken;
   final String? scope;
   final String? refreshToken;
-  // final String idToken;
-  // final String context;
 
   HssOktaDirectAuthResult({
     required this.success,
@@ -41,19 +39,21 @@ class HssOktaDirectAuthResult {
     // required this.idToken,
     // required this.context
   });
-
-  // DateTime get issueDate =>
-  //     DateTime.fromMillisecondsSinceEpoch(issuedAt * 1000);
 }
-
-// extension HssDirectAuthExtension on HssOktaDirectAuthResult {
-//   DateTime get issueDate =>
-//       DateTime.fromMillisecondsSinceEpoch(issuedAt * 1000);
-// }
 
 @HostApi()
 abstract class HssOktaDirectAuthPluginApi {
   @async
   HssOktaDirectAuthResult? signInWithCredentials(
       HssOktaDirectAuthRequest request);
+
+  @async
+  bool? refreshToken();
+
+  @async
+  bool? logout();
+
+  //TODO:
+  // find token by id
+  // logout
 }

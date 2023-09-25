@@ -18,4 +18,12 @@ abstract class HssOktaDirectAuthPlatform extends PlatformInterface {
       HssOktaDirectAuthRequest request) {
     throw UnimplementedError('platformVersion() has not been implemented.');
   }
+
+  Future<bool> logout() {
+    throw UnimplementedError('platformVersion() has not been implemented.');
+  }
+
+  Future<bool> refreshToken() {
+    throw UnimplementedError('platformVersion() has not been implemented.');
+  }
 }
