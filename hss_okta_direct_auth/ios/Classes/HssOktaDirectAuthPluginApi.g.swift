@@ -156,6 +156,7 @@ protocol HssOktaDirectAuthPluginApi {
   func signInWithCredentials(request: HssOktaDirectAuthRequest, completion: @escaping (Result<HssOktaDirectAuthResult?, Error>) -> Void)
   func refreshDefaultToken(completion: @escaping (Result<Bool?, Error>) -> Void)
   func revokeDefaultToken(completion: @escaping (Result<Bool?, Error>) -> Void)
+  func getCredential(completion: @escaping (Result<HssOktaDirectAuthResult?, Error>) -> Void)
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -210,6 +211,21 @@ class HssOktaDirectAuthPluginApiSetup {
       }
     } else {
       revokeDefaultTokenChannel.setMessageHandler(nil)
+    }
+    let getCredentialChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_direct_auth.HssOktaDirectAuthPluginApi.getCredential", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      getCredentialChannel.setMessageHandler { _, reply in
+        api.getCredential() { result in
+          switch result {
+            case .success(let res):
+              reply(wrapResult(res))
+            case .failure(let error):
+              reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      getCredentialChannel.setMessageHandler(nil)
     }
   }
 }

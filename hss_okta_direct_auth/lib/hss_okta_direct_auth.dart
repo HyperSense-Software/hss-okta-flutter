@@ -22,4 +22,10 @@ class HssOktaDirectAuth {
 
     return result;
   }
+
+  Future<HssOktaDirectAuthResult> getCredential() async {
+    var result = await HssOktaDirectAuthPlatform.instance.getCredential();
+
+    return result;
+  }
 }

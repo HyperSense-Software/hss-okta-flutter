@@ -25,12 +25,16 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+    init();
   }
 
-  Future<HssOktaDirectAuthResult> initSigninToOktaTest() async {
-    var result = await _hssOktaDirectAuthPlugin.signIn();
+  Future<void> init() async {
+    await _hssOktaDirectAuthPlugin.signIn();
+  }
 
-    return result;
+  Future<HssOktaDirectAuthResult> getCredential() async {
+    var res = await _hssOktaDirectAuthPlugin.getCredential();
+    return res;
   }
 
   @override
@@ -41,27 +45,33 @@ class _MyAppState extends State<MyApp> {
           title: const Text('Plugin example app'),
         ),
         body: FutureBuilder<HssOktaDirectAuthResult?>(
-            future: initSigninToOktaTest(),
+            future: getCredential(),
             initialData: null,
             builder: (context, snapshot) {
               if (snapshot.data != null) {
-                return Padding(
-                  padding: const EdgeInsets.all(14.0),
-                  child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                            'Authentication is successful : ${snapshot.data?.success}'),
-                        Text('id : ${snapshot.data?.id}'),
-                        Text(
-                            'Issued At : ${DateTime.fromMillisecondsSinceEpoch(snapshot.data?.issuedAt ?? 0)}'),
-                        Text('refresh token : ${snapshot.data?.refreshToken}'),
-                        Text('Scope : ${snapshot.data?.scope}'),
-                        Text('Token Type: ${snapshot.data?.tokenType}'),
-                        Text(
-                            'JWT Token: ${JwtDecoder.decode(snapshot.data?.token ?? '')}'),
-                      ]),
+                return RefreshIndicator(
+                  onRefresh: () async {
+                    await _hssOktaDirectAuthPlugin.refreshDefaultToken();
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(14.0),
+                    child: ListView(
+                        // mainAxisAlignment: MainAxisAlignment.center,
+                        // crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                              'Authentication is successful : ${snapshot.data?.success}'),
+                          Text('id : ${snapshot.data?.id}'),
+                          Text(
+                              'Issued At : ${DateTime.fromMillisecondsSinceEpoch(snapshot.data?.issuedAt ?? 0)}'),
+                          Text(
+                              'refresh token : ${snapshot.data?.refreshToken}'),
+                          Text('Scope : ${snapshot.data?.scope}'),
+                          Text('Token Type: ${snapshot.data?.tokenType}'),
+                          Text(
+                              'JWT Token: ${JwtDecoder.decode(snapshot.data?.token ?? '')}'),
+                        ]),
+                  ),
                 );
               }
 

@@ -53,6 +53,9 @@ abstract class HssOktaDirectAuthPluginApi {
   @async
   bool? revokeDefaultToken();
 
+  @async
+  HssOktaDirectAuthResult? getCredential();
+
   //TODO:
   // find token by id
   // logout

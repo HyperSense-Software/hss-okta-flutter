@@ -26,4 +26,11 @@ class HssOktaDirectAuthChannel extends HssOktaDirectAuthPlatform {
     if (res == null) throw Exception("Null result from refreshDefaultToken");
     return res;
   }
+
+  @override
+  Future<HssOktaDirectAuthResult> getCredential() async {
+    var res = await _api.getCredential();
+    if (res == null) throw Exception("Null result from getCredential");
+    return res;
+  }
 }
