@@ -5,6 +5,7 @@ import 'package:hss_okta_direct_auth/generated/hss_okta_direct_auth.g.dart';
 import 'dart:async';
 
 import 'package:hss_okta_direct_auth/hss_okta_direct_auth.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
 
 void main() {
   runApp(const MyApp());
@@ -58,7 +59,8 @@ class _MyAppState extends State<MyApp> {
                         Text('refresh token : ${snapshot.data?.refreshToken}'),
                         Text('Scope : ${snapshot.data?.scope}'),
                         Text('Token Type: ${snapshot.data?.tokenType}'),
-                        Text('JWT Token: ${snapshot.data?.token}'),
+                        Text(
+                            'JWT Token: ${JwtDecoder.decode(snapshot.data?.token ?? '')}'),
                       ]),
                 );
               }
