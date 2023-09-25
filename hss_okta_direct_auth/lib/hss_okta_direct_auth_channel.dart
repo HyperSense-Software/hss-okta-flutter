@@ -9,6 +9,7 @@ class HssOktaDirectAuthChannel extends HssOktaDirectAuthPlatform {
   Future<HssOktaDirectAuthResult> signInWithCredentials(
       HssOktaDirectAuthRequest request) async {
     var res = await _api.signInWithCredentials(request);
-    return HssOktaDirectAuthResult(result: res.result);
+    if (res == null) throw Exception("Null result from signInWithCredentials");
+    return res;
   }
 }

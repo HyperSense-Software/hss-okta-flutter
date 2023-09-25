@@ -36,21 +36,56 @@ class HssOktaDirectAuthRequest {
 
 class HssOktaDirectAuthResult {
   HssOktaDirectAuthResult({
-    required this.result,
+    required this.success,
+    this.error,
+    required this.id,
+    required this.issuedAt,
+    required this.tokenType,
+    required this.accessToken,
+    required this.scope,
+    required this.refreshToken,
   });
 
-  String result;
+  bool success;
+
+  String? error;
+
+  String id;
+
+  int issuedAt;
+
+  String tokenType;
+
+  String accessToken;
+
+  String scope;
+
+  String refreshToken;
 
   Object encode() {
     return <Object?>[
-      result,
+      success,
+      error,
+      id,
+      issuedAt,
+      tokenType,
+      accessToken,
+      scope,
+      refreshToken,
     ];
   }
 
   static HssOktaDirectAuthResult decode(Object result) {
     result as List<Object?>;
     return HssOktaDirectAuthResult(
-      result: result[0]! as String,
+      success: result[0]! as bool,
+      error: result[1] as String?,
+      id: result[2]! as String,
+      issuedAt: result[3]! as int,
+      tokenType: result[4]! as String,
+      accessToken: result[5]! as String,
+      scope: result[6]! as String,
+      refreshToken: result[7]! as String,
     );
   }
 }
@@ -93,7 +128,7 @@ class HssOktaDirectAuthPluginApi {
 
   static const MessageCodec<Object?> codec = _HssOktaDirectAuthPluginApiCodec();
 
-  Future<HssOktaDirectAuthResult> signInWithCredentials(HssOktaDirectAuthRequest arg_request) async {
+  Future<HssOktaDirectAuthResult?> signInWithCredentials(HssOktaDirectAuthRequest arg_request) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
         'dev.flutter.pigeon.hss_okta_direct_auth.HssOktaDirectAuthPluginApi.signInWithCredentials', codec,
         binaryMessenger: _binaryMessenger);
@@ -110,13 +145,8 @@ class HssOktaDirectAuthPluginApi {
         message: replyList[1] as String?,
         details: replyList[2],
       );
-    } else if (replyList[0] == null) {
-      throw PlatformException(
-        code: 'null-error',
-        message: 'Host platform returned null value for non-null return value.',
-      );
     } else {
-      return (replyList[0] as HssOktaDirectAuthResult?)!;
+      return (replyList[0] as HssOktaDirectAuthResult?);
     }
   }
 }

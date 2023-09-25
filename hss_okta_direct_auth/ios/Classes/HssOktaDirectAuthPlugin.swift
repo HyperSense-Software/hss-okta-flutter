@@ -6,6 +6,7 @@ import OktaDirectAuth
 
 enum HssOktaError: Error {
 case configError(String)
+case credentialError(String)
 }
 
 
@@ -20,7 +21,7 @@ open class HssOktaDirectAuthPlugin :NSObject, FlutterPlugin,HssOktaDirectAuthPlu
     }
     
     
-    func signInWithCredentials(request: HssOktaDirectAuthRequest, completion: @escaping (Result<HssOktaDirectAuthResult, Error>) -> Void) {
+    func signInWithCredentials(request: HssOktaDirectAuthRequest, completion: @escaping (Result<HssOktaDirectAuthResult?, Error>) -> Void)  {
         let config = try? OAuth2Client.PropertyListConfiguration()
         let flow = DirectAuthenticationFlow(issuer: config!.issuer, clientId: config!.clientId, scopes: config!.scopes)
         
@@ -36,9 +37,11 @@ open class HssOktaDirectAuthPlugin :NSObject, FlutterPlugin,HssOktaDirectAuthPlu
        
         if let result : Credential = Credential.default {
 
-            completion(.success(HssOktaDirectAuthResult(result: "Success! Here is your token \(result.token.accessToken)")))
-        }else{
-            completion(.success(HssOktaDirectAuthResult(result: "Failed to login")))
+            completion(.success(HssOktaDirectAuthResult(
+                success: true, id: result.token.id, issuedAt: Int64(((result.token.issuedAt?.timeIntervalSince1970 ?? 0) * 1000.0).rounded()), tokenType: result.token.tokenType, accessToken: result.token.accessToken, scope: result.token.scope ?? "", refreshToken: result.token.refreshToken ?? ""))) }else{
+            completion(.success(HssOktaDirectAuthResult(
+                success: false, id: "", issuedAt: 0, tokenType: "", accessToken: "", scope: "", refreshToken: ""
+            )))
         }
        
     }

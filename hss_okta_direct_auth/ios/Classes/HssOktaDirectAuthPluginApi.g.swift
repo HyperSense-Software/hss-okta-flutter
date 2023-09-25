@@ -62,18 +62,46 @@ struct HssOktaDirectAuthRequest {
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct HssOktaDirectAuthResult {
-  var result: String
+  var success: Bool
+  var error: String? = nil
+  var id: String
+  var issuedAt: Int64
+  var tokenType: String
+  var accessToken: String
+  var scope: String
+  var refreshToken: String
 
   static func fromList(_ list: [Any?]) -> HssOktaDirectAuthResult? {
-    let result = list[0] as! String
+    let success = list[0] as! Bool
+    let error: String? = nilOrValue(list[1])
+    let id = list[2] as! String
+    let issuedAt = list[3] is Int64 ? list[3] as! Int64 : Int64(list[3] as! Int32)
+    let tokenType = list[4] as! String
+    let accessToken = list[5] as! String
+    let scope = list[6] as! String
+    let refreshToken = list[7] as! String
 
     return HssOktaDirectAuthResult(
-      result: result
+      success: success,
+      error: error,
+      id: id,
+      issuedAt: issuedAt,
+      tokenType: tokenType,
+      accessToken: accessToken,
+      scope: scope,
+      refreshToken: refreshToken
     )
   }
   func toList() -> [Any?] {
     return [
-      result,
+      success,
+      error,
+      id,
+      issuedAt,
+      tokenType,
+      accessToken,
+      scope,
+      refreshToken,
     ]
   }
 }
@@ -109,7 +137,7 @@ private class HssOktaDirectAuthPluginApiCodecReaderWriter: FlutterStandardReader
   override func reader(with data: Data) -> FlutterStandardReader {
     return HssOktaDirectAuthPluginApiCodecReader(data: data)
   }
-
+  
   override func writer(with data: NSMutableData) -> FlutterStandardWriter {
     return HssOktaDirectAuthPluginApiCodecWriter(data: data)
   }
@@ -121,7 +149,7 @@ class HssOktaDirectAuthPluginApiCodec: FlutterStandardMessageCodec {
 
 /// Generated protocol from Pigeon that represents a handler of messages from Flutter.
 protocol HssOktaDirectAuthPluginApi {
-  func signInWithCredentials(request: HssOktaDirectAuthRequest, completion: @escaping (Result<HssOktaDirectAuthResult, Error>) -> Void)
+  func signInWithCredentials(request: HssOktaDirectAuthRequest, completion: @escaping (Result<HssOktaDirectAuthResult?, Error>) -> Void)
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.

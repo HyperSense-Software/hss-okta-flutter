@@ -15,14 +15,43 @@ class HssOktaDirectAuthRequest {
 }
 
 class HssOktaDirectAuthResult {
-  final String result;
+  final bool success;
+  final String? error;
 
-  HssOktaDirectAuthResult({required this.result});
+  final String id;
+  final int issuedAt;
+  final String tokenType;
+  final String accessToken;
+  final String scope;
+  final String refreshToken;
+  // final String idToken;
+  // final String context;
+
+  HssOktaDirectAuthResult({
+    required this.success,
+    this.error,
+    required this.id,
+    required this.issuedAt,
+    required this.tokenType,
+    required this.accessToken,
+    required this.scope,
+    required this.refreshToken,
+    // required this.idToken,
+    // required this.context
+  });
+
+  // DateTime get issueDate =>
+  //     DateTime.fromMillisecondsSinceEpoch(issuedAt * 1000);
 }
+
+// extension HssDirectAuthExtension on HssOktaDirectAuthResult {
+//   DateTime get issueDate =>
+//       DateTime.fromMillisecondsSinceEpoch(issuedAt * 1000);
+// }
 
 @HostApi()
 abstract class HssOktaDirectAuthPluginApi {
   @async
-  HssOktaDirectAuthResult signInWithCredentials(
+  HssOktaDirectAuthResult? signInWithCredentials(
       HssOktaDirectAuthRequest request);
 }
