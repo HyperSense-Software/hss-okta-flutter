@@ -39,6 +39,7 @@ class HssOktaDirectAuthResult {
     required this.success,
     this.error,
     required this.id,
+    required this.token,
     required this.issuedAt,
     required this.tokenType,
     required this.accessToken,
@@ -51,6 +52,8 @@ class HssOktaDirectAuthResult {
   String? error;
 
   String id;
+
+  String token;
 
   int issuedAt;
 
@@ -67,6 +70,7 @@ class HssOktaDirectAuthResult {
       success,
       error,
       id,
+      token,
       issuedAt,
       tokenType,
       accessToken,
@@ -81,11 +85,12 @@ class HssOktaDirectAuthResult {
       success: result[0]! as bool,
       error: result[1] as String?,
       id: result[2]! as String,
-      issuedAt: result[3]! as int,
-      tokenType: result[4]! as String,
-      accessToken: result[5]! as String,
-      scope: result[6]! as String,
-      refreshToken: result[7]! as String,
+      token: result[3]! as String,
+      issuedAt: result[4]! as int,
+      tokenType: result[5]! as String,
+      accessToken: result[6]! as String,
+      scope: result[7]! as String,
+      refreshToken: result[8]! as String,
     );
   }
 }

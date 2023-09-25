@@ -19,6 +19,7 @@ class HssOktaDirectAuthResult {
   final String? error;
 
   final String id;
+  final String token;
   final int issuedAt;
   final String tokenType;
   final String accessToken;
@@ -31,6 +32,7 @@ class HssOktaDirectAuthResult {
     required this.success,
     this.error,
     required this.id,
+    required this.token,
     required this.issuedAt,
     required this.tokenType,
     required this.accessToken,

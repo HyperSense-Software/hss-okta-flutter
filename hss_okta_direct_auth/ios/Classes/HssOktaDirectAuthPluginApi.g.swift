@@ -65,6 +65,7 @@ struct HssOktaDirectAuthResult {
   var success: Bool
   var error: String? = nil
   var id: String
+  var token: String
   var issuedAt: Int64
   var tokenType: String
   var accessToken: String
@@ -75,16 +76,18 @@ struct HssOktaDirectAuthResult {
     let success = list[0] as! Bool
     let error: String? = nilOrValue(list[1])
     let id = list[2] as! String
-    let issuedAt = list[3] is Int64 ? list[3] as! Int64 : Int64(list[3] as! Int32)
-    let tokenType = list[4] as! String
-    let accessToken = list[5] as! String
-    let scope = list[6] as! String
-    let refreshToken = list[7] as! String
+    let token = list[3] as! String
+    let issuedAt = list[4] is Int64 ? list[4] as! Int64 : Int64(list[4] as! Int32)
+    let tokenType = list[5] as! String
+    let accessToken = list[6] as! String
+    let scope = list[7] as! String
+    let refreshToken = list[8] as! String
 
     return HssOktaDirectAuthResult(
       success: success,
       error: error,
       id: id,
+      token: token,
       issuedAt: issuedAt,
       tokenType: tokenType,
       accessToken: accessToken,
@@ -97,6 +100,7 @@ struct HssOktaDirectAuthResult {
       success,
       error,
       id,
+      token,
       issuedAt,
       tokenType,
       accessToken,
@@ -137,7 +141,7 @@ private class HssOktaDirectAuthPluginApiCodecReaderWriter: FlutterStandardReader
   override func reader(with data: Data) -> FlutterStandardReader {
     return HssOktaDirectAuthPluginApiCodecReader(data: data)
   }
-  
+
   override func writer(with data: NSMutableData) -> FlutterStandardWriter {
     return HssOktaDirectAuthPluginApiCodecWriter(data: data)
   }

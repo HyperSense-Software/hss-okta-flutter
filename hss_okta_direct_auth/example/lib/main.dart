@@ -58,6 +58,7 @@ class _MyAppState extends State<MyApp> {
                         Text('refresh token : ${snapshot.data?.refreshToken}'),
                         Text('Scope : ${snapshot.data?.scope}'),
                         Text('Token Type: ${snapshot.data?.tokenType}'),
+                        Text('JWT Token: ${snapshot.data?.token}'),
                       ]),
                 );
               }
