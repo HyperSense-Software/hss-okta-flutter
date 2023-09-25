@@ -40,7 +40,7 @@ open class HssOktaDirectAuthPlugin :NSObject, FlutterPlugin,HssOktaDirectAuthPlu
             completion(.success(HssOktaDirectAuthResult(
                 success: true, id: result.token.id, token: result.token.idToken?.rawValue ?? "", issuedAt: Int64(((result.token.issuedAt?.timeIntervalSince1970 ?? 0) * 1000.0).rounded()), tokenType: result.token.tokenType, accessToken: result.token.accessToken, scope: result.token.scope ?? "", refreshToken: result.token.refreshToken ?? ""))) }else{
             completion(.success(HssOktaDirectAuthResult(
-                success: false, id: "", token: "", issuedAt: 0,
+                success: false,error: "Failed to Login : Server did not provide result", id: "", token: "", issuedAt: 0,
                 tokenType: "", accessToken: "", scope: "", refreshToken: ""
             )))
         }
