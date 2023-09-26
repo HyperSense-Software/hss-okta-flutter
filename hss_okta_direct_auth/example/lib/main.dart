@@ -21,22 +21,20 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   final _hssOktaDirectAuthPlugin = HssOktaDirectAuth();
   String res = 'None';
+  String username = "";
+  String password = "";
   final TextEditingController _controller = TextEditingController();
+  final TextEditingController _usernamecontroller =
+      TextEditingController(text: "AldrinFrancisco@ntsafety.com");
+  final TextEditingController _passwordcontroller =
+      TextEditingController(text: "S@asAppD3v!");
+  final PageController _pageController = PageController(initialPage: 0);
+
+  HssOktaDirectAuthResult? result;
 
   @override
   void initState() {
     super.initState();
-  }
-
-  Future<void> init() async {
-    await _hssOktaDirectAuthPlugin.signIn(
-        email: 'AldrinFrancisco@ntsafety.com', password: 'S@asAppD3v!');
-  }
-
-  Future<HssOktaDirectAuthResult> getCredential() async {
-    await init();
-    var res = await _hssOktaDirectAuthPlugin.getCredential();
-    return res;
   }
 
   Widget _mfa() {
@@ -56,6 +54,75 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
+  Widget _form(BuildContext formContext) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        children: [
+          const Text('Username'),
+          TextField(
+            controller: _usernamecontroller,
+          ),
+          const Text('Password'),
+          TextField(
+            controller: _passwordcontroller,
+          ),
+          OutlinedButton(
+              onPressed: () async {
+                try {
+                  await _hssOktaDirectAuthPlugin
+                      .signIn(
+                          email: _usernamecontroller.text,
+                          password: _passwordcontroller.text)
+                      .then((res) {
+                    if (res.result == DirectAuthResult.success) {
+                      result = res;
+                      _pageController.animateToPage(2,
+                          duration: const Duration(milliseconds: 500),
+                          curve: Curves.ease);
+                    }
+
+                    if (res.result == DirectAuthResult.error) {
+                      ScaffoldMessenger.of(formContext).showSnackBar(
+                          SnackBar(content: Text('Error: ${res.error}')));
+                    }
+
+                    setState(() {});
+                  });
+                } catch (e) {
+                  ScaffoldMessenger.of(formContext).showSnackBar(
+                      SnackBar(content: Text('Error: ${e.toString()}')));
+                }
+              },
+              child: const Text('Submit'))
+        ],
+      ),
+    );
+  }
+
+  Widget _profile() {
+    if (result == null) return const CircularProgressIndicator.adaptive();
+
+    return Padding(
+      padding: const EdgeInsets.all(14.0),
+      child: ListView(children: [
+        Text('Authentication Result : ${result?.result}'),
+        if (result!.result != DirectAuthResult.success)
+          Text('error : ${result?.error}')
+        else ...[
+          Text('id : ${result?.id}'),
+          Text(
+              'Issued At : ${DateTime.fromMillisecondsSinceEpoch(result?.issuedAt ?? 0)}'),
+          Text('refresh token : ${result?.refreshToken}'),
+          Text('Scope : ${result?.scope}'),
+          Text('Token Type: ${result?.tokenType}'),
+          if (result?.token != null)
+            Text('JWT Token: ${JwtDecoder.decode(result?.token ?? '')}'),
+        ]
+      ]),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -63,44 +130,17 @@ class _MyAppState extends State<MyApp> {
         appBar: AppBar(
           title: const Text('Plugin example app'),
         ),
-        body: FutureBuilder<HssOktaDirectAuthResult?>(
-            future: getCredential(),
-            initialData: null,
-            builder: (context, snapshot) {
-              if (snapshot.data != null) {
-                if (snapshot.data!.result == DirectAuthResult.mfaRequired) {
-                  return _mfa();
-                }
-
-                return RefreshIndicator(
-                  onRefresh: () async {
-                    await _hssOktaDirectAuthPlugin.refreshDefaultToken();
-                    await getCredential();
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.all(14.0),
-                    child: ListView(children: [
-                      Text('Authentication Result : ${snapshot.data?.result}'),
-                      if (snapshot.data!.result != DirectAuthResult.success)
-                        Text('error : ${snapshot.data?.error}')
-                      else ...[
-                        Text('id : ${snapshot.data?.id}'),
-                        Text(
-                            'Issued At : ${DateTime.fromMillisecondsSinceEpoch(snapshot.data?.issuedAt ?? 0)}'),
-                        Text('refresh token : ${snapshot.data?.refreshToken}'),
-                        Text('Scope : ${snapshot.data?.scope}'),
-                        Text('Token Type: ${snapshot.data?.tokenType}'),
-                        if (snapshot.data?.token != null)
-                          Text(
-                              'JWT Token: ${JwtDecoder.decode(snapshot.data?.token ?? '')}'),
-                      ]
-                    ]),
-                  ),
-                );
-              }
-
-              return const Center(child: CircularProgressIndicator());
-            }),
+        body: Builder(builder: (_builderContext) {
+          return PageView(
+            controller: _pageController,
+            physics: const NeverScrollableScrollPhysics(),
+            children: [
+              _form(_builderContext),
+              _mfa(),
+              _profile(),
+            ],
+          );
+        }),
       ),
     );
   }
