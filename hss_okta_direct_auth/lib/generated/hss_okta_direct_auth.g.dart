@@ -8,6 +8,12 @@ import 'dart:typed_data' show Float64List, Int32List, Int64List, Uint8List;
 import 'package:flutter/foundation.dart' show ReadBuffer, WriteBuffer;
 import 'package:flutter/services.dart';
 
+enum DirectAuthResult {
+  success,
+  mfaRequired,
+  error,
+}
+
 class HssOktaDirectAuthRequest {
   HssOktaDirectAuthRequest({
     required this.username,
@@ -36,7 +42,7 @@ class HssOktaDirectAuthRequest {
 
 class HssOktaDirectAuthResult {
   HssOktaDirectAuthResult({
-    required this.success,
+    this.result,
     this.error,
     this.id,
     this.token,
@@ -47,7 +53,7 @@ class HssOktaDirectAuthResult {
     this.refreshToken,
   });
 
-  bool success;
+  DirectAuthResult? result;
 
   String? error;
 
@@ -67,7 +73,7 @@ class HssOktaDirectAuthResult {
 
   Object encode() {
     return <Object?>[
-      success,
+      result?.index,
       error,
       id,
       token,
@@ -82,7 +88,9 @@ class HssOktaDirectAuthResult {
   static HssOktaDirectAuthResult decode(Object result) {
     result as List<Object?>;
     return HssOktaDirectAuthResult(
-      success: result[0]! as bool,
+      result: result[0] != null
+          ? DirectAuthResult.values[result[0]! as int]
+          : null,
       error: result[1] as String?,
       id: result[2] as String?,
       token: result[3] as String?,
@@ -139,6 +147,28 @@ class HssOktaDirectAuthPluginApi {
         binaryMessenger: _binaryMessenger);
     final List<Object?>? replyList =
         await channel.send(<Object?>[arg_request]) as List<Object?>?;
+    if (replyList == null) {
+      throw PlatformException(
+        code: 'channel-error',
+        message: 'Unable to establish connection on channel.',
+      );
+    } else if (replyList.length > 1) {
+      throw PlatformException(
+        code: replyList[0]! as String,
+        message: replyList[1] as String?,
+        details: replyList[2],
+      );
+    } else {
+      return (replyList[0] as HssOktaDirectAuthResult?);
+    }
+  }
+
+  Future<HssOktaDirectAuthResult?> mfaOtpSignInWithCredentials(String arg_otp) async {
+    final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
+        'dev.flutter.pigeon.hss_okta_direct_auth.HssOktaDirectAuthPluginApi.mfaOtpSignInWithCredentials', codec,
+        binaryMessenger: _binaryMessenger);
+    final List<Object?>? replyList =
+        await channel.send(<Object?>[arg_otp]) as List<Object?>?;
     if (replyList == null) {
       throw PlatformException(
         code: 'channel-error',

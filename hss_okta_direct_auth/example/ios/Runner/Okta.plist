@@ -10,13 +10,13 @@
 <plist version="1.0">
    <dict>
       <key>issuer</key>
-      <string>https://dev-88611703.okta.com/oauth2/default</string>
+      <string>https://ntsafety.okta.com</string>
       <key>clientId</key>
-      <string>0oa6o42r20pZcgHUX5d7</string>
+      <string>0oa7vbqbudjoR9zMX697</string>
       <key>redirectUri</key>
-      <string>com.okta.dev-88611703:/callback</string>
+      <string>com.okta.ntsafety:/callback</string>
       <key>logoutRedirectUri</key>
-      <string>com.okta.dev-88611703:/logout</string>
+      <string>com.okta.ntsafety:/</string>
       <key>scopes</key>
       <string>openid profile</string>
     </dict>

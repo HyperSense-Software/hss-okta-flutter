@@ -30,4 +30,8 @@ abstract class HssOktaDirectAuthPlatform extends PlatformInterface {
   Future<HssOktaDirectAuthResult> getCredential() {
     throw UnimplementedError('platformVersion() has not been implemented.');
   }
+
+  Future<HssOktaDirectAuthResult> mfaOtpSignInWithCredentials(String otp) {
+    throw UnimplementedError('platformVersion() has not been implemented.');
+  }
 }

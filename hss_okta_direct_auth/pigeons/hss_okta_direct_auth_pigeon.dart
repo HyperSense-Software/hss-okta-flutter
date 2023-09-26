@@ -7,6 +7,8 @@ import 'package:pigeon/pigeon.dart';
   // cppHeaderOut: 'ios/Classes/HssOktaDirectAuthPlugin.h',
   // cppSourceOut: 'ios/Classes/HssOktaDirectAuthPlugin.m',
 ))
+enum DirectAuthResult { success, mfaRequired, error }
+
 class HssOktaDirectAuthRequest {
   final String username;
   final String password;
@@ -15,7 +17,7 @@ class HssOktaDirectAuthRequest {
 }
 
 class HssOktaDirectAuthResult {
-  final bool success;
+  final DirectAuthResult? result;
   final String? error;
 
   final String? id;
@@ -27,7 +29,7 @@ class HssOktaDirectAuthResult {
   final String? refreshToken;
 
   HssOktaDirectAuthResult({
-    required this.success,
+    required this.result,
     this.error,
     required this.id,
     required this.token,
@@ -48,6 +50,9 @@ abstract class HssOktaDirectAuthPluginApi {
       HssOktaDirectAuthRequest request);
 
   @async
+  HssOktaDirectAuthResult? mfaOtpSignInWithCredentials(String otp);
+
+  @async
   bool? refreshDefaultToken();
 
   @async
@@ -55,8 +60,4 @@ abstract class HssOktaDirectAuthPluginApi {
 
   @async
   HssOktaDirectAuthResult? getCredential();
-
-  //TODO:
-  // find token by id
-  // logout
 }

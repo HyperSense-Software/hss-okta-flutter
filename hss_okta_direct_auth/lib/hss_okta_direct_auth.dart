@@ -3,10 +3,10 @@ import 'package:hss_okta_direct_auth/generated/hss_okta_direct_auth.g.dart';
 import 'hss_okta_direct_auth_platform_interface.dart';
 
 class HssOktaDirectAuth {
-  Future<HssOktaDirectAuthResult> signIn() async {
+  Future<HssOktaDirectAuthResult> signIn(
+      {required String email, required String password}) async {
     var result = await HssOktaDirectAuthPlatform.instance.signInWithCredentials(
-        HssOktaDirectAuthRequest(
-            username: 'AldrinFrancisco@ntsafety.com', password: 'S@asAppD3!'));
+        HssOktaDirectAuthRequest(username: email, password: password));
 
     return result;
   }
@@ -25,6 +25,14 @@ class HssOktaDirectAuth {
 
   Future<HssOktaDirectAuthResult> getCredential() async {
     var result = await HssOktaDirectAuthPlatform.instance.getCredential();
+
+    return result;
+  }
+
+  Future<HssOktaDirectAuthResult> mfaOtpSignInWithCredentials(
+      String otp) async {
+    var result = await HssOktaDirectAuthPlatform.instance
+        .mfaOtpSignInWithCredentials(otp);
 
     return result;
   }

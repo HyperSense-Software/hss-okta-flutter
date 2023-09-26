@@ -33,4 +33,15 @@ class HssOktaDirectAuthChannel extends HssOktaDirectAuthPlatform {
     if (res == null) throw Exception("Null result from getCredential");
     return res;
   }
+
+  @override
+  Future<HssOktaDirectAuthResult> mfaOtpSignInWithCredentials(
+      String otp) async {
+    var res = await _api.mfaOtpSignInWithCredentials(otp);
+    if (res == null) {
+      throw Exception("Null result from mfaOtpSignInWithCredentials");
+    }
+
+    return res;
+  }
 }

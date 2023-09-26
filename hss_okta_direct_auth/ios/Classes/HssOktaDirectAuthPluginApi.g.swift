@@ -38,6 +38,12 @@ private func nilOrValue<T>(_ value: Any?) -> T? {
   return value as! T?
 }
 
+enum DirectAuthResult: Int {
+  case success = 0
+  case mfaRequired = 1
+  case error = 2
+}
+
 /// Generated class from Pigeon that represents data sent in messages.
 struct HssOktaDirectAuthRequest {
   var username: String
@@ -62,7 +68,7 @@ struct HssOktaDirectAuthRequest {
 
 /// Generated class from Pigeon that represents data sent in messages.
 struct HssOktaDirectAuthResult {
-  var success: Bool
+  var result: DirectAuthResult? = nil
   var error: String? = nil
   var id: String? = nil
   var token: String? = nil
@@ -73,7 +79,11 @@ struct HssOktaDirectAuthResult {
   var refreshToken: String? = nil
 
   static func fromList(_ list: [Any?]) -> HssOktaDirectAuthResult? {
-    let success = list[0] as! Bool
+    var result: DirectAuthResult? = nil
+    let resultEnumVal: Int? = nilOrValue(list[0])
+    if let resultRawValue = resultEnumVal {
+      result = DirectAuthResult(rawValue: resultRawValue)!
+    }
     let error: String? = nilOrValue(list[1])
     let id: String? = nilOrValue(list[2])
     let token: String? = nilOrValue(list[3])
@@ -84,7 +94,7 @@ struct HssOktaDirectAuthResult {
     let refreshToken: String? = nilOrValue(list[8])
 
     return HssOktaDirectAuthResult(
-      success: success,
+      result: result,
       error: error,
       id: id,
       token: token,
@@ -97,7 +107,7 @@ struct HssOktaDirectAuthResult {
   }
   func toList() -> [Any?] {
     return [
-      success,
+      result?.rawValue,
       error,
       id,
       token,
@@ -154,6 +164,7 @@ class HssOktaDirectAuthPluginApiCodec: FlutterStandardMessageCodec {
 /// Generated protocol from Pigeon that represents a handler of messages from Flutter.
 protocol HssOktaDirectAuthPluginApi {
   func signInWithCredentials(request: HssOktaDirectAuthRequest, completion: @escaping (Result<HssOktaDirectAuthResult?, Error>) -> Void)
+  func mfaOtpSignInWithCredentials(otp: String, completion: @escaping (Result<HssOktaDirectAuthResult?, Error>) -> Void)
   func refreshDefaultToken(completion: @escaping (Result<Bool?, Error>) -> Void)
   func revokeDefaultToken(completion: @escaping (Result<Bool?, Error>) -> Void)
   func getCredential(completion: @escaping (Result<HssOktaDirectAuthResult?, Error>) -> Void)
@@ -181,6 +192,23 @@ class HssOktaDirectAuthPluginApiSetup {
       }
     } else {
       signInWithCredentialsChannel.setMessageHandler(nil)
+    }
+    let mfaOtpSignInWithCredentialsChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_direct_auth.HssOktaDirectAuthPluginApi.mfaOtpSignInWithCredentials", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      mfaOtpSignInWithCredentialsChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let otpArg = args[0] as! String
+        api.mfaOtpSignInWithCredentials(otp: otpArg) { result in
+          switch result {
+            case .success(let res):
+              reply(wrapResult(res))
+            case .failure(let error):
+              reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      mfaOtpSignInWithCredentialsChannel.setMessageHandler(nil)
     }
     let refreshDefaultTokenChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_direct_auth.HssOktaDirectAuthPluginApi.refreshDefaultToken", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
