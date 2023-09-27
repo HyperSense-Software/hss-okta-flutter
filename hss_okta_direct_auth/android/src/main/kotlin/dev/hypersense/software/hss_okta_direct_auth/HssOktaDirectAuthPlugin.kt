@@ -1,6 +1,9 @@
 package dev.hypersense.software.hss_okta_direct_auth
 
 
+import HssOktaDirectAuthPluginApi
+import HssOktaDirectAuthRequest
+import HssOktaDirectAuthResult
 import android.content.Context
 import com.okta.authfoundation.client.OidcClient
 import com.okta.authfoundation.client.OidcClientResult
@@ -10,10 +13,6 @@ import com.okta.authfoundationbootstrap.CredentialBootstrap
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 //import com.okta.idx.kotlin.*
 import com.okta.oauth2.ResourceOwnerFlow.Companion.createResourceOwnerFlow
-import dev.hypersense.software.hss_okta_direct_auth_plugin_api.DirectAuthResult
-import dev.hypersense.software.hss_okta_direct_auth_plugin_api.HssOktaDirectAuthPluginApi
-import dev.hypersense.software.hss_okta_direct_auth_plugin_api.HssOktaDirectAuthRequest
-import dev.hypersense.software.hss_okta_direct_auth_plugin_api.HssOktaDirectAuthResult
 import kotlinx.coroutines.runBlocking
 import okhttp3.HttpUrl.Companion.toHttpUrl
 

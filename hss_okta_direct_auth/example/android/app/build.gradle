@@ -56,8 +56,8 @@ android {
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         
-        manifestPlaceholders += [
-      "webAuthenticationRedirectScheme": "com.okta.ntsafety:/callback"]
+    //     manifestPlaceholders += [
+    //   "webAuthenticationRedirectScheme": "com.okta.ntsafety:/callback"]
     }
 
     buildTypes {

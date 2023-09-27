@@ -5,10 +5,7 @@ import 'package:pigeon/pigeon.dart';
   dartOut: 'lib/generated/hss_okta_direct_auth.g.dart',
   swiftOut: 'ios/Classes/HssOktaDirectAuthPluginApi.g.swift',
   kotlinOut:
-      'android/src/main/kotlin/dev/hypersense/software/hss_okta_direct_auth_plugin_api/HssOktaDirectAuthPluginApi.g.kt',
-  kotlinOptions: KotlinOptions(
-    package: 'dev.hypersense.software.hss_okta_direct_auth_plugin_api',
-  ),
+      'android/src/main/kotlin/dev/hypersense/software/hss_okta_direct_auth/HssOktaDirectAuthPluginApi.g.kt',
 )
     // cppHeaderOut: 'ios/Classes/HssOktaDirectAuthPlugin.h',
     // cppSourceOut: 'ios/Classes/HssOktaDirectAuthPlugin.m',
