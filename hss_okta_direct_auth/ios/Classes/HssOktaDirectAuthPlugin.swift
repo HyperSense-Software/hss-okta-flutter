@@ -18,23 +18,7 @@ open class HssOktaDirectAuthPlugin :NSObject, FlutterPlugin,HssOktaDirectAuthPlu
     var status : DirectAuthenticationFlow.Status?
     
     
-    func mfaOtpSignInWithCredentials(otp: String, completion: @escaping (Result<HssOktaDirectAuthResult?, Error>) -> Void) {
-        Task{
-            do{
-             status = try await flow?.resume(self.status!, with: .otp(code: otp))
-                if case let .success(token) = status{
-                    Credential.default = try Credential.store(token)
-                    completion(.success(HssOktaDirectAuthResult(
-                        result: DirectAuthResult.success, id: token.id, token: token.idToken?.rawValue ?? "", issuedAt: Int64(((token.issuedAt?.timeIntervalSince1970 ?? 0) * 1000.0).rounded()), tokenType: token.tokenType, accessToken: token.accessToken, scope: token.scope ?? "", refreshToken: token.refreshToken ?? "")))
-                }else{
-                    completion(.success(HssOktaDirectAuthResult(result: DirectAuthResult.error,error: "MFA Failed")))
-                }
-            }catch let error{
-                completion(.success(HssOktaDirectAuthResult(result: DirectAuthResult.error,error: "\(error)")))
-            }
-        }
-    }
-    
+   
     public static func register(with registrar: FlutterPluginRegistrar) {
         let messenger : FlutterBinaryMessenger = registrar.messenger()
         let api : HssOktaDirectAuthPluginApi & NSObjectProtocol = HssOktaDirectAuthPlugin.init()
@@ -73,6 +57,24 @@ open class HssOktaDirectAuthPlugin :NSObject, FlutterPlugin,HssOktaDirectAuthPlu
             completion(.failure(HssOktaError.configError("Configuration Error, Check okta.plist")))
         }
     }
+
+     func mfaOtpSignInWithCredentials(otp: String, completion: @escaping (Result<HssOktaDirectAuthResult?, Error>) -> Void) {
+        Task{
+            do{
+             status = try await flow?.resume(self.status!, with: .otp(code: otp))
+                if case let .success(token) = status{
+                    Credential.default = try Credential.store(token)
+                    completion(.success(HssOktaDirectAuthResult(
+                        result: DirectAuthResult.success, id: token.id, token: token.idToken?.rawValue ?? "", issuedAt: Int64(((token.issuedAt?.timeIntervalSince1970 ?? 0) * 1000.0).rounded()), tokenType: token.tokenType, accessToken: token.accessToken, scope: token.scope ?? "", refreshToken: token.refreshToken ?? "")))
+                }else{
+                    completion(.success(HssOktaDirectAuthResult(result: DirectAuthResult.error,error: "MFA Failed")))
+                }
+            }catch let error{
+                completion(.success(HssOktaDirectAuthResult(result: DirectAuthResult.error,error: "\(error)")))
+            }
+        }
+    }
+    
     
     func refreshDefaultToken(completion: @escaping (Result<Bool?, Error>) -> Void){
         if let credential = Credential.default{
