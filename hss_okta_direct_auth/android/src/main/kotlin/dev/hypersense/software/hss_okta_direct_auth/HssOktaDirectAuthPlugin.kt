@@ -1,34 +1,70 @@
-import com.okta.authfoundation.client.OidcClientResult
-import com.okta.authfoundationbootstrap.CredentialBootstrap
-import com.okta.oauth2.ResourceOwnerFlow.Companion.createResourceOwnerFlow
-import io.flutter.embedding.engine.plugins.FlutterPlugin
-import kotlinx.coroutines.runBlocking
-import java.lang.Exception
-import kotlin.coroutines.*
+package dev.hypersense.software.hss_okta_direct_auth
 
+
+import android.content.Context
+import com.okta.authfoundation.client.OidcClient
+import com.okta.authfoundation.client.OidcClientResult
+import com.okta.authfoundation.client.OidcConfiguration
+import com.okta.authfoundation.credential.CredentialDataSource.Companion.createCredentialDataSource
+import com.okta.authfoundationbootstrap.CredentialBootstrap
+import io.flutter.embedding.engine.plugins.FlutterPlugin
+//import com.okta.idx.kotlin.*
+import com.okta.oauth2.ResourceOwnerFlow.Companion.createResourceOwnerFlow
+import dev.hypersense.software.hss_okta_direct_auth_plugin_api.DirectAuthResult
+import dev.hypersense.software.hss_okta_direct_auth_plugin_api.HssOktaDirectAuthPluginApi
+import dev.hypersense.software.hss_okta_direct_auth_plugin_api.HssOktaDirectAuthRequest
+import dev.hypersense.software.hss_okta_direct_auth_plugin_api.HssOktaDirectAuthResult
+import kotlinx.coroutines.runBlocking
+import okhttp3.HttpUrl.Companion.toHttpUrl
 
 class HssOktaDirectAuthPlugin : HssOktaDirectAuthPluginApi, FlutterPlugin {
-    
+    var oidcConfiguration : OidcConfiguration? = null
+    var oidcClient : OidcClient? = null
+    var context : Context? = null
+    override fun init(
+        clientid: String,
+        signInRedirectUrl: String,
+        signOutRedirectUrl: String,
+        issuer: String,
+        scopes: String
+    ) {
+        oidcConfiguration = OidcConfiguration(
+            clientId =  clientid,
+            defaultScope = scopes,
+        )
+
+        oidcClient = OidcClient.createFromDiscoveryUrl(
+            oidcConfiguration!!,
+            "${issuer}/.well-known/openid-configuration".toHttpUrl(),)
+        
+        if(context != null && oidcClient != null)
+        {
+            CredentialBootstrap.initialize(oidcClient!!.createCredentialDataSource(context!!))
+        }
+
+    }
+
     override fun onAttachedToEngine(binding: FlutterPlugin.FlutterPluginBinding) {
-        HssOktaDirectAuthPluginApi.Companion.setUp(binding.binaryMessenger,this)
+        HssOktaDirectAuthPluginApi.Companion.setUp(binding.binaryMessenger, this)
+        context = binding.applicationContext
     }
 
     override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
-        HssOktaDirectAuthPluginApi.Companion.setUp(binding.binaryMessenger,null)
-
-
+        // HssOktaDirectAuthPluginApi.setUp(binding.binaryMessenger, null)
     }
+
+
+
     override fun signInWithCredentials(
         request: HssOktaDirectAuthRequest,
         callback: (Result<HssOktaDirectAuthResult?>) -> Unit
     ) {
         runBlocking {
-            var flow = CredentialBootstrap.oidcClient.createResourceOwnerFlow()
+            val flow = CredentialBootstrap.oidcClient.createResourceOwnerFlow()
             when(val res = flow.start(request.username,request.password)){
                 is OidcClientResult.Error -> {
                     throw Exception(res.exception)
                 }
-
                 is OidcClientResult.Success -> {
                     CredentialBootstrap.defaultCredential().storeToken(token = res.result)
                     callback.invoke(Result.success(HssOktaDirectAuthResult(
@@ -45,7 +81,9 @@ class HssOktaDirectAuthPlugin : HssOktaDirectAuthPluginApi, FlutterPlugin {
                 }
             }
         }
-    }
+
+
+}
 
     override fun mfaOtpSignInWithCredentials(
         otp: String,

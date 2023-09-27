@@ -163,6 +163,7 @@ class HssOktaDirectAuthPluginApiCodec: FlutterStandardMessageCodec {
 
 /// Generated protocol from Pigeon that represents a handler of messages from Flutter.
 protocol HssOktaDirectAuthPluginApi {
+  func init(clientid: String, signInRedirectUrl: String, signOutRedirectUrl: String, issuer: String, scopes: String) throws
   func signInWithCredentials(request: HssOktaDirectAuthRequest, completion: @escaping (Result<HssOktaDirectAuthResult?, Error>) -> Void)
   func mfaOtpSignInWithCredentials(otp: String, completion: @escaping (Result<HssOktaDirectAuthResult?, Error>) -> Void)
   func refreshDefaultToken(completion: @escaping (Result<Bool?, Error>) -> Void)
@@ -176,6 +177,25 @@ class HssOktaDirectAuthPluginApiSetup {
   static var codec: FlutterStandardMessageCodec { HssOktaDirectAuthPluginApiCodec.shared }
   /// Sets up an instance of `HssOktaDirectAuthPluginApi` to handle messages through the `binaryMessenger`.
   static func setUp(binaryMessenger: FlutterBinaryMessenger, api: HssOktaDirectAuthPluginApi?) {
+    let initChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_direct_auth.HssOktaDirectAuthPluginApi.init", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      initChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let clientidArg = args[0] as! String
+        let signInRedirectUrlArg = args[1] as! String
+        let signOutRedirectUrlArg = args[2] as! String
+        let issuerArg = args[3] as! String
+        let scopesArg = args[4] as! String
+        do {
+          try api.init(clientid: clientidArg, signInRedirectUrl: signInRedirectUrlArg, signOutRedirectUrl: signOutRedirectUrlArg, issuer: issuerArg, scopes: scopesArg)
+          reply(wrapResult(nil))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      initChannel.setMessageHandler(nil)
+    }
     let signInWithCredentialsChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_direct_auth.HssOktaDirectAuthPluginApi.signInWithCredentials", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       signInWithCredentialsChannel.setMessageHandler { message, reply in

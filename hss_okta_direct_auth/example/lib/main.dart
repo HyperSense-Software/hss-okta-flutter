@@ -89,7 +89,8 @@ class _MyAppState extends State<MyApp> {
 
                     setState(() {});
                   });
-                } catch (e) {
+                } catch (e, s) {
+                  debugPrint(e.toString() + s.toString());
                   ScaffoldMessenger.of(formContext).showSnackBar(
                       SnackBar(content: Text('Error: ${e.toString()}')));
                 }

@@ -44,4 +44,21 @@ class HssOktaDirectAuthChannel extends HssOktaDirectAuthPlatform {
 
     return res;
   }
+
+  @override
+  void init(
+    String clientid,
+    String signInRedirectUrl,
+    String signOutRedirectUrl,
+    String issuer,
+    String scopes,
+  ) {
+    _api.init(
+      clientid,
+      signInRedirectUrl,
+      signOutRedirectUrl,
+      issuer,
+      scopes,
+    );
+  }
 }

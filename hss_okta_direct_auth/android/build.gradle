@@ -42,21 +42,23 @@ android {
     }
 
     defaultConfig {
-        minSdkVersion 16
+        minSdkVersion 21
     }
 
     dependencies {
         testImplementation 'org.jetbrains.kotlin:kotlin-test'
         testImplementation 'org.mockito:mockito-core:5.0.0'
+        
+        implementation 'com.okta.android:okta-idx-kotlin:2.4.0'
 
         // Ensure all dependencies are compatible using the Bill of Materials (BOM).
-        implementation(platform('com.okta.kotlin:bom:1.1.5'))
+implementation(platform('com.okta.kotlin:bom:1.1.5'))
 
-        // Add the dependencies to your project.
-        implementation('com.okta.kotlin:auth-foundation')
-        implementation('com.okta.kotlin:auth-foundation-bootstrap')
-        implementation('com.okta.kotlin:oauth2')
-        implementation('com.okta.kotlin:web-authentication-ui')
+// Add the dependencies to your project.
+implementation('com.okta.kotlin:auth-foundation')
+implementation('com.okta.kotlin:auth-foundation-bootstrap')
+implementation('com.okta.kotlin:oauth2')
+implementation('com.okta.kotlin:web-authentication-ui')
     }
 
     testOptions {
