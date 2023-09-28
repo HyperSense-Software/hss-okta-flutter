@@ -35,6 +35,12 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+    _hssOktaDirectAuthPlugin.init(
+        "0oa7vbqbudjoR9zMX697",
+        "com.okta.ntsafety:/callback",
+        "com.okta.ntsafety:/",
+        "https://ntsafety.okta.com",
+        "openid profile");
   }
 
   Widget _mfa() {

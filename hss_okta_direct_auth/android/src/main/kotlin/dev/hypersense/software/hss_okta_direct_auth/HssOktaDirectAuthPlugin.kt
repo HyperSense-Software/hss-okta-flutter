@@ -10,7 +10,10 @@ import com.okta.authfoundationbootstrap.*
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 //import com.okta.idx.kotlin.*
 import com.okta.oauth2.ResourceOwnerFlow.Companion.createResourceOwnerFlow
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import okhttp3.HttpUrl.Companion.toHttpUrl
 
@@ -54,43 +57,38 @@ class HssOktaDirectAuthPlugin : HssOktaDirectAuthPluginApi, FlutterPlugin{
     }
 
 
+    suspend fun signInWithCredentialsRoutine(request : HssOktaDirectAuthRequest): HssOktaDirectAuthResult {
+        val flow = CredentialBootstrap.oidcClient.createResourceOwnerFlow()
+        when(val res = flow.start(request.username,request.password)){
+            is OidcClientResult.Error -> {
+                throw Exception(res.exception)
+            }
+            is OidcClientResult.Success -> {
 
+                CredentialBootstrap.defaultCredential().storeToken(token = res.result)
+                return     HssOktaDirectAuthResult(
+                    result = DirectAuthResult.SUCCESS,
+                    error = null,
+                    id = "",
+                    token = res.result.accessToken,
+                    issuedAt = null,
+                    tokenType = res.result.tokenType,
+                    accessToken = res.result.accessToken,
+                    scope = res.result.scope,
+                    refreshToken = res.result.accessToken
+                )
+            }
+        }
+    }
 
     override fun signInWithCredentials(
         request: HssOktaDirectAuthRequest,
         callback: (Result<HssOktaDirectAuthResult?>) -> Unit
     ) {
-//TODO: NOT WORKING
-        runBlocking {
-            val flow = CredentialBootstrap.oidcClient.createResourceOwnerFlow()
-            when(val res = flow.start(request.username,request.password)){
-                is OidcClientResult.Error -> {
-                    throw Exception(res.exception)
-                }
-                is OidcClientResult.Success -> {
-                    CredentialBootstrap.defaultCredential().storeToken(token = res.result)
-                     callback(Result.success(
-                         HssOktaDirectAuthResult(
-                             result = DirectAuthResult.SUCCESS,
-                             error = null,
-                             id = res.result.idToken,
-                             token = res.result.deviceSecret,
-                             issuedAt = null,
-                             tokenType = res.result.tokenType,
-                             accessToken = res.result.accessToken,
-                             scope = res.result.scope,
-                             refreshToken = res.result.accessToken
-                         )
-                     ))
-
-                }
-            }
+        CoroutineScope(Dispatchers.IO).launch {
+           var result = signInWithCredentialsRoutine(request)
+            callback.invoke(Result.success(result))
         }
-
-        callback.invoke(Result.success(HssOktaDirectAuthResult(
-            result = DirectAuthResult.ERROR,
-            error = "Error Failed to process request"
-        )))
     }
 
     override fun mfaOtpSignInWithCredentials(
