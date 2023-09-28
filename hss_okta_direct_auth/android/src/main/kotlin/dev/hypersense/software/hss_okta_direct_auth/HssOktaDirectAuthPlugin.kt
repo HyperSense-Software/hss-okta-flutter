@@ -9,17 +9,31 @@ import com.okta.authfoundation.client.OidcClient
 import com.okta.authfoundation.client.OidcClientResult
 import com.okta.authfoundation.client.OidcConfiguration
 import com.okta.authfoundation.credential.CredentialDataSource.Companion.createCredentialDataSource
-import com.okta.authfoundationbootstrap.CredentialBootstrap
+import com.okta.authfoundationbootstrap.*
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 //import com.okta.idx.kotlin.*
 import com.okta.oauth2.ResourceOwnerFlow.Companion.createResourceOwnerFlow
+import io.flutter.plugin.common.MethodCall
+import io.flutter.plugin.common.MethodChannel
 import kotlinx.coroutines.runBlocking
 import okhttp3.HttpUrl.Companion.toHttpUrl
 
-class HssOktaDirectAuthPlugin : HssOktaDirectAuthPluginApi, FlutterPlugin {
+class HssOktaDirectAuthPlugin : HssOktaDirectAuthPluginApi, FlutterPlugin{
     var oidcConfiguration : OidcConfiguration? = null
     var oidcClient : OidcClient? = null
     var context : Context? = null
+
+
+
+    override fun onAttachedToEngine(binding: FlutterPlugin.FlutterPluginBinding) {
+        HssOktaDirectAuthPluginApi.setUp(binding.binaryMessenger, this)
+        context = binding.applicationContext
+    }
+
+    override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
+        // HssOktaDirectAuthPluginApi.setUp(binding.binaryMessenger, null)
+    }
+
     override fun init(
         clientid: String,
         signInRedirectUrl: String,
@@ -43,14 +57,7 @@ class HssOktaDirectAuthPlugin : HssOktaDirectAuthPluginApi, FlutterPlugin {
 
     }
 
-    override fun onAttachedToEngine(binding: FlutterPlugin.FlutterPluginBinding) {
-        HssOktaDirectAuthPluginApi.Companion.setUp(binding.binaryMessenger, this)
-        context = binding.applicationContext
-    }
 
-    override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
-        // HssOktaDirectAuthPluginApi.setUp(binding.binaryMessenger, null)
-    }
 
 
 
@@ -102,6 +109,7 @@ class HssOktaDirectAuthPlugin : HssOktaDirectAuthPluginApi, FlutterPlugin {
     override fun getCredential(callback: (Result<HssOktaDirectAuthResult?>) -> Unit) {
         TODO("Not yet implemented")
     }
+
 
 
 
