@@ -53,7 +53,7 @@ class HssOktaDirectAuthChannel extends HssOktaDirectAuthPlatform {
     String issuer,
     String scopes,
   ) {
-    _api.init(
+    _api.initializeConfiguration(
       clientid,
       signInRedirectUrl,
       signOutRedirectUrl,

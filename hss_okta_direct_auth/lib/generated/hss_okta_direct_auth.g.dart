@@ -141,9 +141,9 @@ class HssOktaDirectAuthPluginApi {
 
   static const MessageCodec<Object?> codec = _HssOktaDirectAuthPluginApiCodec();
 
-  Future<void> init(String arg_clientid, String arg_signInRedirectUrl, String arg_signOutRedirectUrl, String arg_issuer, String arg_scopes) async {
+  Future<void> initializeConfiguration(String arg_clientid, String arg_signInRedirectUrl, String arg_signOutRedirectUrl, String arg_issuer, String arg_scopes) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
-        'dev.flutter.pigeon.hss_okta_direct_auth.HssOktaDirectAuthPluginApi.init', codec,
+        'dev.flutter.pigeon.hss_okta_direct_auth.HssOktaDirectAuthPluginApi.initializeConfiguration', codec,
         binaryMessenger: _binaryMessenger);
     final List<Object?>? replyList =
         await channel.send(<Object?>[arg_clientid, arg_signInRedirectUrl, arg_signOutRedirectUrl, arg_issuer, arg_scopes]) as List<Object?>?;

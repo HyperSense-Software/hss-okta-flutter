@@ -1,15 +1,18 @@
 import 'package:pigeon/pigeon.dart';
 
-@ConfigurePigeon(PigeonOptions(
-  input: 'pigeons/hss_okta_direct_auth_pigeon.dart',
-  dartOut: 'lib/generated/hss_okta_direct_auth.g.dart',
-  swiftOut: 'ios/Classes/HssOktaDirectAuthPluginApi.g.swift',
-  kotlinOut:
-      'android/src/main/kotlin/dev/hypersense/software/hss_okta_direct_auth/HssOktaDirectAuthPluginApi.g.kt',
+@ConfigurePigeon(
+  PigeonOptions(
+      input: 'pigeons/hss_okta_direct_auth_pigeon.dart',
+      dartOut: 'lib/generated/hss_okta_direct_auth.g.dart',
+      swiftOut: 'ios/Classes/HssOktaDirectAuthPluginApi.g.swift',
+      kotlinOut:
+          'android/src/main/kotlin/dev/hypersense/software/hss_okta_direct_auth/HssOktaDirectAuthPluginApi.kt',
+      kotlinOptions: KotlinOptions(
+          package: "dev.hypersense.software.hss_okta_direct_auth")),
+
+  // cppHeaderOut: 'ios/Classes/HssOktaDirectAuthPlugin.h',
+  // cppSourceOut: 'ios/Classes/HssOktaDirectAuthPlugin.m',
 )
-    // cppHeaderOut: 'ios/Classes/HssOktaDirectAuthPlugin.h',
-    // cppSourceOut: 'ios/Classes/HssOktaDirectAuthPlugin.m',
-    )
 enum DirectAuthResult { success, mfaRequired, error }
 
 class HssOktaDirectAuthRequest {
@@ -48,7 +51,7 @@ class HssOktaDirectAuthResult {
 
 @HostApi()
 abstract class HssOktaDirectAuthPluginApi {
-  void init(
+  void initializeConfiguration(
     String clientid,
     String signInRedirectUrl,
     String signOutRedirectUrl,
