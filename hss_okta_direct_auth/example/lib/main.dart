@@ -35,6 +35,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+
     _hssOktaDirectAuthPlugin.init(
         "0oa7vbqbudjoR9zMX697",
         "com.okta.ntsafety:/callback",
@@ -123,6 +124,7 @@ class _MyAppState extends State<MyApp> {
           Text('refresh token : ${result?.refreshToken}'),
           Text('Scope : ${result?.scope}'),
           Text('Token Type: ${result?.tokenType}'),
+          Text('Access Token : ${result?.accessToken}'),
           if (result?.token != null)
             Text('JWT Token: ${JwtDecoder.decode(result?.token ?? '')}'),
         ]

@@ -2,6 +2,8 @@ package dev.hypersense.software.hss_okta_direct_auth
 
 
 import android.content.Context
+import com.okta.authfoundation.claims.issuedAt
+import com.okta.authfoundation.claims.userId
 import com.okta.authfoundation.client.OidcClient
 import com.okta.authfoundation.client.OidcClientResult
 import com.okta.authfoundation.client.OidcConfiguration
@@ -16,6 +18,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import okhttp3.HttpUrl.Companion.toHttpUrl
+import java.util.Date
 
 class HssOktaDirectAuthPlugin : HssOktaDirectAuthPluginApi, FlutterPlugin{
     var oidcConfiguration : OidcConfiguration? = null
@@ -65,17 +68,20 @@ class HssOktaDirectAuthPlugin : HssOktaDirectAuthPluginApi, FlutterPlugin{
             }
             is OidcClientResult.Success -> {
 
+
+
                 CredentialBootstrap.defaultCredential().storeToken(token = res.result)
+                var userInfo = CredentialBootstrap.defaultCredential().getUserInfo()
+                var userInfoResult = userInfo.getOrThrow()
+
                 return     HssOktaDirectAuthResult(
                     result = DirectAuthResult.SUCCESS,
-                    error = null,
-                    id = "",
+                    id = userInfoResult.userId,
                     token = res.result.accessToken,
-                    issuedAt = null,
+                    issuedAt = userInfoResult.issuedAt?.toLong(),
                     tokenType = res.result.tokenType,
-                    accessToken = res.result.accessToken,
                     scope = res.result.scope,
-                    refreshToken = res.result.accessToken
+                    refreshToken = res.result.refreshToken
                 )
             }
         }
