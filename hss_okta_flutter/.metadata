@@ -7,4 +7,4 @@ version:
   revision: "12fccda598477eddd19f93040a1dba24f915b9be"
   channel: "stable"
 
-project_type: module
+project_type: package
