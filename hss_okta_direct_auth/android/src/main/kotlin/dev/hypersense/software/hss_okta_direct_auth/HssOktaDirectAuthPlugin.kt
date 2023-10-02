@@ -2,9 +2,16 @@ package dev.hypersense.software.hss_okta_direct_auth
 
 
 import android.content.Context
+import com.okta.authfoundation.claims.email
+import com.okta.authfoundation.claims.familyName
+import com.okta.authfoundation.claims.gender
+import com.okta.authfoundation.claims.givenName
 import com.okta.authfoundation.claims.issuedAt
+import com.okta.authfoundation.claims.middleName
+import com.okta.authfoundation.claims.phoneNumber
 import com.okta.authfoundation.claims.scope
 import com.okta.authfoundation.claims.userId
+import com.okta.authfoundation.claims.username
 import com.okta.authfoundation.client.OidcClient
 import com.okta.authfoundation.client.OidcClientResult
 import com.okta.authfoundation.client.OidcConfiguration
@@ -22,8 +29,6 @@ import okhttp3.HttpUrl.Companion.toHttpUrl
 import java.util.Date
 
 class HssOktaDirectAuthPlugin : HssOktaDirectAuthPluginApi, FlutterPlugin{
-    var oidcConfiguration : OidcConfiguration? = null
-    var oidcClient : OidcClient? = null
     var context : Context? = null
 
 
@@ -44,28 +49,39 @@ class HssOktaDirectAuthPlugin : HssOktaDirectAuthPluginApi, FlutterPlugin{
         issuer: String,
         scopes: String
     ) {
-        oidcConfiguration = OidcConfiguration(
+
+        println("Initializing OIDC Configuration")
+        val oidcConfiguration = OidcConfiguration(
             clientId =  clientid,
             defaultScope = scopes,
         )
 
-        oidcClient = OidcClient.createFromDiscoveryUrl(
+        println("${issuer.toHttpUrl()}")
+
+       val oidcClient = OidcClient.createFromDiscoveryUrl(
             oidcConfiguration!!,
-            "${issuer}/.well-known/openid-configuration".toHttpUrl(),)
-        
-        if(context != null && oidcClient != null)
-        {
-            CredentialBootstrap.initialize(oidcClient!!.createCredentialDataSource(context!!))
+           "${issuer}/.well-known/openid-configuration".toHttpUrl(),)
+
+
+        if(context == null){
+            throw  Exception("Context is null")
         }
 
+        CredentialBootstrap.initialize(oidcClient.createCredentialDataSource(context!!))
+
+        println("Done Initializing OIDC Configuration /()")
     }
 
 
     private suspend fun signInWithCredentialsRoutine(request : HssOktaDirectAuthRequest): HssOktaDirectAuthResult {
         val flow = CredentialBootstrap.oidcClient.createResourceOwnerFlow()
+
         when(val res = flow.start(request.username,request.password)){
             is OidcClientResult.Error -> {
-                throw Exception(res.exception)
+                return HssOktaDirectAuthResult(
+                    result = DirectAuthResult.ERROR,
+                    error = res.exception.message
+                )
             }
             is OidcClientResult.Success -> {
 
@@ -73,14 +89,25 @@ class HssOktaDirectAuthPlugin : HssOktaDirectAuthPluginApi, FlutterPlugin{
                 var userInfo = CredentialBootstrap.defaultCredential().getUserInfo()
                 var userInfoResult = userInfo.getOrThrow()
 
+
                 return HssOktaDirectAuthResult(
                     result = DirectAuthResult.SUCCESS,
-                    id = userInfoResult.userId,
+                    id = res.result.idToken,
                     token = res.result.accessToken,
                     issuedAt = userInfoResult.issuedAt?.toLong(),
                     tokenType = res.result.tokenType,
                     scope = res.result.scope,
-                    refreshToken = res.result.refreshToken
+                    refreshToken = res.result.refreshToken,
+                    userInfo = UserInfo(
+                        userId = userInfoResult.userId?:"",
+                        givenName = userInfoResult.givenName?:"",
+                        middleName = userInfoResult.middleName?:"",
+                        familyName = userInfoResult.familyName?:"",
+                        gender = userInfoResult.gender?:"",
+                        email = userInfoResult.email?:"",
+                        phoneNumber = userInfoResult.phoneNumber?:"",
+                        username = userInfoResult.username?:""
+                    )
                 )
             }
         }
@@ -125,7 +152,8 @@ class HssOktaDirectAuthPlugin : HssOktaDirectAuthPluginApi, FlutterPlugin{
         CoroutineScope(Dispatchers.IO).launch {
             var credential = CredentialBootstrap.defaultCredential()
             var userInfo = credential.getUserInfo().getOrThrow()
-            
+
+
             callback.invoke(Result.success(HssOktaDirectAuthResult(
                 result = DirectAuthResult.SUCCESS,
                 id = userInfo.userId,
@@ -134,7 +162,16 @@ class HssOktaDirectAuthPlugin : HssOktaDirectAuthPluginApi, FlutterPlugin{
                 tokenType = credential.token?.tokenType,
                 scope = credential.token?.scope,
                 refreshToken = credential.token?.refreshToken,
-
+                userInfo = UserInfo(
+                    userId = userInfo.userId?:"",
+                    givenName = userInfo.givenName?:"",
+                    middleName = userInfo.middleName?:"",
+                    familyName = userInfo.familyName?:"",
+                    gender = userInfo.gender?:"",
+                    email = userInfo.email?:"",
+                    phoneNumber = userInfo.phoneNumber?:"",
+                    username = userInfo.username?:""
+                )
             )))
 
     }

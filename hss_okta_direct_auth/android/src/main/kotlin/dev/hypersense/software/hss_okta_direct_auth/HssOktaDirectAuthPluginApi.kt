@@ -87,7 +87,8 @@ data class HssOktaDirectAuthResult (
   val tokenType: String? = null,
   val accessToken: String? = null,
   val scope: String? = null,
-  val refreshToken: String? = null
+  val refreshToken: String? = null,
+  val userInfo: UserInfo? = null
 
 ) {
   companion object {
@@ -104,7 +105,10 @@ data class HssOktaDirectAuthResult (
       val accessToken = list[6] as String?
       val scope = list[7] as String?
       val refreshToken = list[8] as String?
-      return HssOktaDirectAuthResult(result, error, id, token, issuedAt, tokenType, accessToken, scope, refreshToken)
+      val userInfo: UserInfo? = (list[9] as List<Any?>?)?.let {
+        UserInfo.fromList(it)
+      }
+      return HssOktaDirectAuthResult(result, error, id, token, issuedAt, tokenType, accessToken, scope, refreshToken, userInfo)
     }
   }
   fun toList(): List<Any?> {
@@ -118,6 +122,47 @@ data class HssOktaDirectAuthResult (
       accessToken,
       scope,
       refreshToken,
+      userInfo?.toList(),
+    )
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class UserInfo (
+  val userId: String,
+  val givenName: String,
+  val middleName: String,
+  val familyName: String,
+  val gender: String,
+  val email: String,
+  val phoneNumber: String,
+  val username: String
+
+) {
+  companion object {
+    @Suppress("UNCHECKED_CAST")
+    fun fromList(list: List<Any?>): UserInfo {
+      val userId = list[0] as String
+      val givenName = list[1] as String
+      val middleName = list[2] as String
+      val familyName = list[3] as String
+      val gender = list[4] as String
+      val email = list[5] as String
+      val phoneNumber = list[6] as String
+      val username = list[7] as String
+      return UserInfo(userId, givenName, middleName, familyName, gender, email, phoneNumber, username)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf<Any?>(
+      userId,
+      givenName,
+      middleName,
+      familyName,
+      gender,
+      email,
+      phoneNumber,
+      username,
     )
   }
 }
@@ -136,6 +181,11 @@ private object HssOktaDirectAuthPluginApiCodec : StandardMessageCodec() {
           HssOktaDirectAuthResult.fromList(it)
         }
       }
+      130.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          UserInfo.fromList(it)
+        }
+      }
       else -> super.readValueOfType(type, buffer)
     }
   }
@@ -147,6 +197,10 @@ private object HssOktaDirectAuthPluginApiCodec : StandardMessageCodec() {
       }
       is HssOktaDirectAuthResult -> {
         stream.write(129)
+        writeValue(stream, value.toList())
+      }
+      is UserInfo -> {
+        stream.write(130)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)

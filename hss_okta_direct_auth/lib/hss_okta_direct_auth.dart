@@ -44,12 +44,16 @@ class HssOktaDirectAuth {
     String issuer,
     String scopes,
   ) {
-    HssOktaDirectAuthPlatform.instance.init(
-      clientid,
-      signInRedirectUrl,
-      signOutRedirectUrl,
-      issuer,
-      scopes,
-    );
+    try {
+      HssOktaDirectAuthPlatform.instance.init(
+        clientid,
+        signInRedirectUrl,
+        signOutRedirectUrl,
+        issuer,
+        scopes,
+      );
+    } catch (ex) {
+      throw Exception(ex);
+    }
   }
 }
