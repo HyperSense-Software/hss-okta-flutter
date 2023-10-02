@@ -3,6 +3,7 @@ package dev.hypersense.software.hss_okta_direct_auth
 
 import android.content.Context
 import com.okta.authfoundation.claims.issuedAt
+import com.okta.authfoundation.claims.scope
 import com.okta.authfoundation.claims.userId
 import com.okta.authfoundation.client.OidcClient
 import com.okta.authfoundation.client.OidcClientResult
@@ -60,7 +61,7 @@ class HssOktaDirectAuthPlugin : HssOktaDirectAuthPluginApi, FlutterPlugin{
     }
 
 
-    suspend fun signInWithCredentialsRoutine(request : HssOktaDirectAuthRequest): HssOktaDirectAuthResult {
+    private suspend fun signInWithCredentialsRoutine(request : HssOktaDirectAuthRequest): HssOktaDirectAuthResult {
         val flow = CredentialBootstrap.oidcClient.createResourceOwnerFlow()
         when(val res = flow.start(request.username,request.password)){
             is OidcClientResult.Error -> {
@@ -68,13 +69,11 @@ class HssOktaDirectAuthPlugin : HssOktaDirectAuthPluginApi, FlutterPlugin{
             }
             is OidcClientResult.Success -> {
 
-
-
                 CredentialBootstrap.defaultCredential().storeToken(token = res.result)
                 var userInfo = CredentialBootstrap.defaultCredential().getUserInfo()
                 var userInfoResult = userInfo.getOrThrow()
 
-                return     HssOktaDirectAuthResult(
+                return HssOktaDirectAuthResult(
                     result = DirectAuthResult.SUCCESS,
                     id = userInfoResult.userId,
                     token = res.result.accessToken,
@@ -105,18 +104,39 @@ class HssOktaDirectAuthPlugin : HssOktaDirectAuthPluginApi, FlutterPlugin{
     }
 
     override fun refreshDefaultToken(callback: (Result<Boolean?>) -> Unit) {
-        TODO("Not yet implemented")
+        CoroutineScope(Dispatchers.IO).launch {
+            when(val result = CredentialBootstrap.defaultCredential().refreshToken()){
+                is OidcClientResult.Error -> callback.invoke(Result.failure(Exception("Failed to refresh token")))
+                is OidcClientResult.Success -> callback.invoke(Result.success(true))
+            }
+        }
     }
 
     override fun revokeDefaultToken(callback: (Result<Boolean?>) -> Unit) {
-        TODO("Not yet implemented")
+        CoroutineScope(Dispatchers.IO).launch {
+            when(val result = CredentialBootstrap.defaultCredential().refreshToken()){
+                is OidcClientResult.Error -> callback.invoke(Result.failure(Exception("Failed to revoke token")))
+                is OidcClientResult.Success -> callback.invoke(Result.success(true))
+            }
+        }
     }
 
     override fun getCredential(callback: (Result<HssOktaDirectAuthResult?>) -> Unit) {
-        TODO("Not yet implemented")
+        CoroutineScope(Dispatchers.IO).launch {
+            var credential = CredentialBootstrap.defaultCredential()
+            var userInfo = credential.getUserInfo().getOrThrow()
+            
+            callback.invoke(Result.success(HssOktaDirectAuthResult(
+                result = DirectAuthResult.SUCCESS,
+                id = userInfo.userId,
+                token = credential.token?.accessToken,
+                issuedAt = userInfo.issuedAt?.toLong(),
+                tokenType = credential.token?.tokenType,
+                scope = credential.token?.scope,
+                refreshToken = credential.token?.refreshToken,
+
+            )))
+
     }
 
-
-
-
-}
+}}
