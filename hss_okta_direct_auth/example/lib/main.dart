@@ -2,7 +2,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:hss_okta_direct_auth/generated/hss_okta_direct_auth.g.dart';
-import 'dart:async';
 
 import 'package:hss_okta_direct_auth/hss_okta_direct_auth.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
@@ -35,6 +34,19 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+      _hssOktaDirectAuthPlugin.init(
+          "0oa7vbqbudjoR9zMX697",
+          "com.okta.ntsafety:/callback",
+          "com.okta.ntsafety:/",
+          "https://ntsafety.okta.com",
+          "openid profile");
+    });
+  }
+
+  Future<void> getCredential() async {
+    result = await _hssOktaDirectAuthPlugin.getCredential();
+    setState(() {});
   }
 
   Widget _mfa() {
@@ -89,7 +101,8 @@ class _MyAppState extends State<MyApp> {
 
                     setState(() {});
                   });
-                } catch (e) {
+                } catch (e, s) {
+                  debugPrint(e.toString() + s.toString());
                   ScaffoldMessenger.of(formContext).showSnackBar(
                       SnackBar(content: Text('Error: ${e.toString()}')));
                 }
@@ -105,21 +118,41 @@ class _MyAppState extends State<MyApp> {
 
     return Padding(
       padding: const EdgeInsets.all(14.0),
-      child: ListView(children: [
-        Text('Authentication Result : ${result?.result}'),
-        if (result!.result != DirectAuthResult.success)
-          Text('error : ${result?.error}')
-        else ...[
-          Text('id : ${result?.id}'),
-          Text(
-              'Issued At : ${DateTime.fromMillisecondsSinceEpoch(result?.issuedAt ?? 0)}'),
-          Text('refresh token : ${result?.refreshToken}'),
-          Text('Scope : ${result?.scope}'),
-          Text('Token Type: ${result?.tokenType}'),
-          if (result?.token != null)
-            Text('JWT Token: ${JwtDecoder.decode(result?.token ?? '')}'),
-        ]
-      ]),
+      child: RefreshIndicator(
+        onRefresh: () async => await getCredential(),
+        child: ListView(children: [
+          Text('Authentication Result : ${result?.result}'),
+          if (result!.result != DirectAuthResult.success)
+            Text('error : ${result?.error}')
+          else ...[
+            Text('id : ${result?.id}'),
+            Text(
+                'Issued At : ${DateTime.fromMillisecondsSinceEpoch(result?.issuedAt ?? 0)}'),
+            Text('refresh token : ${result?.refreshToken}'),
+            Text('Scope : ${result?.scope}'),
+            Text('Token Type: ${result?.tokenType}'),
+            Text('Access Token : ${result?.accessToken}'),
+            const Divider(
+              thickness: 4,
+            ),
+            if (result?.token != null)
+              Text('JWT Token: ${JwtDecoder.decode(result?.token ?? '')}'),
+            const Divider(
+              thickness: 4,
+            ),
+            if (result!.userInfo != null) ...[
+              Text('User ID : ${result?.userInfo!.userId ?? ''}'),
+              Text('Given name : ${result?.userInfo!.givenName ?? ''}'),
+              Text('Middle name : ${result?.userInfo!.middleName ?? ''}'),
+              Text('Family Name : ${result?.userInfo!.familyName ?? ''}'),
+              Text('Gender : ${result?.userInfo!.gender ?? ''}'),
+              Text('Phone Number : ${result?.userInfo!.phoneNumber ?? ''}'),
+              Text('Email : ${result?.userInfo!.email ?? ''}'),
+              Text('Username : ${result?.userInfo!.username ?? ''}'),
+            ]
+          ]
+        ]),
+      ),
     );
   }
 
@@ -130,12 +163,12 @@ class _MyAppState extends State<MyApp> {
         appBar: AppBar(
           title: const Text('Plugin example app'),
         ),
-        body: Builder(builder: (_builderContext) {
+        body: Builder(builder: (builderContext) {
           return PageView(
             controller: _pageController,
             physics: const NeverScrollableScrollPhysics(),
             children: [
-              _form(_builderContext),
+              _form(builderContext),
               _mfa(),
               _profile(),
             ],

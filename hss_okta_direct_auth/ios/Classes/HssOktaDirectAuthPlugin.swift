@@ -12,6 +12,10 @@ case credentialError(String)
 
 open class HssOktaDirectAuthPlugin :NSObject, FlutterPlugin,HssOktaDirectAuthPluginApi
 {
+    func initializeConfiguration(clientid: String, signInRedirectUrl: String, signOutRedirectUrl: String, issuer: String, scopes: String) throws {
+       
+    }
+    
     
     
     var flow : DirectAuthenticationFlow?
@@ -40,9 +44,12 @@ open class HssOktaDirectAuthPlugin :NSObject, FlutterPlugin,HssOktaDirectAuthPlu
                     switch status{
                     case .success(let token):
                         Credential.default = try Credential.store(token)
-                        
+                        var userInfo = try await Credential.default?.userInfo()
+
                         completion(.success(HssOktaDirectAuthResult(
-                            result: DirectAuthResult.success, id: token.id, token: token.idToken?.rawValue ?? "", issuedAt: Int64(((token.issuedAt?.timeIntervalSince1970 ?? 0) * 1000.0).rounded()), tokenType: token.tokenType, accessToken: token.accessToken, scope: token.scope ?? "", refreshToken: token.refreshToken ?? ""))) 
+                            result: DirectAuthResult.success, id: token.id, token: token.idToken?.rawValue ?? "", issuedAt: Int64(((token.issuedAt?.timeIntervalSince1970 ?? 0) * 1000.0).rounded()), tokenType: token.tokenType, accessToken: token.accessToken, scope: token.scope ?? "", refreshToken: token.refreshToken ?? "",
+                        userInfo:  UserInfo(userId: "", givenName: userInfo?.givenName ?? "", middleName: userInfo?.middleName ?? "", familyName: userInfo?.familyName ?? "", gender: userInfo?.gender ?? "", email: userInfo?.email ?? "", phoneNumber: userInfo?.phoneNumber ?? "", username: userInfo?.preferredUsername  ?? "")
+                        )))
                         
                     case .mfaRequired(_):
                         completion(.success(HssOktaDirectAuthResult(result: DirectAuthResult.mfaRequired,error: "MFA Required")))
@@ -64,8 +71,12 @@ open class HssOktaDirectAuthPlugin :NSObject, FlutterPlugin,HssOktaDirectAuthPlu
              status = try await flow?.resume(self.status!, with: .otp(code: otp))
                 if case let .success(token) = status{
                     Credential.default = try Credential.store(token)
+                    var userInfo = try await Credential.default?.userInfo()
+                    
                     completion(.success(HssOktaDirectAuthResult(
-                        result: DirectAuthResult.success, id: token.id, token: token.idToken?.rawValue ?? "", issuedAt: Int64(((token.issuedAt?.timeIntervalSince1970 ?? 0) * 1000.0).rounded()), tokenType: token.tokenType, accessToken: token.accessToken, scope: token.scope ?? "", refreshToken: token.refreshToken ?? "")))
+                        result: DirectAuthResult.success, id: token.id, token: token.idToken?.rawValue ?? "", issuedAt: Int64(((token.issuedAt?.timeIntervalSince1970 ?? 0) * 1000.0).rounded()), tokenType: token.tokenType, accessToken: token.accessToken, scope: token.scope ?? "", refreshToken: token.refreshToken ?? "",
+                    userInfo: UserInfo(userId: "", givenName: userInfo?.givenName ?? "", middleName: userInfo?.middleName ?? "", familyName: userInfo?.familyName ?? "", gender: userInfo?.gender ?? "", email: userInfo?.email ?? "", phoneNumber: userInfo?.phoneNumber ?? "", username: userInfo?.preferredUsername  ?? "")
+                    )))
                 }else{
                     completion(.success(HssOktaDirectAuthResult(result: DirectAuthResult.error,error: "MFA Failed")))
                 }
@@ -111,14 +122,20 @@ open class HssOktaDirectAuthPlugin :NSObject, FlutterPlugin,HssOktaDirectAuthPlu
     }
     
     func getCredential(completion: @escaping (Result<HssOktaDirectAuthResult?, Error>) -> Void){
-        if let result = Credential.default{
-            
-            var resultEnum = DirectAuthResult.success
-            completion(.success(HssOktaDirectAuthResult(
-                result: resultEnum, id: result.token.id, token: result.token.idToken?.rawValue ?? "", issuedAt: Int64(((result.token.issuedAt?.timeIntervalSince1970 ?? 0) * 1000.0).rounded()), tokenType: result.token.tokenType, accessToken: result.token.accessToken, scope: result.token.scope ?? "", refreshToken: result.token.refreshToken ?? "")))
-        }else{
-            var resultEnum = DirectAuthResult.error
-            completion(.success(HssOktaDirectAuthResult(result: resultEnum,error: "Failed to Login : Server did not provide result")))
+        Task{
+            if let result = Credential.default{
+                
+                var resultEnum = DirectAuthResult.success
+                var userInfo = try await Credential.default?.userInfo()
+                
+                completion(.success(HssOktaDirectAuthResult(
+                    result: resultEnum, id: result.token.id, token: result.token.idToken?.rawValue ?? "", issuedAt: Int64(((result.token.issuedAt?.timeIntervalSince1970 ?? 0) * 1000.0).rounded()), tokenType: result.token.tokenType, accessToken: result.token.accessToken, scope: result.token.scope ?? "", refreshToken: result.token.refreshToken ?? "",
+                    userInfo: UserInfo(userId: "", givenName: userInfo?.givenName ?? "", middleName: userInfo?.middleName ?? "", familyName: userInfo?.familyName ?? "", gender: userInfo?.gender ?? "", email: userInfo?.email ?? "", phoneNumber: userInfo?.phoneNumber ?? "", username: userInfo?.preferredUsername  ?? "")
+                )))
+            }else{
+                var resultEnum = DirectAuthResult.error
+                completion(.success(HssOktaDirectAuthResult(result: resultEnum,error: "Failed to Login : Server did not provide result")))
+            }
         }
     }
     

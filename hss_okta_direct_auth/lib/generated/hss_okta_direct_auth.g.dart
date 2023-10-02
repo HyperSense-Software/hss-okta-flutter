@@ -51,6 +51,7 @@ class HssOktaDirectAuthResult {
     this.accessToken,
     this.scope,
     this.refreshToken,
+    this.userInfo,
   });
 
   DirectAuthResult? result;
@@ -71,6 +72,8 @@ class HssOktaDirectAuthResult {
 
   String? refreshToken;
 
+  UserInfo? userInfo;
+
   Object encode() {
     return <Object?>[
       result?.index,
@@ -82,6 +85,7 @@ class HssOktaDirectAuthResult {
       accessToken,
       scope,
       refreshToken,
+      userInfo?.encode(),
     ];
   }
 
@@ -99,6 +103,65 @@ class HssOktaDirectAuthResult {
       accessToken: result[6] as String?,
       scope: result[7] as String?,
       refreshToken: result[8] as String?,
+      userInfo: result[9] != null
+          ? UserInfo.decode(result[9]! as List<Object?>)
+          : null,
+    );
+  }
+}
+
+class UserInfo {
+  UserInfo({
+    required this.userId,
+    required this.givenName,
+    required this.middleName,
+    required this.familyName,
+    required this.gender,
+    required this.email,
+    required this.phoneNumber,
+    required this.username,
+  });
+
+  String userId;
+
+  String givenName;
+
+  String middleName;
+
+  String familyName;
+
+  String gender;
+
+  String email;
+
+  String phoneNumber;
+
+  String username;
+
+  Object encode() {
+    return <Object?>[
+      userId,
+      givenName,
+      middleName,
+      familyName,
+      gender,
+      email,
+      phoneNumber,
+      username,
+    ];
+  }
+
+  static UserInfo decode(Object result) {
+    result as List<Object?>;
+    return UserInfo(
+      userId: result[0]! as String,
+      givenName: result[1]! as String,
+      middleName: result[2]! as String,
+      familyName: result[3]! as String,
+      gender: result[4]! as String,
+      email: result[5]! as String,
+      phoneNumber: result[6]! as String,
+      username: result[7]! as String,
     );
   }
 }
@@ -113,6 +176,9 @@ class _HssOktaDirectAuthPluginApiCodec extends StandardMessageCodec {
     } else if (value is HssOktaDirectAuthResult) {
       buffer.putUint8(129);
       writeValue(buffer, value.encode());
+    } else if (value is UserInfo) {
+      buffer.putUint8(130);
+      writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
     }
@@ -125,6 +191,8 @@ class _HssOktaDirectAuthPluginApiCodec extends StandardMessageCodec {
         return HssOktaDirectAuthRequest.decode(readValue(buffer)!);
       case 129: 
         return HssOktaDirectAuthResult.decode(readValue(buffer)!);
+      case 130: 
+        return UserInfo.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
     }
@@ -140,6 +208,28 @@ class HssOktaDirectAuthPluginApi {
   final BinaryMessenger? _binaryMessenger;
 
   static const MessageCodec<Object?> codec = _HssOktaDirectAuthPluginApiCodec();
+
+  Future<void> initializeConfiguration(String arg_clientid, String arg_signInRedirectUrl, String arg_signOutRedirectUrl, String arg_issuer, String arg_scopes) async {
+    final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
+        'dev.flutter.pigeon.hss_okta_direct_auth.HssOktaDirectAuthPluginApi.initializeConfiguration', codec,
+        binaryMessenger: _binaryMessenger);
+    final List<Object?>? replyList =
+        await channel.send(<Object?>[arg_clientid, arg_signInRedirectUrl, arg_signOutRedirectUrl, arg_issuer, arg_scopes]) as List<Object?>?;
+    if (replyList == null) {
+      throw PlatformException(
+        code: 'channel-error',
+        message: 'Unable to establish connection on channel.',
+      );
+    } else if (replyList.length > 1) {
+      throw PlatformException(
+        code: replyList[0]! as String,
+        message: replyList[1] as String?,
+        details: replyList[2],
+      );
+    } else {
+      return;
+    }
+  }
 
   Future<HssOktaDirectAuthResult?> signInWithCredentials(HssOktaDirectAuthRequest arg_request) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(

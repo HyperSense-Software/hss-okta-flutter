@@ -77,6 +77,7 @@ struct HssOktaDirectAuthResult {
   var accessToken: String? = nil
   var scope: String? = nil
   var refreshToken: String? = nil
+  var userInfo: UserInfo? = nil
 
   static func fromList(_ list: [Any?]) -> HssOktaDirectAuthResult? {
     var result: DirectAuthResult? = nil
@@ -92,6 +93,10 @@ struct HssOktaDirectAuthResult {
     let accessToken: String? = nilOrValue(list[6])
     let scope: String? = nilOrValue(list[7])
     let refreshToken: String? = nilOrValue(list[8])
+    var userInfo: UserInfo? = nil
+    if let userInfoList: [Any?] = nilOrValue(list[9]) {
+      userInfo = UserInfo.fromList(userInfoList)
+    }
 
     return HssOktaDirectAuthResult(
       result: result,
@@ -102,7 +107,8 @@ struct HssOktaDirectAuthResult {
       tokenType: tokenType,
       accessToken: accessToken,
       scope: scope,
-      refreshToken: refreshToken
+      refreshToken: refreshToken,
+      userInfo: userInfo
     )
   }
   func toList() -> [Any?] {
@@ -116,6 +122,53 @@ struct HssOktaDirectAuthResult {
       accessToken,
       scope,
       refreshToken,
+      userInfo?.toList(),
+    ]
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+struct UserInfo {
+  var userId: String
+  var givenName: String
+  var middleName: String
+  var familyName: String
+  var gender: String
+  var email: String
+  var phoneNumber: String
+  var username: String
+
+  static func fromList(_ list: [Any?]) -> UserInfo? {
+    let userId = list[0] as! String
+    let givenName = list[1] as! String
+    let middleName = list[2] as! String
+    let familyName = list[3] as! String
+    let gender = list[4] as! String
+    let email = list[5] as! String
+    let phoneNumber = list[6] as! String
+    let username = list[7] as! String
+
+    return UserInfo(
+      userId: userId,
+      givenName: givenName,
+      middleName: middleName,
+      familyName: familyName,
+      gender: gender,
+      email: email,
+      phoneNumber: phoneNumber,
+      username: username
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      userId,
+      givenName,
+      middleName,
+      familyName,
+      gender,
+      email,
+      phoneNumber,
+      username,
     ]
   }
 }
@@ -127,6 +180,8 @@ private class HssOktaDirectAuthPluginApiCodecReader: FlutterStandardReader {
         return HssOktaDirectAuthRequest.fromList(self.readValue() as! [Any?])
       case 129:
         return HssOktaDirectAuthResult.fromList(self.readValue() as! [Any?])
+      case 130:
+        return UserInfo.fromList(self.readValue() as! [Any?])
       default:
         return super.readValue(ofType: type)
     }
@@ -140,6 +195,9 @@ private class HssOktaDirectAuthPluginApiCodecWriter: FlutterStandardWriter {
       super.writeValue(value.toList())
     } else if let value = value as? HssOktaDirectAuthResult {
       super.writeByte(129)
+      super.writeValue(value.toList())
+    } else if let value = value as? UserInfo {
+      super.writeByte(130)
       super.writeValue(value.toList())
     } else {
       super.writeValue(value)
@@ -163,6 +221,7 @@ class HssOktaDirectAuthPluginApiCodec: FlutterStandardMessageCodec {
 
 /// Generated protocol from Pigeon that represents a handler of messages from Flutter.
 protocol HssOktaDirectAuthPluginApi {
+  func initializeConfiguration(clientid: String, signInRedirectUrl: String, signOutRedirectUrl: String, issuer: String, scopes: String) throws
   func signInWithCredentials(request: HssOktaDirectAuthRequest, completion: @escaping (Result<HssOktaDirectAuthResult?, Error>) -> Void)
   func mfaOtpSignInWithCredentials(otp: String, completion: @escaping (Result<HssOktaDirectAuthResult?, Error>) -> Void)
   func refreshDefaultToken(completion: @escaping (Result<Bool?, Error>) -> Void)
@@ -176,6 +235,25 @@ class HssOktaDirectAuthPluginApiSetup {
   static var codec: FlutterStandardMessageCodec { HssOktaDirectAuthPluginApiCodec.shared }
   /// Sets up an instance of `HssOktaDirectAuthPluginApi` to handle messages through the `binaryMessenger`.
   static func setUp(binaryMessenger: FlutterBinaryMessenger, api: HssOktaDirectAuthPluginApi?) {
+    let initializeConfigurationChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_direct_auth.HssOktaDirectAuthPluginApi.initializeConfiguration", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      initializeConfigurationChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let clientidArg = args[0] as! String
+        let signInRedirectUrlArg = args[1] as! String
+        let signOutRedirectUrlArg = args[2] as! String
+        let issuerArg = args[3] as! String
+        let scopesArg = args[4] as! String
+        do {
+          try api.initializeConfiguration(clientid: clientidArg, signInRedirectUrl: signInRedirectUrlArg, signOutRedirectUrl: signOutRedirectUrlArg, issuer: issuerArg, scopes: scopesArg)
+          reply(wrapResult(nil))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      initializeConfigurationChannel.setMessageHandler(nil)
+    }
     let signInWithCredentialsChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_direct_auth.HssOktaDirectAuthPluginApi.signInWithCredentials", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       signInWithCredentialsChannel.setMessageHandler { message, reply in

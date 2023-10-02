@@ -36,4 +36,24 @@ class HssOktaDirectAuth {
 
     return result;
   }
+
+  void init(
+    String clientid,
+    String signInRedirectUrl,
+    String signOutRedirectUrl,
+    String issuer,
+    String scopes,
+  ) {
+    try {
+      HssOktaDirectAuthPlatform.instance.init(
+        clientid,
+        signInRedirectUrl,
+        signOutRedirectUrl,
+        issuer,
+        scopes,
+      );
+    } catch (ex) {
+      throw Exception(ex);
+    }
+  }
 }
