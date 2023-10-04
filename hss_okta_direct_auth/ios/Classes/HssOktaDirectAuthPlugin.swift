@@ -33,7 +33,7 @@ open class HssOktaDirectAuthPlugin :NSObject, FlutterPlugin,HssOktaDirectAuthPlu
     func signInWithCredentials(request: HssOktaDirectAuthRequest, completion: @escaping (Result<HssOktaDirectAuthResult?, Error>) -> Void)  {
         
         if let config = try? OAuth2Client.PropertyListConfiguration(){
-            flow = DirectAuthenticationFlow(issuer: config.issuer, clientId: config.clientId, scopes: config.scopes)
+            flow = DirectAuthenticationFlow(issuer: config.issuer, clientId: config.clientId, scopes: config.scopes,supportedGrants: [.password,.otpMFA])
             
             Task{
                 do{

@@ -24,9 +24,14 @@ class _MyAppState extends State<MyApp> {
   String password = "";
   final TextEditingController _controller = TextEditingController();
   final TextEditingController _usernamecontroller =
-      TextEditingController(text: "AldrinFrancisco@ntsafety.com");
+      TextEditingController(text: "aldrin.francisco@designli.co");
   final TextEditingController _passwordcontroller =
-      TextEditingController(text: "S@asAppD3v!");
+      TextEditingController(text: "tZTEvb2vZNrFTVB");
+
+  //     final TextEditingController _usernamecontroller =
+  //     TextEditingController(text: "AldrinFrancisco@ntsafety.com");
+  // final TextEditingController _passwordcontroller =
+  //     TextEditingController(text: "S@asAppD3v!");
   final PageController _pageController = PageController(initialPage: 0);
 
   HssOktaDirectAuthResult? result;
@@ -57,9 +62,20 @@ class _MyAppState extends State<MyApp> {
           controller: _controller,
         ),
         OutlinedButton(
-            onPressed: () {
-              _hssOktaDirectAuthPlugin
-                  .mfaOtpSignInWithCredentials(_controller.text);
+            onPressed: () async {
+              await _hssOktaDirectAuthPlugin
+                  .mfaOtpSignInWithCredentials(_controller.text)
+                  .then((value) async {
+                debugPrint("${value.result}");
+                if (value.result == DirectAuthResult.success) {
+                  result = value;
+
+                  await getCredential();
+                  _pageController.animateToPage(2,
+                      duration: const Duration(milliseconds: 500),
+                      curve: Curves.ease);
+                }
+              });
             },
             child: const Text('Submit'))
       ],
@@ -97,6 +113,12 @@ class _MyAppState extends State<MyApp> {
                     if (res.result == DirectAuthResult.error) {
                       ScaffoldMessenger.of(formContext).showSnackBar(
                           SnackBar(content: Text('Error: ${res.error}')));
+                    }
+
+                    if (res.result == DirectAuthResult.mfaRequired) {
+                      _pageController.animateToPage(1,
+                          duration: const Duration(milliseconds: 500),
+                          curve: Curves.ease);
                     }
 
                     setState(() {});
@@ -161,7 +183,7 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Plugin example app'),
+          title: const Text('Okta Direct Authentication Example'),
         ),
         body: Builder(builder: (builderContext) {
           return PageView(
