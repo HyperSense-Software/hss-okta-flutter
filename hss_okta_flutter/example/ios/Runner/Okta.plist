@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+
+<!-- <plist version="1.0">
+   <dict>
+      <key>issuer</key>
+      <string>https://ntsafety.okta.com</string>
+      <key>clientId</key>
+      <string>0oa7vbqbudjoR9zMX697</string>
+      <key>redirectUri</key>
+      <string>com.okta.ntsafety:/callback</string>
+      <key>logoutRedirectUri</key>
+      <string>com.okta.ntsafety:/</string>
+      <key>scopes</key>
+      <string>openid offline_access email profile</string>
+    </dict>
+</plist> -->
+
+<plist version="1.0">
+   <dict>
+      <key>issuer</key>
+      <string>https://dev-88611703.okta.com</string>
+      <key>clientId</key>
+      <string>0oa6o42r20pZcgHUX5d7</string>
+      <key>redirectUri</key>
+      <string>com.okta.dev-88611703:/callback</string>
+      <key>logoutRedirectUri</key>
+      <string>com.okta.dev-88611703:/logout</string>
+      <key>scopes</key>
+      <string>openid email profile</string>
+    </dict>
+</plist>
