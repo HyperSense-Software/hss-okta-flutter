@@ -2,6 +2,8 @@ import Flutter
 import OktaDirectAuth
 import AuthFoundation
 import UIKit
+import WebAuthenticationUI
+
 
 enum HssOktaError: Error {
 case configError(String)
@@ -11,7 +13,10 @@ case credentialError(String)
 
 public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginApi {
     
-
+    func startBrowserAuthenticationFlow(completion: @escaping (Result<OktaAuthenticationResult?, Error>) -> Void) {
+        
+    }
+    
     var flow : DirectAuthenticationFlow?
     var status : DirectAuthenticationFlow.Status?
     
@@ -19,6 +24,9 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
     public static func register(with registrar: FlutterPluginRegistrar) {
         let messenger : FlutterBinaryMessenger = registrar.messenger()
         let api : HssOktaFlutterPluginApi & NSObjectProtocol = HssOktaFlutterPlugin.init()
+        let factory = FLNativeViewFactory(messenger: registrar.messenger())
+        registrar.register(factory, withId: "browser-redirect")
+        
         HssOktaFlutterPluginApiSetup.setUp(binaryMessenger: messenger, api: api)
     }
     
@@ -29,7 +37,9 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
     
     func startDirectAuthenticationFlow(request: DirectAuthRequest, completion: @escaping (Result<OktaAuthenticationResult?, Error>) -> Void) {
         
+        
         if let config = try? OAuth2Client.PropertyListConfiguration(){
+
             flow = DirectAuthenticationFlow(issuer: config.issuer, clientId: config.clientId, scopes: config.scopes,supportedGrants: [.password,.otpMFA])
             
             Task{
@@ -163,4 +173,95 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
             }
         }
     }
+}
+
+class FLNativeViewFactory: NSObject, FlutterPlatformViewFactory {
+    private var messenger: FlutterBinaryMessenger
+
+    init(messenger: FlutterBinaryMessenger) {
+        self.messenger = messenger
+        super.init()
+    }
+
+    func create(
+        withFrame frame: CGRect,
+        viewIdentifier viewId: Int64,
+        arguments args: Any?
+    ) -> FlutterPlatformView {
+        return FLNativeView(
+            frame: frame,
+            viewIdentifier: viewId,
+            arguments: args,
+            binaryMessenger: messenger)
+    }
+
+
+    public func createArgsCodec() -> FlutterMessageCodec & NSObjectProtocol {
+          return FlutterStandardMessageCodec.sharedInstance()
+    }
+}
+
+class FLNativeView: NSObject, FlutterPlatformView {
+    private var _view: UIView
+    
+    
+    
+    init(
+        frame: CGRect,
+        viewIdentifier viewId: Int64,
+        arguments args: Any?,
+        binaryMessenger messenger: FlutterBinaryMessenger
+    ) {
+        _view = UIView()
+        super.init()
+        createNativeView(view: _view)
+        let browserAuth = FlutterEventChannel(name: "dev.hss.okta_flutter/browser_signin", binaryMessenger: messenger)
+        browserAuth.setStreamHandler(BrowserAuthenticationHandler(view: _view))
+        
+        
+    }
+
+    func view() -> UIView {
+        return _view
+    }
+
+
+    func createNativeView(view _view: UIView){
+        _view.backgroundColor = UIColor.white
+    }
+}
+
+class BrowserAuthenticationHandler : NSObject, FlutterStreamHandler{
+    private var sink: FlutterEventSink?
+    lazy var auth = WebAuthentication.shared
+    private var view : UIView
+    
+    init(view : UIView){
+        self.view = view
+    }
+    
+    func onListen(withArguments arguments: Any?, eventSink: @escaping FlutterEventSink) -> FlutterError? {
+                print("onListen......")
+                self.sink = eventSink
+                
+        Task{
+            do{
+                let token = try await auth?.signIn(from: self.view.window)
+                eventSink("success?")
+            }catch let e{
+                eventSink(e.localizedDescription)
+            }
+            eventSink("success after the task?")
+        }
+
+        
+                return nil
+            }
+    
+    func onCancel(withArguments arguments: Any?) -> FlutterError? {
+        sink = nil
+        return nil
+    }
+    
+    
 }

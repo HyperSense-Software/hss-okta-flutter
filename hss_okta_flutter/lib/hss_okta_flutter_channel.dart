@@ -2,7 +2,7 @@ import 'package:hss_okta_flutter/generated/hss_okta_flutter.g.dart';
 
 import 'hss_okta_platform_interface.dart';
 
-class HssOktaFlutterChannel extends HssOktaDirectAuthPlatform {
+class HssOktaFlutterChannel extends HssOktaFlutterPluginPlatform {
   final _api = HssOktaFlutterPluginApi();
 
   @override
@@ -38,6 +38,17 @@ class HssOktaFlutterChannel extends HssOktaDirectAuthPlatform {
   Future<OktaAuthenticationResult> continueDirectAuthenticationMfaFlow(
       String otp) async {
     var res = await _api.continueDirectAuthenticationMfaFlow(otp);
+    if (res == null) {
+      throw Exception("Null result from mfaOtpSignInWithCredentials");
+    }
+
+    return res;
+  }
+
+  @override
+  Future<OktaAuthenticationResult> startBrowserAuthenticationFlow() async {
+    var res = await _api.startBrowserAuthenticationFlow();
+
     if (res == null) {
       throw Exception("Null result from mfaOtpSignInWithCredentials");
     }

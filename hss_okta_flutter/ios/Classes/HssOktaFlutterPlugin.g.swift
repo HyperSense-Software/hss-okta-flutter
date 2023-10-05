@@ -268,6 +268,7 @@ protocol HssOktaFlutterPluginApi {
   func refreshDefaultToken(completion: @escaping (Result<Bool?, Error>) -> Void)
   func revokeDefaultToken(completion: @escaping (Result<Bool?, Error>) -> Void)
   func getCredential(completion: @escaping (Result<OktaAuthenticationResult?, Error>) -> Void)
+  func startBrowserAuthenticationFlow(completion: @escaping (Result<OktaAuthenticationResult?, Error>) -> Void)
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -373,6 +374,21 @@ class HssOktaFlutterPluginApiSetup {
       }
     } else {
       getCredentialChannel.setMessageHandler(nil)
+    }
+    let startBrowserAuthenticationFlowChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.startBrowserAuthenticationFlow", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      startBrowserAuthenticationFlowChannel.setMessageHandler { _, reply in
+        api.startBrowserAuthenticationFlow() { result in
+          switch result {
+            case .success(let res):
+              reply(wrapResult(res))
+            case .failure(let error):
+              reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      startBrowserAuthenticationFlowChannel.setMessageHandler(nil)
     }
   }
 }

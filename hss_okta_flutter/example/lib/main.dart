@@ -4,6 +4,7 @@ import 'package:hss_okta_flutter/generated/hss_okta_flutter.g.dart';
 import 'dart:async';
 
 import 'package:hss_okta_flutter/hss_okta_flutter.dart';
+import 'package:hss_okta_flutter_example/web_auth.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 
 void main() {
@@ -41,6 +42,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+    // For android
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
       _plugin.init("0oa7vbqbudjoR9zMX697", "com.okta.ntsafety:/callback",
           "com.okta.ntsafety:/", "https://ntsafety.okta.com", "openid profile");
@@ -126,7 +128,16 @@ class _MyAppState extends State<MyApp> {
                       SnackBar(content: Text('Error: ${e.toString()}')));
                 }
               },
-              child: const Text('Submit'))
+              child: const Text('Submit')),
+          const SizedBox(
+            height: 24,
+          ),
+          OutlinedButton(
+              onPressed: () {
+                Navigator.of(formContext).push(MaterialPageRoute(
+                    builder: (c) => const WebAuthenticationOkta()));
+              },
+              child: const Text('Browser sign in'))
         ],
       ),
     );

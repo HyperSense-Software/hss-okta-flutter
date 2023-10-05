@@ -272,6 +272,7 @@ interface HssOktaFlutterPluginApi {
   fun refreshDefaultToken(callback: (Result<Boolean?>) -> Unit)
   fun revokeDefaultToken(callback: (Result<Boolean?>) -> Unit)
   fun getCredential(callback: (Result<OktaAuthenticationResult?>) -> Unit)
+  fun startBrowserAuthenticationFlow(callback: (Result<OktaAuthenticationResult?>) -> Unit)
 
   companion object {
     /** The codec used by HssOktaFlutterPluginApi. */
@@ -385,6 +386,24 @@ interface HssOktaFlutterPluginApi {
         if (api != null) {
           channel.setMessageHandler { _, reply ->
             api.getCredential() { result: Result<OktaAuthenticationResult?> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(wrapResult(data))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.startBrowserAuthenticationFlow", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            api.startBrowserAuthenticationFlow() { result: Result<OktaAuthenticationResult?> ->
               val error = result.exceptionOrNull()
               if (error != null) {
                 reply.reply(wrapError(error))
