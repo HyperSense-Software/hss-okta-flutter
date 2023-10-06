@@ -1,7 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:hss_okta_flutter/enums/sign_in_factors.dart';
 import 'package:hss_okta_flutter/generated/hss_okta_flutter.g.dart';
 import 'package:hss_okta_flutter/hss_okta_platform_interface.dart';
@@ -48,20 +46,6 @@ class HssOktaFlutter {
     return result;
   }
 
-  Widget webAuthenticationWidget() {
-    return UiKitView(
-      viewType: 'browser-redirect',
-      layoutDirection: TextDirection.ltr,
-      creationParams: const {},
-      creationParamsCodec: const StandardMessageCodec(),
-      onPlatformViewCreated: (id) async {
-        var result = await HssOktaFlutterPluginPlatform.instance
-            .startBrowserAuthenticationFlow();
-        print(result);
-      },
-    );
-  }
-
   void init(
     String clientid,
     String signInRedirectUrl,
@@ -80,13 +64,5 @@ class HssOktaFlutter {
     } catch (ex) {
       throw Exception(ex);
     }
-  }
-}
-
-class HssOktaBrowserAuthenticator {
-  var channel = const EventChannel("dev.hss.okta_flutter/browser_signin");
-
-  Stream<dynamic> browserSigninStream() {
-    return channel.receiveBroadcastStream().map((event) => event);
   }
 }

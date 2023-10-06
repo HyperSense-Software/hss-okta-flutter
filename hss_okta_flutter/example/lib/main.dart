@@ -66,7 +66,6 @@ class _MyAppState extends State<MyApp> {
               await _plugin
                   .mfaOtpSignInWithCredentials(_controller.text)
                   .then((value) async {
-                debugPrint("${value.result}");
                 if (value.result == AuthenticationResult.success) {
                   result = value;
 
@@ -102,23 +101,7 @@ class _MyAppState extends State<MyApp> {
                       email: _usernamecontroller.text,
                       password: _passwordcontroller.text,
                       factors: [OktaSignInFactor.otp]).then((res) {
-                    if (res.result == AuthenticationResult.success) {
-                      result = res;
-                      _pageController.animateToPage(2,
-                          duration: const Duration(milliseconds: 500),
-                          curve: Curves.ease);
-                    }
-
-                    if (res.result == AuthenticationResult.error) {
-                      ScaffoldMessenger.of(formContext).showSnackBar(
-                          SnackBar(content: Text('Error: ${res.error}')));
-                    }
-
-                    if (res.result == AuthenticationResult.mfaRequired) {
-                      _pageController.animateToPage(1,
-                          duration: const Duration(milliseconds: 500),
-                          curve: Curves.ease);
-                    }
+                    _processResult(res, formContext);
 
                     setState(() {});
                   });
@@ -133,14 +116,40 @@ class _MyAppState extends State<MyApp> {
             height: 24,
           ),
           OutlinedButton(
-              onPressed: () {
-                Navigator.of(formContext).push(MaterialPageRoute(
-                    builder: (c) => const WebAuthenticationOkta()));
+              onPressed: () async {
+                var result = await Navigator.of(formContext).push(
+                    MaterialPageRoute(builder: (c) => const WebAuthExample()));
+
+                if (result != null) {
+                  if (result) {
+                    var cred = await _plugin.getCredential();
+                    _processResult(cred, formContext);
+                    setState(() {});
+                  }
+                }
               },
               child: const Text('Browser sign in'))
         ],
       ),
     );
+  }
+
+  void _processResult(OktaAuthenticationResult res, BuildContext context) {
+    if (res.result == AuthenticationResult.success) {
+      result = res;
+      _pageController.animateToPage(2,
+          duration: const Duration(milliseconds: 500), curve: Curves.ease);
+    }
+
+    if (res.result == AuthenticationResult.error) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Error: ${res.error}')));
+    }
+
+    if (res.result == AuthenticationResult.mfaRequired) {
+      _pageController.animateToPage(1,
+          duration: const Duration(milliseconds: 500), curve: Curves.ease);
+    }
   }
 
   Widget _profile() {

@@ -22,12 +22,14 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
     
     
     public static func register(with registrar: FlutterPluginRegistrar) {
+       
         let messenger : FlutterBinaryMessenger = registrar.messenger()
         let api : HssOktaFlutterPluginApi & NSObjectProtocol = HssOktaFlutterPlugin.init()
         let factory = FLNativeViewFactory(messenger: registrar.messenger())
-        registrar.register(factory, withId: "browser-redirect")
+        registrar.register(factory, withId: "dev.hypersense.software.hss_okta.browser-signin-widget")
         
         HssOktaFlutterPluginApiSetup.setUp(binaryMessenger: messenger, api: api)
+               
     }
     
     func initializeConfiguration(clientid: String, signInRedirectUrl: String, signOutRedirectUrl: String, issuer: String, scopes: String) throws {
@@ -51,20 +53,9 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
                     switch status{
                     case .success(let token):
                         Credential.default = try Credential.store(token)
-                        var userInfo = try await Credential.default?.userInfo()
+                        let userInfo = try await Credential.default?.userInfo()
 
-                        completion(.success(OktaAuthenticationResult(
-                            result: AuthenticationResult.success,
-                            
-                            token: OktaToken(
-                                id: token.id,
-                                token: token.idToken?.rawValue ?? "",
-                                issuedAt: Int64(((token.issuedAt?.timeIntervalSince1970 ?? 0) * 1000.0).rounded()),
-                                tokenType: token.tokenType, accessToken: token.accessToken, scope: token.scope ?? "",
-                                refreshToken: token.refreshToken ?? ""),
-                            
-                        userInfo:  UserInfo(userId: "", givenName: userInfo?.givenName ?? "", middleName: userInfo?.middleName ?? "", familyName: userInfo?.familyName ?? "", gender: userInfo?.gender ?? "", email: userInfo?.email ?? "", phoneNumber: userInfo?.phoneNumber ?? "", username: userInfo?.preferredUsername  ?? "")
-                        )))
+                        completion(.success(constructAuthenticationResult(resultEnum: AuthenticationResult.success, token: token, userInfo: userInfo)))
                         
                     case .mfaRequired(_):
                         completion(.success(OktaAuthenticationResult(result: AuthenticationResult.mfaRequired,error: "MFA Required")))
@@ -87,23 +78,9 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
              status = try await flow?.resume(self.status!, with: .otp(code: otp))
                 if case let .success(token) = status{
                     Credential.default = try Credential.store(token)
-                    var userInfo = try await Credential.default?.userInfo()
+                    let userInfo = try await Credential.default?.userInfo()
                     
-                    completion(.success(OktaAuthenticationResult(
-                        result: AuthenticationResult.success,
-                        
-                        token: OktaToken(
-                            id: token.id,
-                            
-                            token: token.idToken?.rawValue ?? "",
-                            issuedAt: Int64(((token.issuedAt?.timeIntervalSince1970 ?? 0) * 1000.0).rounded()),
-                            tokenType: token.tokenType,
-                            accessToken: token.accessToken,
-                            scope: token.scope ?? "",
-                            refreshToken: token.refreshToken ?? ""),
-                        
-                            userInfo: UserInfo(userId: "", givenName: userInfo?.givenName ?? "", middleName: userInfo?.middleName ?? "", familyName: userInfo?.familyName ?? "", gender: userInfo?.gender ?? "", email: userInfo?.email ?? "", phoneNumber: userInfo?.phoneNumber ?? "", username: userInfo?.preferredUsername  ?? "")
-                    )))
+                    completion(.success(constructAuthenticationResult(resultEnum: AuthenticationResult.success, token: token, userInfo: userInfo)))
                 }else{
                     completion(.success(OktaAuthenticationResult(result: AuthenticationResult.error,error: "MFA Failed")))
                 }
@@ -151,33 +128,37 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
         Task{
             if let result = Credential.default{
                 
-                var resultEnum = AuthenticationResult.success
-                var userInfo = try await Credential.default?.userInfo()
+                let userInfo = try await Credential.default?.userInfo()
                 
-                completion(.success(OktaAuthenticationResult(
-                    result: resultEnum,
-                    token: OktaToken(
-                        id: result.token.id,
-                        token: result.token.idToken?.rawValue ?? "",
-                        issuedAt: Int64(((result.token.issuedAt?.timeIntervalSince1970 ?? 0) * 1000.0).rounded()),
-                        tokenType: result.token.tokenType,
-                        accessToken: result.token.accessToken,
-                        scope: result.token.scope ?? "",
-                        refreshToken: result.token.refreshToken ?? ""
-                    ),
-                    userInfo: UserInfo(userId: "", givenName: userInfo?.givenName ?? "", middleName: userInfo?.middleName ?? "", familyName: userInfo?.familyName ?? "", gender: userInfo?.gender ?? "", email: userInfo?.email ?? "", phoneNumber: userInfo?.phoneNumber ?? "", username: userInfo?.preferredUsername  ?? "")
-                )))
+                completion(.success(constructAuthenticationResult(resultEnum: AuthenticationResult.success, token: result.token, userInfo: userInfo ?? nil)))
             }else{
-                var resultEnum = AuthenticationResult.error
-                completion(.success(OktaAuthenticationResult(result: resultEnum,error: "Failed to Login : Server did not provide result")))
+                
+                completion(.success(OktaAuthenticationResult(result:  AuthenticationResult.error,error: "Failed to Login : Server did not provide result")))
             }
         }
+    }
+    
+    func constructAuthenticationResult(resultEnum : AuthenticationResult, token : Token,userInfo : AuthFoundation.UserInfo?) -> OktaAuthenticationResult{
+        return OktaAuthenticationResult(
+            result: resultEnum,
+            token: OktaToken(
+                id: token.id,
+                token: token.idToken?.rawValue ?? "",
+                issuedAt: Int64(((token.issuedAt?.timeIntervalSince1970 ?? 0) * 1000.0).rounded()),
+                tokenType: token.tokenType,
+                accessToken: token.accessToken,
+                scope: token.scope ?? "",
+                refreshToken: token.refreshToken ?? ""
+            ),
+            userInfo: UserInfo(userId: "", givenName: userInfo?.givenName ?? "", middleName: userInfo?.middleName ?? "", familyName: userInfo?.familyName ?? "", gender: userInfo?.gender ?? "", email: userInfo?.email ?? "", phoneNumber: userInfo?.phoneNumber ?? "", username: userInfo?.preferredUsername  ?? "")
+        )
     }
 }
 
 class FLNativeViewFactory: NSObject, FlutterPlatformViewFactory {
     private var messenger: FlutterBinaryMessenger
 
+    
     init(messenger: FlutterBinaryMessenger) {
         self.messenger = messenger
         super.init()
@@ -192,7 +173,8 @@ class FLNativeViewFactory: NSObject, FlutterPlatformViewFactory {
             frame: frame,
             viewIdentifier: viewId,
             arguments: args,
-            binaryMessenger: messenger)
+            binaryMessenger: self.messenger
+        )
     }
 
 
@@ -205,30 +187,26 @@ class FLNativeView: NSObject, FlutterPlatformView {
     private var _view: UIView
     
     
-    
     init(
         frame: CGRect,
         viewIdentifier viewId: Int64,
         arguments args: Any?,
-        binaryMessenger messenger: FlutterBinaryMessenger
-    ) {
+        binaryMessenger messenger: FlutterBinaryMessenger) {
         _view = UIView()
         super.init()
-        createNativeView(view: _view)
-        let browserAuth = FlutterEventChannel(name: "dev.hss.okta_flutter/browser_signin", binaryMessenger: messenger)
+       
+        let browserAuth = FlutterEventChannel(name: "dev.hss.okta_flutter.browser_signin", binaryMessenger: messenger)
         browserAuth.setStreamHandler(BrowserAuthenticationHandler(view: _view))
-        
-        
+        createNativeView(view: _view)
     }
 
     func view() -> UIView {
+        
         return _view
     }
 
 
-    func createNativeView(view _view: UIView){
-        _view.backgroundColor = UIColor.white
-    }
+    func createNativeView(view _view: UIView){}
 }
 
 class BrowserAuthenticationHandler : NSObject, FlutterStreamHandler{
@@ -238,25 +216,36 @@ class BrowserAuthenticationHandler : NSObject, FlutterStreamHandler{
     
     init(view : UIView){
         self.view = view
+        super.init()
+        
     }
     
-    func onListen(withArguments arguments: Any?, eventSink: @escaping FlutterEventSink) -> FlutterError? {
-                print("onListen......")
-                self.sink = eventSink
+    func startAuthenticationFlow() async throws -> Bool {
+        do{
+            if let token = try await self.auth?.signIn(from: self.view.window){
+                try Credential.store(token)
+               return true
                 
-        Task{
-            do{
-                let token = try await auth?.signIn(from: self.view.window)
-                eventSink("success?")
-            }catch let e{
-                eventSink(e.localizedDescription)
             }
-            eventSink("success after the task?")
+            
+        }catch let e{
+            throw e
         }
-
         
-                return nil
-            }
+        return false;
+    }
+    
+    
+    func onListen(withArguments arguments: Any?, eventSink: @escaping FlutterEventSink) -> FlutterError? {
+        
+        self.sink = eventSink
+        Task{@MainActor in
+           let result = try await startAuthenticationFlow()
+            eventSink(result)
+        }
+        return nil
+        
+    }
     
     func onCancel(withArguments arguments: Any?) -> FlutterError? {
         sink = nil

@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:hss_okta_flutter/hss_okta_flutter.dart';
+import 'package:hss_okta_flutter/widgets/hss_okta_browser_authenticator_widget.dart';
 
-class WebAuthenticationOkta extends StatefulWidget {
-  const WebAuthenticationOkta({super.key});
+class WebAuthExample extends StatefulWidget {
+  const WebAuthExample({super.key});
 
   @override
-  State<WebAuthenticationOkta> createState() => _WebAuthenticationOktaState();
+  State<WebAuthExample> createState() => _WebAuthExampleState();
 }
 
-class _WebAuthenticationOktaState extends State<WebAuthenticationOkta> {
+class _WebAuthExampleState extends State<WebAuthExample> {
   @override
   void initState() {
     super.initState();
@@ -20,31 +19,17 @@ class _WebAuthenticationOktaState extends State<WebAuthenticationOkta> {
     return Scaffold(
       appBar: AppBar(),
       body: SafeArea(
-        child: Column(
-          children: [
-            SizedBox(
-              height: 0,
-              width: 0,
-              child: UiKitView(
-                viewType: 'browser-redirect',
-                layoutDirection: TextDirection.ltr,
-                creationParams: {},
-                creationParamsCodec: const StandardMessageCodec(),
-                onPlatformViewCreated: (i) {},
-              ),
-            ),
-            const Text("Authenticating..."),
-            StreamBuilder(
-                stream: HssOktaBrowserAuthenticator().browserSigninStream(),
-                builder: (c, s) {
-                  if (s.hasData) {
-                    return Text(s.data.toString());
-                  }
-                  return const Text("");
-                })
-          ],
-        ),
-      ),
+          child: HssOktaBrowserAuthenticatorWidget(
+        onResult: (v) {
+          Navigator.pop(context, v);
+        },
+        builder: (context) {
+          return const Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [Center(child: CircularProgressIndicator.adaptive())],
+          );
+        },
+      )),
     );
   }
 }
