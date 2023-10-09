@@ -117,4 +117,7 @@ abstract class HssOktaFlutterPluginApi {
 
   @async
   OktaAuthenticationResult? startBrowserAuthenticationFlow();
+
+  @async
+  bool startWebSignoutFlow();
 }

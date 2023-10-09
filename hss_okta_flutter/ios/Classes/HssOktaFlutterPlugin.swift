@@ -12,6 +12,10 @@ case credentialError(String)
 
 
 public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginApi {
+   
+    
+    let browserAuth = WebAuthentication.shared
+    
     
     func startBrowserAuthenticationFlow(completion: @escaping (Result<OktaAuthenticationResult?, Error>) -> Void) {
         
@@ -108,11 +112,32 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
         
     }
     
+    
+    func startWebSignoutFlow(completion: @escaping (Result<Bool, Error>) -> Void) {
+        if let credential = Credential.default{
+            Task{
+                do{
+                    let result = try await browserAuth?.signOutFlow?.start(idToken: credential.id)
+                    
+                }catch let error{
+                    debugPrint(error)
+                    completion(.success(false))
+                }
+            }
+            completion(.success(true))
+        }else{
+            completion(.success(false))
+        }
+    }
+    
+    
     func revokeDefaultToken(completion: @escaping (Result<Bool?, Error>) -> Void){
         if let credential = Credential.default{
             Task{
                 do{
+//                    let result = try await browserAuth?.signOutFlow?.start(idToken: credential.id)
                     try await credential.revoke()
+                    
                 }catch let error{
                     debugPrint(error)
                     completion(.success(false))
@@ -128,12 +153,13 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
         Task{
             if let result = Credential.default{
                 
-                let userInfo = try await Credential.default?.userInfo()
+                let userInfo = Credential.default?.userInfo
                 
-                completion(.success(constructAuthenticationResult(resultEnum: AuthenticationResult.success, token: result.token, userInfo: userInfo ?? nil)))
+                completion(.success(constructAuthenticationResult(resultEnum: AuthenticationResult.success, token: result.token, userInfo: userInfo)))
+                
             }else{
                 
-                completion(.success(OktaAuthenticationResult(result:  AuthenticationResult.error,error: "Failed to Login : Server did not provide result")))
+                completion(.success(OktaAuthenticationResult(result:  AuthenticationResult.error,error: "Failed To fetch default Credentail ")))
             }
         }
     }
@@ -225,8 +251,9 @@ class BrowserAuthenticationHandler : NSObject, FlutterStreamHandler{
             if let token = try await self.auth?.signIn(from: self.view.window){
                 try Credential.store(token)
                return true
-                
             }
+            
+          
             
         }catch let e{
             throw e

@@ -57,6 +57,13 @@ class HssOktaFlutterChannel extends HssOktaFlutterPluginPlatform {
   }
 
   @override
+  Future<bool> startSignOutFlow() async {
+    var res = await _api.startWebSignoutFlow();
+
+    return res;
+  }
+
+  @override
   void init(
     String clientid,
     String signInRedirectUrl,

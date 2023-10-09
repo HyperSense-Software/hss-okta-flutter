@@ -42,10 +42,17 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+    _pageController.addListener(() {
+      if (result != null) {
+        _pageController.jumpToPage(2);
+      }
+    });
     // For android
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
       _plugin.init("0oa7vbqbudjoR9zMX697", "com.okta.ntsafety:/callback",
           "com.okta.ntsafety:/", "https://ntsafety.okta.com", "openid profile");
+
+      result = await _plugin.getCredential();
     });
   }
 
@@ -120,12 +127,11 @@ class _MyAppState extends State<MyApp> {
                 var result = await Navigator.of(formContext).push(
                     MaterialPageRoute(builder: (c) => const WebAuthExample()));
 
-                if (result != null) {
-                  if (result) {
-                    var cred = await _plugin.getCredential();
-                    _processResult(cred, formContext);
-                    setState(() {});
-                  }
+                if (result) {
+                  var cred = await _plugin.getCredential();
+
+                  _processResult(cred, formContext);
+                  setState(() {});
                 }
               },
               child: const Text('Browser sign in'))
@@ -189,7 +195,14 @@ class _MyAppState extends State<MyApp> {
               Text('Phone Number : ${result?.userInfo!.phoneNumber ?? ''}'),
               Text('Email : ${result?.userInfo!.email ?? ''}'),
               Text('Username : ${result?.userInfo!.username ?? ''}'),
-            ]
+            ],
+            const SizedBox(
+              height: 24,
+            ),
+            if (result != null)
+              OutlinedButton(
+                  onPressed: () async => await _plugin.startSignOutFlow(),
+                  child: const Text('WebAuth Signout'))
           ]
         ]),
       ),

@@ -46,6 +46,12 @@ class HssOktaFlutter {
     return result;
   }
 
+  Future<bool> startSignOutFlow() async {
+    var result = await HssOktaFlutterPluginPlatform.instance.startSignOutFlow();
+
+    return result;
+  }
+
   void init(
     String clientid,
     String signInRedirectUrl,

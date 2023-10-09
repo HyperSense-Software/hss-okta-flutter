@@ -21,7 +21,9 @@ class _WebAuthExampleState extends State<WebAuthExample> {
       body: SafeArea(
           child: HssOktaBrowserAuthenticatorWidget(
         onResult: (v) {
-          Navigator.pop(context, v);
+          if (v) {
+            Navigator.pop(context, v);
+          }
         },
         builder: (context) {
           return const Column(

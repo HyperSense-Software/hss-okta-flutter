@@ -269,6 +269,7 @@ protocol HssOktaFlutterPluginApi {
   func revokeDefaultToken(completion: @escaping (Result<Bool?, Error>) -> Void)
   func getCredential(completion: @escaping (Result<OktaAuthenticationResult?, Error>) -> Void)
   func startBrowserAuthenticationFlow(completion: @escaping (Result<OktaAuthenticationResult?, Error>) -> Void)
+  func startWebSignoutFlow(completion: @escaping (Result<Bool, Error>) -> Void)
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -389,6 +390,21 @@ class HssOktaFlutterPluginApiSetup {
       }
     } else {
       startBrowserAuthenticationFlowChannel.setMessageHandler(nil)
+    }
+    let startWebSignoutFlowChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.startWebSignoutFlow", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      startWebSignoutFlowChannel.setMessageHandler { _, reply in
+        api.startWebSignoutFlow() { result in
+          switch result {
+            case .success(let res):
+              reply(wrapResult(res))
+            case .failure(let error):
+              reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      startWebSignoutFlowChannel.setMessageHandler(nil)
     }
   }
 }
