@@ -19,7 +19,7 @@ class _WebAuthExampleState extends State<WebAuthExample> {
     return Scaffold(
       appBar: AppBar(),
       body: SafeArea(
-          child: HssOktaBrowserAuthenticatorWidget(
+          child: HssOktaBrowserSignInWidget(
         onResult: (v) {
           if (v) {
             Navigator.pop(context, v);

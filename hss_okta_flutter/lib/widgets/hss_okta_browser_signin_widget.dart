@@ -3,31 +3,15 @@ import 'package:flutter/services.dart';
 
 typedef AuthBrowserLoginBuilder = Widget Function(BuildContext context);
 
-class HssOktaBrowserAuthenticatorWidget extends StatefulWidget {
+class HssOktaBrowserSignInWidget extends StatelessWidget {
   final AuthBrowserLoginBuilder? builder;
   final ValueSetter<bool>? onResult;
-  const HssOktaBrowserAuthenticatorWidget({
-    super.key,
-    this.builder,
-    this.onResult,
-  });
+  final channel = const EventChannel("dev.hss.okta_flutter.browser_signin");
 
-  @override
-  State<HssOktaBrowserAuthenticatorWidget> createState() =>
-      _HssOktaBrowserAuthenticatorWidgetState();
-}
-
-class _HssOktaBrowserAuthenticatorWidgetState
-    extends State<HssOktaBrowserAuthenticatorWidget> {
-  var channel = const EventChannel("dev.hss.okta_flutter.browser_signin");
+  const HssOktaBrowserSignInWidget({super.key, this.builder, this.onResult});
 
   Stream<bool> get browserSigninStream {
     return channel.receiveBroadcastStream().map((event) => event);
-  }
-
-  @override
-  void initState() {
-    super.initState();
   }
 
   @override
@@ -43,13 +27,13 @@ class _HssOktaBrowserAuthenticatorWidgetState
             onPlatformViewCreated: (i) {
               browserSigninStream.listen((event) async {
                 if (event) {
-                  widget.onResult?.call(true);
+                  onResult?.call(true);
                 }
               });
             },
           ),
         ),
-        if (widget.builder != null) widget.builder!(context),
+        if (builder != null) builder!(context),
       ],
     );
   }

@@ -42,17 +42,15 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    _pageController.addListener(() {
-      if (result != null) {
-        _pageController.jumpToPage(2);
-      }
-    });
+
     // For android
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
       _plugin.init("0oa7vbqbudjoR9zMX697", "com.okta.ntsafety:/callback",
           "com.okta.ntsafety:/", "https://ntsafety.okta.com", "openid profile");
-
-      result = await _plugin.getCredential();
+      await getCredential();
+      if (result != null) {
+        _pageController.jumpToPage(2);
+      }
     });
   }
 
@@ -124,17 +122,15 @@ class _MyAppState extends State<MyApp> {
           ),
           OutlinedButton(
               onPressed: () async {
-                var result = await _plugin.startSignOutFlow();
-                print(result);
-                // var result = await Navigator.of(formContext).push(
-                //     MaterialPageRoute(builder: (c) => const WebAuthExample()));
+                var result = await Navigator.of(formContext).push(
+                    MaterialPageRoute(builder: (c) => const WebAuthExample()));
 
-                // if (result) {
-                //   var cred = await _plugin.getCredential();
+                if (result) {
+                  var cred = await _plugin.getCredential();
 
-                //   _processResult(cred, formContext);
-                //   setState(() {});
-                // }
+                  _processResult(cred, formContext);
+                  setState(() {});
+                }
               },
               child: const Text('Browser sign in'))
         ],
@@ -203,7 +199,10 @@ class _MyAppState extends State<MyApp> {
             ),
             if (result != null)
               OutlinedButton(
-                  onPressed: () async => await _plugin.startSignOutFlow(),
+                  onPressed: () async {
+                    var result = await _plugin.startSignOutFlow();
+                    print(result);
+                  },
                   child: const Text('WebAuth Signout'))
           ]
         ]),

@@ -47,7 +47,8 @@ class HssOktaFlutter {
   }
 
   Future<bool> startSignOutFlow() async {
-    var result = await HssOktaFlutterPluginPlatform.instance.startSignOutFlow();
+    var result =
+        await HssOktaFlutterPluginPlatform.instance.startWebSignoutFlow();
 
     return result;
   }
