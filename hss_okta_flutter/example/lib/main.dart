@@ -124,15 +124,17 @@ class _MyAppState extends State<MyApp> {
           ),
           OutlinedButton(
               onPressed: () async {
-                var result = await Navigator.of(formContext).push(
-                    MaterialPageRoute(builder: (c) => const WebAuthExample()));
+                var result = await _plugin.startSignOutFlow();
+                print(result);
+                // var result = await Navigator.of(formContext).push(
+                //     MaterialPageRoute(builder: (c) => const WebAuthExample()));
 
-                if (result) {
-                  var cred = await _plugin.getCredential();
+                // if (result) {
+                //   var cred = await _plugin.getCredential();
 
-                  _processResult(cred, formContext);
-                  setState(() {});
-                }
+                //   _processResult(cred, formContext);
+                //   setState(() {});
+                // }
               },
               child: const Text('Browser sign in'))
         ],

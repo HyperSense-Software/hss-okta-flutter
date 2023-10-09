@@ -1,5 +1,6 @@
 import Flutter
 import OktaDirectAuth
+import OktaOAuth2
 import AuthFoundation
 import UIKit
 import WebAuthenticationUI
@@ -15,7 +16,9 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
    
     
     let browserAuth = WebAuthentication.shared
-    
+    var logoutUri : URL?
+    var issuer : String?
+    var clientId : String?
     
     func startBrowserAuthenticationFlow(completion: @escaping (Result<OktaAuthenticationResult?, Error>) -> Void) {
         
@@ -33,7 +36,7 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
         registrar.register(factory, withId: "dev.hypersense.software.hss_okta.browser-signin-widget")
         
         HssOktaFlutterPluginApiSetup.setUp(binaryMessenger: messenger, api: api)
-               
+        
     }
     
     func initializeConfiguration(clientid: String, signInRedirectUrl: String, signOutRedirectUrl: String, issuer: String, scopes: String) throws {
@@ -45,7 +48,9 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
         
         
         if let config = try? OAuth2Client.PropertyListConfiguration(){
-
+            
+            logoutUri = config.logoutRedirectUri
+            
             flow = DirectAuthenticationFlow(issuer: config.issuer, clientId: config.clientId, scopes: config.scopes,supportedGrants: [.password,.otpMFA])
             
             Task{
@@ -114,20 +119,21 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
     
     
     func startWebSignoutFlow(completion: @escaping (Result<Bool, Error>) -> Void) {
-        if let credential = Credential.default{
+       
+        if let config = try? OAuth2Client.PropertyListConfiguration(){
+            
+            let flow = SessionLogoutFlow(issuer: config.issuer, clientId: config.clientId, scopes: config.scopes, logoutRedirectUri: config.redirectUri)
+            
             Task{
                 do{
-                    let result = try await browserAuth?.signOutFlow?.start(idToken: credential.id)
-                    
+                    let result = try await browserAuth?.signOutFlow?.start(with: flow)
+
                 }catch let error{
                     debugPrint(error)
                     completion(.success(false))
                 }
-            }
-            completion(.success(true))
-        }else{
-            completion(.success(false))
         }
+   
     }
     
     
@@ -135,7 +141,6 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
         if let credential = Credential.default{
             Task{
                 do{
-//                    let result = try await browserAuth?.signOutFlow?.start(idToken: credential.id)
                     try await credential.revoke()
                     
                 }catch let error{
