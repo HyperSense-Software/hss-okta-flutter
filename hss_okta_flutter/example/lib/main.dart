@@ -197,6 +197,8 @@ class _MyAppState extends State<MyApp> {
               OutlinedButton(
                   onPressed: () async {
                     try {
+                      await _plugin.revokeDefaultToken();
+
                       var result = await Navigator.of(profileContext).push(
                           MaterialPageRoute(
                               builder: (c) => const WebSignOutExample()));
