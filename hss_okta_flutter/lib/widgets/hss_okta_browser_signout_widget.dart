@@ -6,11 +6,13 @@ typedef AuthBrowserLoginBuilder = Widget Function(BuildContext context);
 class HssOktaBrowserSignOutWidget extends StatelessWidget {
   final AuthBrowserLoginBuilder? builder;
   final ValueSetter<bool>? onResult;
-  final channel = const EventChannel("dev.hss.okta_flutter.browser_signout");
+
+  final channel = const EventChannel(
+      "dev.hypersense.software.hss_okta.channels.browser_signout");
 
   const HssOktaBrowserSignOutWidget({super.key, this.builder, this.onResult});
 
-  Stream<bool> get browserSigninStream {
+  Stream<bool> get browserSignOutStream {
     return channel.receiveBroadcastStream().map((event) => event);
   }
 
@@ -20,12 +22,12 @@ class HssOktaBrowserSignOutWidget extends StatelessWidget {
       children: [
         SizedBox.shrink(
           child: UiKitView(
-            viewType: 'dev.hypersense.software.hss_okta.browser-signout-widget',
+            viewType: 'dev.hypersense.software.hss_okta.views.browser.signout',
             layoutDirection: TextDirection.ltr,
             creationParams: const {},
             creationParamsCodec: const StandardMessageCodec(),
             onPlatformViewCreated: (i) {
-              browserSigninStream.listen((event) async {
+              browserSignOutStream.listen((event) async {
                 if (event) {
                   onResult?.call(true);
                 }

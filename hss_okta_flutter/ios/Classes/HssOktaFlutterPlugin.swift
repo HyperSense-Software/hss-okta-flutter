@@ -6,6 +6,7 @@ import UIKit
 import WebAuthenticationUI
 
 
+
 enum HssOktaError: Error {
 case configError(String)
 case credentialError(String)
@@ -14,16 +15,7 @@ case credentialError(String)
 
 public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginApi {
     
-    
     let browserAuth = WebAuthentication.shared
-    var logoutUri : URL?
-    var issuer : String?
-    var clientId : String?
-    
-    func startBrowserAuthenticationFlow(completion: @escaping (Result<OktaAuthenticationResult?, Error>) -> Void) {
-        
-    }
-    
     var flow : DirectAuthenticationFlow?
     var status : DirectAuthenticationFlow.Status?
     
@@ -32,9 +24,12 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
         
         let messenger : FlutterBinaryMessenger = registrar.messenger()
         let api : HssOktaFlutterPluginApi & NSObjectProtocol = HssOktaFlutterPlugin.init()
+        
+        
         let signInFactory = WebSignInNativeViewFactory(messenger: registrar.messenger())
-        let signOutFactory = WebSignOutNativeViewFactory(messenger: registrar.messenger())
         registrar.register(signInFactory, withId: WebSignInNativeViewFactory.platformViewName)
+        
+        let signOutFactory = WebSignOutNativeViewFactory(messenger: registrar.messenger())
         registrar.register(signOutFactory, withId: WebSignOutNativeViewFactory.platformViewName)
         
         HssOktaFlutterPluginApiSetup.setUp(binaryMessenger: messenger, api: api)
@@ -42,17 +37,12 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
     }
     
     func initializeConfiguration(clientid: String, signInRedirectUrl: String, signOutRedirectUrl: String, issuer: String, scopes: String) throws {
-        
-        
     }
     
     func startDirectAuthenticationFlow(request: DirectAuthRequest, completion: @escaping (Result<OktaAuthenticationResult?, Error>) -> Void) {
         
         
         if let config = try? OAuth2Client.PropertyListConfiguration(){
-            
-            logoutUri = config.logoutRedirectUri
-            
             flow = DirectAuthenticationFlow(issuer: config.issuer, clientId: config.clientId, scopes: config.scopes,supportedGrants: [.password,.otpMFA])
             
             Task{
@@ -118,12 +108,6 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
         
         
     }
-    
-    
-    func startWebSignoutFlow(completion: @escaping (Result<Bool, Error>) -> Void) {
-    }
-        
-        
         func revokeDefaultToken(completion: @escaping (Result<Bool?, Error>) -> Void){
             if let credential = Credential.default{
                 Task{
@@ -172,3 +156,5 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
             )
         }       
 }
+
+

@@ -30,11 +30,6 @@ class _MyAppState extends State<MyApp> {
   final TextEditingController _passwordcontroller =
       TextEditingController(text: "tZTEvb2vZNrFTVB");
 
-  //     final TextEditingController _usernamecontroller =
-  //     TextEditingController(text: "AldrinFrancisco@ntsafety.com");
-  // final TextEditingController _passwordcontroller =
-  //     TextEditingController(text: "S@asAppD3v!");
-
   final PageController _pageController = PageController(initialPage: 0);
 
   OktaAuthenticationResult? result;
@@ -123,7 +118,8 @@ class _MyAppState extends State<MyApp> {
           OutlinedButton(
               onPressed: () async {
                 var result = await Navigator.of(formContext).push(
-                    MaterialPageRoute(builder: (c) => const WebAuthExample()));
+                    MaterialPageRoute(
+                        builder: (c) => const WebSignInExample()));
 
                 if (result) {
                   var cred = await _plugin.getCredential();
@@ -156,7 +152,7 @@ class _MyAppState extends State<MyApp> {
     }
   }
 
-  Widget _profile() {
+  Widget _profile(BuildContext profileContext) {
     if (result == null) return const CircularProgressIndicator.adaptive();
 
     return Padding(
@@ -200,8 +196,18 @@ class _MyAppState extends State<MyApp> {
             if (result != null)
               OutlinedButton(
                   onPressed: () async {
-                    var result = await _plugin.startSignOutFlow();
-                    print(result);
+                    try {
+                      var result = await Navigator.of(profileContext).push(
+                          MaterialPageRoute(
+                              builder: (c) => const WebSignOutExample()));
+
+                      if (result) {
+                        _pageController.jumpTo(0);
+                      }
+                    } catch (e) {
+                      ScaffoldMessenger.of(profileContext).showSnackBar(
+                          SnackBar(content: Text('Error: ${e.toString()}')));
+                    }
                   },
                   child: const Text('WebAuth Signout'))
           ]
@@ -224,7 +230,7 @@ class _MyAppState extends State<MyApp> {
             children: [
               _form(builderContext),
               _mfa(),
-              _profile(),
+              _profile(builderContext),
             ],
           );
         }),

@@ -1,9 +1,9 @@
 import Flutter
 import WebAuthenticationUI
 
-class WebSignOutNativeViewFactory: NSObject, FlutterPlatformViewFactory {
+class WebSignInNativeViewFactory: NSObject, FlutterPlatformViewFactory {
             private var messenger: FlutterBinaryMessenger
-            public static var platformViewName = "dev.hypersense.software.hss_okta.browser-signout-widget"
+            public static var platformViewName = "dev.hypersense.software.hss_okta.views.browser.signin"
             
             init(messenger: FlutterBinaryMessenger) {
                 self.messenger = messenger
@@ -29,7 +29,7 @@ class WebSignOutNativeViewFactory: NSObject, FlutterPlatformViewFactory {
             }
         }
         
-        class WebSignOutNativeView: NSObject, FlutterPlatformView {
+        class WebSignInNativeView: NSObject, FlutterPlatformView {
             private var _view: UIView
             
             
@@ -41,7 +41,8 @@ class WebSignOutNativeViewFactory: NSObject, FlutterPlatformViewFactory {
                     _view = UIView()
                     super.init()
                     
-                    let browserAuth = FlutterEventChannel(name: "dev.hss.okta_flutter.browser_signout", binaryMessenger: messenger)
+                    let browserAuth = FlutterEventChannel(name: "dev.hypersense.software.hss_okta.channels.browser_signin",
+                     binaryMessenger: messenger)
                     browserAuth.setStreamHandler(BrowserAuthenticationHandler(view: _view))
                     createNativeView(view: _view)
                 }
@@ -51,11 +52,10 @@ class WebSignOutNativeViewFactory: NSObject, FlutterPlatformViewFactory {
                 return _view
             }
             
-            
             func createNativeView(view _view: UIView){}
         }
         
-        class BrowserSignOutHandler : NSObject, FlutterStreamHandler{
+        class BrowserAuthenticationHandler : NSObject, FlutterStreamHandler{
             private var sink: FlutterEventSink?
             lazy var auth = WebAuthentication.shared
             private var view : UIView
@@ -66,13 +66,20 @@ class WebSignOutNativeViewFactory: NSObject, FlutterPlatformViewFactory {
                 
             }
             
-            func startSignOut() async throws -> Void {
+            func startAuthenticationFlow() async throws -> Bool {
                 do{
-                    if let webAuth = WebAuthentication.shared{
-                    try await webAuth.signOut(from: self.view.window)
+                    if let token = try await self.auth?.signIn(from: self.view.window){
+                        Credential.default = try Credential.store(token)
+                        return true
                     }
                     
+                    
+                    
+                }catch let e{
+                    throw e
                 }
+                
+                return false;
             }
             
             
@@ -80,8 +87,8 @@ class WebSignOutNativeViewFactory: NSObject, FlutterPlatformViewFactory {
                 
                 self.sink = eventSink
                 Task{@MainActor in
-                   try await startSignOut()
-                    eventSink(true)
+                    let result = try await startAuthenticationFlow()
+                    eventSink(result)
                 }
                 return nil
                 

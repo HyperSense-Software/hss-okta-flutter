@@ -46,24 +46,6 @@ class HssOktaFlutterChannel extends HssOktaFlutterPluginPlatform {
   }
 
   @override
-  Future<OktaAuthenticationResult> startBrowserAuthenticationFlow() async {
-    var res = await _api.startBrowserAuthenticationFlow();
-
-    if (res == null) {
-      throw Exception("Null result from mfaOtpSignInWithCredentials");
-    }
-
-    return res;
-  }
-
-  @override
-  Future<bool> startWebSignoutFlow() async {
-    var res = await _api.startWebSignoutFlow();
-
-    return res;
-  }
-
-  @override
   void init(
     String clientid,
     String signInRedirectUrl,

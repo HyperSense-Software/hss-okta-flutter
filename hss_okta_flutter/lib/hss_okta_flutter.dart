@@ -46,13 +46,6 @@ class HssOktaFlutter {
     return result;
   }
 
-  Future<bool> startSignOutFlow() async {
-    var result =
-        await HssOktaFlutterPluginPlatform.instance.startWebSignoutFlow();
-
-    return result;
-  }
-
   void init(
     String clientid,
     String signInRedirectUrl,

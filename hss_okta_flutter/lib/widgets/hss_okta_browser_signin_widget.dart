@@ -6,7 +6,8 @@ typedef AuthBrowserLoginBuilder = Widget Function(BuildContext context);
 class HssOktaBrowserSignInWidget extends StatelessWidget {
   final AuthBrowserLoginBuilder? builder;
   final ValueSetter<bool>? onResult;
-  final channel = const EventChannel("dev.hss.okta_flutter.browser_signin");
+  final channel = const EventChannel(
+      "dev.hypersense.software.hss_okta.channels.browser_signin");
 
   const HssOktaBrowserSignInWidget({super.key, this.builder, this.onResult});
 
@@ -20,7 +21,7 @@ class HssOktaBrowserSignInWidget extends StatelessWidget {
       children: [
         SizedBox.shrink(
           child: UiKitView(
-            viewType: 'dev.hypersense.software.hss_okta.browser-signin-widget',
+            viewType: 'dev.hypersense.software.hss_okta.views.browser.signin',
             layoutDirection: TextDirection.ltr,
             creationParams: const {},
             creationParamsCodec: const StandardMessageCodec(),
