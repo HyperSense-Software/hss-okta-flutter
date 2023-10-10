@@ -129,7 +129,7 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
             Task{
                
                 if let result = Credential.default{
-                    let userInfo = result.userInfo
+                    let userInfo = try await result.userInfo()
                     
                     completion(.success(constructAuthenticationResult(resultEnum: AuthenticationResult.success, token: result.token, userInfo: userInfo)))
                     

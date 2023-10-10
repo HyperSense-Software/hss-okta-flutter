@@ -122,10 +122,10 @@ class _MyAppState extends State<MyApp> {
                         builder: (c) => const WebSignInExample()));
 
                 if (result) {
-                  var cred = await _plugin.getCredential();
-
-                  _processResult(cred, formContext);
-                  setState(() {});
+                  await _plugin.getCredential().then((cred) {
+                    _processResult(cred, formContext);
+                    setState(() {});
+                  });
                 }
               },
               child: const Text('Browser sign in'))
@@ -193,12 +193,11 @@ class _MyAppState extends State<MyApp> {
             const SizedBox(
               height: 24,
             ),
-            if (result != null)
+            if (result != null) ...[
               OutlinedButton(
                   onPressed: () async {
                     try {
                       await _plugin.revokeDefaultToken();
-
                       var result = await Navigator.of(profileContext).push(
                           MaterialPageRoute(
                               builder: (c) => const WebSignOutExample()));
@@ -211,7 +210,23 @@ class _MyAppState extends State<MyApp> {
                           SnackBar(content: Text('Error: ${e.toString()}')));
                     }
                   },
-                  child: const Text('WebAuth Signout'))
+                  child: const Text('WebAuth Signout')),
+              OutlinedButton(
+                  onPressed: () async {
+                    try {
+                      await _plugin.revokeDefaultToken().then((value) {
+                        if (value) {
+                          result = null;
+                          _pageController.jumpTo(0);
+                        }
+                      });
+                    } catch (e) {
+                      ScaffoldMessenger.of(profileContext).showSnackBar(
+                          SnackBar(content: Text('Error: ${e.toString()}')));
+                    }
+                  },
+                  child: const Text('Revoke token'))
+            ]
           ]
         ]),
       ),
