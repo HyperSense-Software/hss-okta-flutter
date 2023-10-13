@@ -62,6 +62,8 @@ android {
         implementation('com.okta.kotlin:auth-foundation')
         implementation('com.okta.kotlin:auth-foundation-bootstrap')
         implementation('com.okta.kotlin:oauth2')
+        implementation('com.google.crypto.tink:tink-android:1.8.0')
+
     }
     
     testOptions {
