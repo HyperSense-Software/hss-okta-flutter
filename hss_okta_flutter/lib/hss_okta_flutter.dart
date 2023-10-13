@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:hss_okta_flutter/enums/sign_in_factors.dart';
 import 'package:hss_okta_flutter/generated/hss_okta_flutter.g.dart';
 import 'package:hss_okta_flutter/hss_okta_platform_interface.dart';
@@ -9,7 +11,7 @@ class HssOktaFlutter {
       required List<OktaSignInFactor> factors}) async {
     var factorString = factors.map((e) => e.factor).toList();
 
-    var result = await HssOktaDirectAuthPlatform.instance
+    var result = await HssOktaFlutterPluginPlatform.instance
         .startDirectAuthenticationFlow(DirectAuthRequest(
             username: email, password: password, factors: factorString));
 
@@ -17,26 +19,28 @@ class HssOktaFlutter {
   }
 
   Future<bool> revokeDefaultToken() async {
-    var result = await HssOktaDirectAuthPlatform.instance.revokeDefaultToken();
+    var result =
+        await HssOktaFlutterPluginPlatform.instance.revokeDefaultToken();
 
     return result;
   }
 
   Future<bool> refreshDefaultToken() async {
-    var result = await HssOktaDirectAuthPlatform.instance.refreshDefaultToken();
+    var result =
+        await HssOktaFlutterPluginPlatform.instance.refreshDefaultToken();
 
     return result;
   }
 
   Future<OktaAuthenticationResult> getCredential() async {
-    var result = await HssOktaDirectAuthPlatform.instance.getCredential();
+    var result = await HssOktaFlutterPluginPlatform.instance.getCredential();
 
     return result;
   }
 
   Future<OktaAuthenticationResult> mfaOtpSignInWithCredentials(
       String otp) async {
-    var result = await HssOktaDirectAuthPlatform.instance
+    var result = await HssOktaFlutterPluginPlatform.instance
         .continueDirectAuthenticationMfaFlow(otp);
 
     return result;
@@ -50,7 +54,7 @@ class HssOktaFlutter {
     String scopes,
   ) {
     try {
-      HssOktaDirectAuthPlatform.instance.init(
+      HssOktaFlutterPluginPlatform.instance.init(
         clientid,
         signInRedirectUrl,
         signOutRedirectUrl,

@@ -7,9 +7,7 @@ import 'dart:typed_data' show Float64List, Int32List, Int64List, Uint8List;
 
 import 'package:flutter/foundation.dart' show ReadBuffer, WriteBuffer;
 import 'package:flutter/services.dart';
-
-List<Object?> wrapResponse(
-    {Object? result, PlatformException? error, bool empty = false}) {
+List<Object?> wrapResponse({Object? result, PlatformException? error, bool empty = false}) {
   if (empty) {
     return <Object?>[];
   }
@@ -240,13 +238,13 @@ class _HssOktaFlutterPluginApiCodec extends StandardMessageCodec {
   @override
   Object? readValueOfType(int type, ReadBuffer buffer) {
     switch (type) {
-      case 128:
+      case 128: 
         return DirectAuthRequest.decode(readValue(buffer)!);
-      case 129:
+      case 129: 
         return OktaAuthenticationResult.decode(readValue(buffer)!);
-      case 130:
+      case 130: 
         return OktaToken.decode(readValue(buffer)!);
-      case 131:
+      case 131: 
         return UserInfo.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
@@ -264,23 +262,12 @@ class HssOktaFlutterPluginApi {
 
   static const MessageCodec<Object?> codec = _HssOktaFlutterPluginApiCodec();
 
-  Future<void> initializeConfiguration(
-      String arg_clientid,
-      String arg_signInRedirectUrl,
-      String arg_signOutRedirectUrl,
-      String arg_issuer,
-      String arg_scopes) async {
+  Future<void> initializeConfiguration(String arg_clientid, String arg_signInRedirectUrl, String arg_signOutRedirectUrl, String arg_issuer, String arg_scopes) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
-        'dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.initializeConfiguration',
-        codec,
+        'dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.initializeConfiguration', codec,
         binaryMessenger: _binaryMessenger);
-    final List<Object?>? replyList = await channel.send(<Object?>[
-      arg_clientid,
-      arg_signInRedirectUrl,
-      arg_signOutRedirectUrl,
-      arg_issuer,
-      arg_scopes
-    ]) as List<Object?>?;
+    final List<Object?>? replyList =
+        await channel.send(<Object?>[arg_clientid, arg_signInRedirectUrl, arg_signOutRedirectUrl, arg_issuer, arg_scopes]) as List<Object?>?;
     if (replyList == null) {
       throw PlatformException(
         code: 'channel-error',
@@ -297,11 +284,9 @@ class HssOktaFlutterPluginApi {
     }
   }
 
-  Future<OktaAuthenticationResult?> startDirectAuthenticationFlow(
-      DirectAuthRequest arg_request) async {
+  Future<OktaAuthenticationResult?> startDirectAuthenticationFlow(DirectAuthRequest arg_request) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
-        'dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.startDirectAuthenticationFlow',
-        codec,
+        'dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.startDirectAuthenticationFlow', codec,
         binaryMessenger: _binaryMessenger);
     final List<Object?>? replyList =
         await channel.send(<Object?>[arg_request]) as List<Object?>?;
@@ -321,11 +306,9 @@ class HssOktaFlutterPluginApi {
     }
   }
 
-  Future<OktaAuthenticationResult?> continueDirectAuthenticationMfaFlow(
-      String arg_otp) async {
+  Future<OktaAuthenticationResult?> continueDirectAuthenticationMfaFlow(String arg_otp) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
-        'dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.continueDirectAuthenticationMfaFlow',
-        codec,
+        'dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.continueDirectAuthenticationMfaFlow', codec,
         binaryMessenger: _binaryMessenger);
     final List<Object?>? replyList =
         await channel.send(<Object?>[arg_otp]) as List<Object?>?;
@@ -347,10 +330,10 @@ class HssOktaFlutterPluginApi {
 
   Future<bool?> refreshDefaultToken() async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
-        'dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.refreshDefaultToken',
-        codec,
+        'dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.refreshDefaultToken', codec,
         binaryMessenger: _binaryMessenger);
-    final List<Object?>? replyList = await channel.send(null) as List<Object?>?;
+    final List<Object?>? replyList =
+        await channel.send(null) as List<Object?>?;
     if (replyList == null) {
       throw PlatformException(
         code: 'channel-error',
@@ -369,10 +352,10 @@ class HssOktaFlutterPluginApi {
 
   Future<bool?> revokeDefaultToken() async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
-        'dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.revokeDefaultToken',
-        codec,
+        'dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.revokeDefaultToken', codec,
         binaryMessenger: _binaryMessenger);
-    final List<Object?>? replyList = await channel.send(null) as List<Object?>?;
+    final List<Object?>? replyList =
+        await channel.send(null) as List<Object?>?;
     if (replyList == null) {
       throw PlatformException(
         code: 'channel-error',
@@ -391,10 +374,10 @@ class HssOktaFlutterPluginApi {
 
   Future<OktaAuthenticationResult?> getCredential() async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
-        'dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.getCredential',
-        codec,
+        'dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.getCredential', codec,
         binaryMessenger: _binaryMessenger);
-    final List<Object?>? replyList = await channel.send(null) as List<Object?>?;
+    final List<Object?>? replyList =
+        await channel.send(null) as List<Object?>?;
     if (replyList == null) {
       throw PlatformException(
         code: 'channel-error',

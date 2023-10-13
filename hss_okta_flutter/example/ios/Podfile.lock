@@ -6,6 +6,7 @@ PODS:
     - OktaJWT
     - OktaOAuth2
     - OktaOidc
+    - OktaWebAuthenticationUI
   - integration_test (0.0.1):
     - Flutter
   - OktaAuthFoundation (1.4.3)
@@ -20,6 +21,9 @@ PODS:
   - OktaOidc/AppAuth (3.11.2)
   - OktaOidc/Okta (3.11.2):
     - OktaOidc/AppAuth
+  - OktaWebAuthenticationUI (1.4.3):
+    - OktaAuthFoundation (= 1.4.3)
+    - OktaOAuth2 (= 1.4.3)
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
@@ -33,6 +37,7 @@ SPEC REPOS:
     - OktaJWT
     - OktaOAuth2
     - OktaOidc
+    - OktaWebAuthenticationUI
 
 EXTERNAL SOURCES:
   Flutter:
@@ -44,13 +49,14 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
-  hss_okta_flutter: 9215fc710eb0bb3475b1dc1c79de4daa2455c98d
+  hss_okta_flutter: 0199c9c50020c566cb805cc6819a7a4deef6ebff
   integration_test: 13825b8a9334a850581300559b8839134b124670
   OktaAuthFoundation: 5ac1fd93cf428078d82d4fda08cbbe3f4979c6ce
   OktaDirectAuth: 86b9ab4b1f6b1a4c72288ac5a2c388a2e8a3b1bf
   OktaJWT: d9934b947fd0742713557b9ab9e1a313d40751cc
   OktaOAuth2: d063c4e91ab2ad7927fdf95a8f9454019d91eb47
   OktaOidc: 15fb3d494103d4f07ba8a523b3347d02c4d30486
+  OktaWebAuthenticationUI: 1dd167e623e169e83fd8783682feef02c594d110
 
 PODFILE CHECKSUM: 70d9d25280d0dd177a5f637cdb0f0b0b12c6a189
 

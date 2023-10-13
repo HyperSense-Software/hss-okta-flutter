@@ -4,6 +4,7 @@ import 'package:hss_okta_flutter/generated/hss_okta_flutter.g.dart';
 import 'dart:async';
 
 import 'package:hss_okta_flutter/hss_okta_flutter.dart';
+import 'package:hss_okta_flutter_example/web_auth.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 
 void main() {
@@ -29,10 +30,10 @@ class _MyAppState extends State<MyApp> {
   final TextEditingController _passwordcontroller =
       TextEditingController(text: "tZTEvb2vZNrFTVB");
 
-  //     final TextEditingController _usernamecontroller =
+  // final TextEditingController _usernamecontroller =
   //     TextEditingController(text: "AldrinFrancisco@ntsafety.com");
   // final TextEditingController _passwordcontroller =
-  //     TextEditingController(text: "S@asAppD3v!");
+  //     TextEditingController(text: "http://ntsafety.okta.com/");
 
   final PageController _pageController = PageController(initialPage: 0);
 
@@ -41,14 +42,23 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+
+    // For android
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
       _plugin.init("0oa7vbqbudjoR9zMX697", "com.okta.ntsafety:/callback",
           "com.okta.ntsafety:/", "https://ntsafety.okta.com", "openid profile");
+      await getCredential();
+      if (result != null) {
+        _pageController.jumpToPage(2);
+      }
     });
   }
 
   Future<void> getCredential() async {
     result = await _plugin.getCredential();
+    print(result?.token?.accessToken.toString());
+
+    debugPrint(result?.token?.accessToken.toString());
     setState(() {});
   }
 
@@ -64,7 +74,6 @@ class _MyAppState extends State<MyApp> {
               await _plugin
                   .mfaOtpSignInWithCredentials(_controller.text)
                   .then((value) async {
-                debugPrint("${value.result}");
                 if (value.result == AuthenticationResult.success) {
                   result = value;
 
@@ -100,23 +109,7 @@ class _MyAppState extends State<MyApp> {
                       email: _usernamecontroller.text,
                       password: _passwordcontroller.text,
                       factors: [OktaSignInFactor.otp]).then((res) {
-                    if (res.result == AuthenticationResult.success) {
-                      result = res;
-                      _pageController.animateToPage(2,
-                          duration: const Duration(milliseconds: 500),
-                          curve: Curves.ease);
-                    }
-
-                    if (res.result == AuthenticationResult.error) {
-                      ScaffoldMessenger.of(formContext).showSnackBar(
-                          SnackBar(content: Text('Error: ${res.error}')));
-                    }
-
-                    if (res.result == AuthenticationResult.mfaRequired) {
-                      _pageController.animateToPage(1,
-                          duration: const Duration(milliseconds: 500),
-                          curve: Curves.ease);
-                    }
+                    _processResult(res, formContext);
 
                     setState(() {});
                   });
@@ -126,13 +119,48 @@ class _MyAppState extends State<MyApp> {
                       SnackBar(content: Text('Error: ${e.toString()}')));
                 }
               },
-              child: const Text('Submit'))
+              child: const Text('Submit')),
+          const SizedBox(
+            height: 24,
+          ),
+          OutlinedButton(
+              onPressed: () async {
+                var result = await Navigator.of(formContext).push(
+                    MaterialPageRoute(
+                        builder: (c) => const WebSignInExample()));
+
+                if (result) {
+                  await _plugin.getCredential().then((cred) {
+                    _processResult(cred, formContext);
+                    setState(() {});
+                  });
+                }
+              },
+              child: const Text('Browser sign in'))
         ],
       ),
     );
   }
 
-  Widget _profile() {
+  void _processResult(OktaAuthenticationResult res, BuildContext context) {
+    if (res.result == AuthenticationResult.success) {
+      result = res;
+      _pageController.animateToPage(2,
+          duration: const Duration(milliseconds: 500), curve: Curves.ease);
+    }
+
+    if (res.result == AuthenticationResult.error) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Error: ${res.error}')));
+    }
+
+    if (res.result == AuthenticationResult.mfaRequired) {
+      _pageController.animateToPage(1,
+          duration: const Duration(milliseconds: 500), curve: Curves.ease);
+    }
+  }
+
+  Widget _profile(BuildContext profileContext) {
     if (result == null) return const CircularProgressIndicator.adaptive();
 
     return Padding(
@@ -147,10 +175,10 @@ class _MyAppState extends State<MyApp> {
             Text('id : ${result?.token?.id}'),
             Text(
                 'Issued At : ${DateTime.fromMillisecondsSinceEpoch(result?.token?.issuedAt ?? 0)}'),
-            Text('refresh token : ${result?.token?.refreshToken}'),
+            SelectableText('refresh token : ${result?.token?.refreshToken}'),
             Text('Scope : ${result?.token?.scope}'),
             Text('Token Type: ${result?.token?.tokenType}'),
-            Text('Access Token : ${result?.token?.accessToken}'),
+            SelectableText('Access Token : ${result?.token?.accessToken}'),
             const Divider(
               thickness: 4,
             ),
@@ -169,6 +197,43 @@ class _MyAppState extends State<MyApp> {
               Text('Phone Number : ${result?.userInfo!.phoneNumber ?? ''}'),
               Text('Email : ${result?.userInfo!.email ?? ''}'),
               Text('Username : ${result?.userInfo!.username ?? ''}'),
+            ],
+            const SizedBox(
+              height: 24,
+            ),
+            if (result != null) ...[
+              OutlinedButton(
+                  onPressed: () async {
+                    try {
+                      await _plugin.revokeDefaultToken();
+                      var result = await Navigator.of(profileContext).push(
+                          MaterialPageRoute(
+                              builder: (c) => const WebSignOutExample()));
+
+                      if (result) {
+                        _pageController.jumpTo(0);
+                      }
+                    } catch (e) {
+                      ScaffoldMessenger.of(profileContext).showSnackBar(
+                          SnackBar(content: Text('Error: ${e.toString()}')));
+                    }
+                  },
+                  child: const Text('WebAuth Signout')),
+              OutlinedButton(
+                  onPressed: () async {
+                    try {
+                      await _plugin.revokeDefaultToken().then((value) {
+                        if (value) {
+                          result = null;
+                          _pageController.jumpTo(0);
+                        }
+                      });
+                    } catch (e) {
+                      ScaffoldMessenger.of(profileContext).showSnackBar(
+                          SnackBar(content: Text('Error: ${e.toString()}')));
+                    }
+                  },
+                  child: const Text('Revoke token'))
             ]
           ]
         ]),
@@ -190,7 +255,7 @@ class _MyAppState extends State<MyApp> {
             children: [
               _form(builderContext),
               _mfa(),
-              _profile(),
+              _profile(builderContext),
             ],
           );
         }),
