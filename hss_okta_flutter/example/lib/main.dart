@@ -25,10 +25,15 @@ class _MyAppState extends State<MyApp> {
   String username = "";
   String password = "";
   final TextEditingController _controller = TextEditingController();
+  // final TextEditingController _usernamecontroller =
+  //     TextEditingController(text: "aldrin.francisco@designli.co");
+  // final TextEditingController _passwordcontroller =
+  // TextEditingController(text: "tZTEvb2vZNrFTVB");
+
   final TextEditingController _usernamecontroller =
-      TextEditingController(text: "aldrin.francisco@designli.co");
+      TextEditingController(text: "AldrinFrancisco@ntsafety.com");
   final TextEditingController _passwordcontroller =
-      TextEditingController(text: "tZTEvb2vZNrFTVB");
+      TextEditingController(text: "http://ntsafety.okta.com/");
 
   final PageController _pageController = PageController(initialPage: 0);
 
@@ -51,6 +56,9 @@ class _MyAppState extends State<MyApp> {
 
   Future<void> getCredential() async {
     result = await _plugin.getCredential();
+    print(result?.token?.accessToken.toString());
+
+    debugPrint(result?.token?.accessToken.toString());
     setState(() {});
   }
 
@@ -167,10 +175,10 @@ class _MyAppState extends State<MyApp> {
             Text('id : ${result?.token?.id}'),
             Text(
                 'Issued At : ${DateTime.fromMillisecondsSinceEpoch(result?.token?.issuedAt ?? 0)}'),
-            Text('refresh token : ${result?.token?.refreshToken}'),
+            SelectableText('refresh token : ${result?.token?.refreshToken}'),
             Text('Scope : ${result?.token?.scope}'),
             Text('Token Type: ${result?.token?.tokenType}'),
-            Text('Access Token : ${result?.token?.accessToken}'),
+            SelectableText('Access Token : ${result?.token?.accessToken}'),
             const Divider(
               thickness: 4,
             ),

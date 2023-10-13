@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 
-<!-- <plist version="1.0">
+<plist version="1.0">
    <dict>
       <key>issuer</key>
       <string>https://ntsafety.okta.com</string>
@@ -14,8 +14,8 @@
       <key>scopes</key>
       <string>openid offline_access email profile</string>
     </dict>
-</plist> -->
-
+</plist>
+<!-- 
 <plist version="1.0">
    <dict>
       <key>issuer</key>
@@ -29,4 +29,4 @@
       <key>scopes</key>
       <string>openid email profile</string>
     </dict>
-</plist>
+</plist> -->
