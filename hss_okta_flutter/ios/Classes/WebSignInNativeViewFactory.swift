@@ -68,6 +68,11 @@ class WebSignInNativeViewFactory: NSObject, FlutterPlatformViewFactory {
             
             func startAuthenticationFlow() async throws -> Bool {
                 do{
+
+                    if(auth == nil){
+                        throw HssOktaError.configError("Okta.plist is missing")
+                    }
+
                     if let token = try await self.auth?.signIn(from: self.view.window){
                         Credential.default = try Credential.store(token)
                         return true
