@@ -39,7 +39,7 @@ class HssOktaBrowserSignOutWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (builder != null) builder!(context, _nativeView);
+    if (builder != null) return builder!(context, _nativeView);
 
     return _nativeView;
   }
