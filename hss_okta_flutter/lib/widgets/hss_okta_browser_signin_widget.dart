@@ -6,7 +6,7 @@ typedef AuthBrowserLoginBuilder = Widget Function(BuildContext context);
 class HssOktaBrowserSignInWidget extends StatelessWidget {
   final AuthBrowserLoginBuilder? builder;
   final ValueSetter<bool>? onResult;
-  final ValueSetter<Exception>? onError;
+  final ValueSetter<Object>? onError;
 
   final channel = const EventChannel(
       "dev.hypersense.software.hss_okta.channels.browser_signin");
