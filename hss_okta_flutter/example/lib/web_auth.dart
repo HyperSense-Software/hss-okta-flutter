@@ -16,10 +16,16 @@ class WebSignInExample extends StatelessWidget {
             Navigator.pop(context, v);
           }
         },
-        builder: (context) {
-          return const Column(
+        onError: (value) {
+          print(value);
+        },
+        builder: (context, child) {
+          return Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: [Center(child: CircularProgressIndicator.adaptive())],
+            children: [
+              child,
+              const Center(child: CircularProgressIndicator.adaptive())
+            ],
           );
         },
       )),
@@ -41,10 +47,13 @@ class WebSignOutExample extends StatelessWidget {
             Navigator.pop(context, v);
           }
         },
-        builder: (context) {
-          return const Column(
+        builder: (context, child) {
+          return Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: [Center(child: CircularProgressIndicator.adaptive())],
+            children: [
+              child,
+              const Center(child: CircularProgressIndicator.adaptive())
+            ],
           );
         },
       )),
