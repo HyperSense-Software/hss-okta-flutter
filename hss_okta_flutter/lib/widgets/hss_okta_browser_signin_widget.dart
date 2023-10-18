@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 typedef AuthBrowserLoginBuilder = Widget Function(
-    BuildContext context, Widget? child);
+    BuildContext context, Widget child);
 
 class HssOktaBrowserSignInWidget extends StatelessWidget {
   final AuthBrowserLoginBuilder? builder;
