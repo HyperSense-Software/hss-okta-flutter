@@ -6,11 +6,13 @@ typedef AuthBrowserLoginBuilder = Widget Function(BuildContext context);
 class HssOktaBrowserSignInWidget extends StatelessWidget {
   final AuthBrowserLoginBuilder? builder;
   final ValueSetter<bool>? onResult;
+  final ValueSetter<Exception>? onError;
 
   final channel = const EventChannel(
       "dev.hypersense.software.hss_okta.channels.browser_signin");
 
-  const HssOktaBrowserSignInWidget({super.key, this.builder, this.onResult});
+  const HssOktaBrowserSignInWidget(
+      {super.key, this.builder, this.onResult, this.onError});
 
   Stream<bool> get browserSigninStream {
     return channel.receiveBroadcastStream().map((event) => event);
@@ -31,7 +33,7 @@ class HssOktaBrowserSignInWidget extends StatelessWidget {
                 if (event) {
                   onResult?.call(true);
                 }
-              }, onError: (e) => throw e);
+              }, onError: onError ?? (e) => throw e);
             },
           ),
         ),
