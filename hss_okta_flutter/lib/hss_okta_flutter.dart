@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:hss_okta_flutter/enums/sign_in_factors.dart';
 import 'package:hss_okta_flutter/generated/hss_okta_flutter.g.dart';
 import 'package:hss_okta_flutter/hss_okta_platform_interface.dart';
+import 'package:hss_okta_flutter/widgets/widgets.dart';
 
 class HssOktaFlutter {
   Future<OktaAuthenticationResult> startDirectAuthenticationFlow(
