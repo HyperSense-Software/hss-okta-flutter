@@ -66,28 +66,24 @@ class WebSignInNativeViewFactory: NSObject, FlutterPlatformViewFactory {
                 
             }
             
-            func startAuthenticationFlow() async throws -> Bool {
-                if(auth == nil){
-                    throw HssOktaError.configError("Okta.plist is missing")
-                }
-
-                if let token = try await self.auth?.signIn(from: self.view.window){
-                    Credential.default = try Credential.store(token)
-                    return true
-                }
-                
-                return false;
-            }
-            
-            
             func onListen(withArguments arguments: Any?, eventSink: @escaping FlutterEventSink) -> FlutterError? {
                 
                 self.sink = eventSink
 
                 Task{@MainActor in
                     do{
-                        let result = try await startAuthenticationFlow()
-                        eventSink(result)
+                        
+                        if(auth == nil){
+                            return FlutterError(code: "ConfigError", message: "Missing or bad Okta.plist", details: "")
+                        }
+
+                        if let token = try await self.auth?.signIn(from: self.view.window){
+                            Credential.default = try Credential.store(token)
+                            
+                            eventSink(true)
+                        }
+                        
+                        
                         
                     }catch let e{
                             return FlutterError(code: "Browser Authentication Failed", message: e.localizedDescription.stringValue, details: "Failed to start Flow")
