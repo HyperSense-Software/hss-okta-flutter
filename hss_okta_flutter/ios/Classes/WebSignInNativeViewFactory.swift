@@ -67,21 +67,13 @@ class WebSignInNativeViewFactory: NSObject, FlutterPlatformViewFactory {
             }
             
             func startAuthenticationFlow() async throws -> Bool {
-                do{
+                if(auth == nil){
+                    throw HssOktaError.configError("Okta.plist is missing")
+                }
 
-                    if(auth == nil){
-                        throw HssOktaError.configError("Okta.plist is missing")
-                    }
-
-                    if let token = try await self.auth?.signIn(from: self.view.window){
-                        Credential.default = try Credential.store(token)
-                        return true
-                    }
-                    
-                    
-                    
-                }catch let e{
-                    throw e
+                if let token = try await self.auth?.signIn(from: self.view.window){
+                    Credential.default = try Credential.store(token)
+                    return true
                 }
                 
                 return false;
@@ -91,12 +83,19 @@ class WebSignInNativeViewFactory: NSObject, FlutterPlatformViewFactory {
             func onListen(withArguments arguments: Any?, eventSink: @escaping FlutterEventSink) -> FlutterError? {
                 
                 self.sink = eventSink
+
                 Task{@MainActor in
-                    let result = try await startAuthenticationFlow()
-                    eventSink(result)
+                    do{
+                        let result = try await startAuthenticationFlow()
+                        eventSink(result)
+                        
+                    }catch let e{
+                            return FlutterError(code: "Browser Authentication Failed", message: e.localizedDescription.stringValue, details: "Failed to start Flow")
+                        }
+                    
+                    return FlutterError(code: "Browser Authentication Failed", message: "Something went wrong", details: "Failed to start Flow")
                 }
                 return nil
-                
             }
             
             func onCancel(withArguments arguments: Any?) -> FlutterError? {
