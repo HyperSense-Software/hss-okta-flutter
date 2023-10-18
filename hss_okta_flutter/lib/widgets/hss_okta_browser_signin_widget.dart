@@ -6,6 +6,7 @@ typedef AuthBrowserLoginBuilder = Widget Function(BuildContext context);
 class HssOktaBrowserSignInWidget extends StatelessWidget {
   final AuthBrowserLoginBuilder? builder;
   final ValueSetter<bool>? onResult;
+
   final channel = const EventChannel(
       "dev.hypersense.software.hss_okta.channels.browser_signin");
 
@@ -30,7 +31,7 @@ class HssOktaBrowserSignInWidget extends StatelessWidget {
                 if (event) {
                   onResult?.call(true);
                 }
-              });
+              }, onError: (e) => throw e);
             },
           ),
         ),
