@@ -52,7 +52,7 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
         println("${issuer.toHttpUrl()}")
 
        val oidcClient = OidcClient.createFromDiscoveryUrl(
-            oidcConfiguration!!,
+            oidcConfiguration,
            "${issuer}/.well-known/openid-configuration".toHttpUrl(),)
 
 
@@ -70,8 +70,13 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
         callback: (Result<OktaAuthenticationResult?>) -> Unit
     ) {
         CoroutineScope(Dispatchers.IO).launch {
-            var result = directAuthFlow(request)
-            callback.invoke(Result.success(result))
+
+            try {
+                var result = directAuthFlow(request)
+                callback.invoke(Result.success(result))
+            }catch (e: java.lang.Exception){
+                callback.invoke(Result.failure(e))
+            }
         }
     }
 
@@ -145,8 +150,19 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
 
     override fun getCredential(callback: (Result<OktaAuthenticationResult?>) -> Unit) {
         CoroutineScope(Dispatchers.IO).launch {
-            var credential = CredentialBootstrap.defaultCredential()
-            var userInfo = credential.getUserInfo().getOrThrow()
+            val credential = try{
+                CredentialBootstrap.defaultCredential();
+            }catch(e: java.lang.Exception){
+                callback.invoke(Result.failure(e))
+                null
+            } ?: return@launch
+
+            val userInfo = try{
+                credential.getUserInfo().getOrThrow()
+            }catch(e: java.lang.Exception){
+               callback.invoke(Result.failure(e))
+                null
+            } ?: return@launch
 
 
             callback.invoke(Result.success(OktaAuthenticationResult(

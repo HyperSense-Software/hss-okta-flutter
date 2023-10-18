@@ -1,8 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:hss_okta_flutter/enums/sign_in_factors.dart';
 import 'package:hss_okta_flutter/generated/hss_okta_flutter.g.dart';
-import 'dart:async';
-
 import 'package:hss_okta_flutter/hss_okta_flutter.dart';
 import 'package:hss_okta_flutter_example/web_auth.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
@@ -21,6 +21,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   final _plugin = HssOktaFlutter();
 
+  String _errors = '';
   String res = 'None';
   String username = "";
   String password = "";
@@ -47,18 +48,27 @@ class _MyAppState extends State<MyApp> {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
       _plugin.init("0oa7vbqbudjoR9zMX697", "com.okta.ntsafety:/callback",
           "com.okta.ntsafety:/", "https://ntsafety.okta.com", "openid profile");
-      await getCredential();
+      await getCredential(context);
       if (result != null) {
         _pageController.jumpToPage(2);
       }
     });
   }
 
-  Future<void> getCredential() async {
-    result = await _plugin.getCredential();
-    print(result?.token?.accessToken.toString());
+  Future<void> getCredential(BuildContext context) async {
+    try {
+      result = await _plugin.getCredential();
+      print(result?.token?.accessToken.toString());
 
-    debugPrint(result?.token?.accessToken.toString());
+      debugPrint(result?.token?.accessToken.toString());
+    } catch (e, s) {
+      _errors = '$e';
+      debugPrint(e.toString() + s.toString());
+      if (mounted) {
+        ScaffoldMessenger.maybeOf(context)
+            ?.showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
+      }
+    }
     setState(() {});
   }
 
@@ -77,7 +87,7 @@ class _MyAppState extends State<MyApp> {
                 if (value.result == AuthenticationResult.success) {
                   result = value;
 
-                  await getCredential();
+                  await getCredential(context);
                   _pageController.animateToPage(2,
                       duration: const Duration(milliseconds: 500),
                       curve: Curves.ease);
@@ -115,8 +125,10 @@ class _MyAppState extends State<MyApp> {
                   });
                 } catch (e, s) {
                   debugPrint(e.toString() + s.toString());
-                  ScaffoldMessenger.of(formContext).showSnackBar(
-                      SnackBar(content: Text('Error: ${e.toString()}')));
+                  if (mounted) {
+                    ScaffoldMessenger.of(formContext).showSnackBar(
+                        SnackBar(content: Text('Error: ${e.toString()}')));
+                  }
                 }
               },
               child: const Text('Submit')),
@@ -166,7 +178,7 @@ class _MyAppState extends State<MyApp> {
     return Padding(
       padding: const EdgeInsets.all(14.0),
       child: RefreshIndicator(
-        onRefresh: () async => await getCredential(),
+        onRefresh: () async => await getCredential(context),
         child: ListView(children: [
           Text('Authentication Result : ${result?.result}'),
           if (result!.result != AuthenticationResult.success)
