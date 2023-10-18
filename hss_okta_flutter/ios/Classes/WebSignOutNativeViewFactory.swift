@@ -66,22 +66,21 @@ class WebSignOutNativeViewFactory: NSObject, FlutterPlatformViewFactory {
                 super.init()
             }
             
-            func startSignOut() async throws -> Void {
-                do{
-                    if let webAuth = WebAuthentication.shared{
-                    try await webAuth.signOut(from: self.view.window)
-                    }
-                    
-                }
-            }
-            
-            
             func onListen(withArguments arguments: Any?, eventSink: @escaping FlutterEventSink) -> FlutterError? {
                 
                 self.sink = eventSink
                 Task{@MainActor in
-                   try await startSignOut()
-                    eventSink(true)
+                    
+                    do{
+                        if let webAuth = WebAuthentication.shared{
+                        try await webAuth.signOut(from: self.view.window)
+                        eventSink(true)
+                        }
+                    }catch let e{
+                        return FlutterError(code: "Browser Authentication Failed", message: e.localizedDescription.stringValue, details: "Failed to start Flow")
+                    }
+                    
+                    return FlutterError(code: "Browser Sign out Failed", message:"Failed to Process Signout", details: "")
                 }
                 return nil
                 
