@@ -137,11 +137,11 @@ class _MyAppState extends State<MyApp> {
           ),
           OutlinedButton(
               onPressed: () async {
-                var result = await Navigator.of(formContext).push(
+                var result = await Navigator.of(formContext).push<bool>(
                     MaterialPageRoute(
                         builder: (c) => const WebSignInExample()));
 
-                if (result) {
+                if (result != null && result) {
                   await _plugin.getCredential().then((cred) {
                     _processResult(cred, formContext);
                     setState(() {});

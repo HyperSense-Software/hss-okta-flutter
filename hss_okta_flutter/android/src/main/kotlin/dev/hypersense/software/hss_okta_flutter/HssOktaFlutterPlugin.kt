@@ -16,19 +16,30 @@ import dev.hypersense.software.hss_okta.HssOktaFlutterPluginApi
 import dev.hypersense.software.hss_okta.OktaAuthenticationResult
 import dev.hypersense.software.hss_okta.OktaToken
 import dev.hypersense.software.hss_okta.UserInfo
+import io.flutter.embedding.engine.FlutterEngine
+import io.flutter.embedding.engine.plugins.activity.ActivityAware
+import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import okhttp3.HttpUrl.Companion.toHttpUrl
 
+const val SIGN_IN_EVENT_VIEW_TYPE = "dev.hypersense.software.hss_okta.views.browser.signin"
 class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
     var context : Context? = null
-
-
-
+    private lateinit var oidcClient: OidcClient;
     override fun onAttachedToEngine(binding: FlutterPlugin.FlutterPluginBinding) {
-        HssOktaFlutterPluginApi.setUp(binding.binaryMessenger, this)
-        context = binding.applicationContext
+        binding
+            .platformViewRegistry
+            .registerViewFactory(SIGN_IN_EVENT_VIEW_TYPE, HssOktaFlutterWebSignInFactory())
+
+            context = binding.applicationContext
+        try {
+
+            HssOktaFlutterPluginApi.setUp(binding.binaryMessenger, this)
+        }catch (e: java.lang.Exception){
+            //
+        }
     }
 
     override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
@@ -51,7 +62,7 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
 
         println("${issuer.toHttpUrl()}")
 
-       val oidcClient = OidcClient.createFromDiscoveryUrl(
+        oidcClient = OidcClient.createFromDiscoveryUrl(
             oidcConfiguration,
            "${issuer}/.well-known/openid-configuration".toHttpUrl(),)
 
@@ -90,7 +101,7 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
 
     private suspend fun directAuthFlow(request : DirectAuthRequest): OktaAuthenticationResult {
         val flow = CredentialBootstrap.oidcClient.createResourceOwnerFlow()
-
+        
         when(val res = flow.start(request.username,request.password)){
             is OidcClientResult.Error -> {
                 return OktaAuthenticationResult(
