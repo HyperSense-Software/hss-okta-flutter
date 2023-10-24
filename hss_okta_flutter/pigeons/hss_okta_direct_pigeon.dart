@@ -89,6 +89,14 @@ class DirectAuthRequest {
       {required this.username, required this.password, required this.factors});
 }
 
+class DeviceAuthorizationSession {
+  final String? userCode;
+  final String? verificationUri;
+
+  DeviceAuthorizationSession(
+      {required this.userCode, required this.verificationUri});
+}
+
 @HostApi()
 abstract class HssOktaFlutterPluginApi {
   void initializeConfiguration(
@@ -114,4 +122,10 @@ abstract class HssOktaFlutterPluginApi {
 
   @async
   OktaAuthenticationResult? getCredential();
+
+  @async
+  DeviceAuthorizationSession startDeviceAuthorizationFlow();
+
+  @async
+  OktaAuthenticationResult resumeDeviceAuthorizationFlow();
 }

@@ -214,21 +214,53 @@ class DirectAuthRequest {
   }
 }
 
+class DeviceAuthorizationSession {
+  DeviceAuthorizationSession({
+    this.userCode,
+    this.verificationUri,
+  });
+
+  String? userCode;
+
+  String? verificationUri;
+
+  Object encode() {
+    return <Object?>[
+      userCode,
+      verificationUri,
+    ];
+  }
+
+  static DeviceAuthorizationSession decode(Object result) {
+    result as List<Object?>;
+    return DeviceAuthorizationSession(
+      userCode: result[0] as String?,
+      verificationUri: result[1] as String?,
+    );
+  }
+}
+
 class _HssOktaFlutterPluginApiCodec extends StandardMessageCodec {
   const _HssOktaFlutterPluginApiCodec();
   @override
   void writeValue(WriteBuffer buffer, Object? value) {
-    if (value is DirectAuthRequest) {
+    if (value is DeviceAuthorizationSession) {
       buffer.putUint8(128);
       writeValue(buffer, value.encode());
-    } else if (value is OktaAuthenticationResult) {
+    } else if (value is DirectAuthRequest) {
       buffer.putUint8(129);
       writeValue(buffer, value.encode());
-    } else if (value is OktaToken) {
+    } else if (value is OktaAuthenticationResult) {
       buffer.putUint8(130);
       writeValue(buffer, value.encode());
-    } else if (value is UserInfo) {
+    } else if (value is OktaAuthenticationResult) {
       buffer.putUint8(131);
+      writeValue(buffer, value.encode());
+    } else if (value is OktaToken) {
+      buffer.putUint8(132);
+      writeValue(buffer, value.encode());
+    } else if (value is UserInfo) {
+      buffer.putUint8(133);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -239,12 +271,16 @@ class _HssOktaFlutterPluginApiCodec extends StandardMessageCodec {
   Object? readValueOfType(int type, ReadBuffer buffer) {
     switch (type) {
       case 128: 
-        return DirectAuthRequest.decode(readValue(buffer)!);
+        return DeviceAuthorizationSession.decode(readValue(buffer)!);
       case 129: 
-        return OktaAuthenticationResult.decode(readValue(buffer)!);
+        return DirectAuthRequest.decode(readValue(buffer)!);
       case 130: 
-        return OktaToken.decode(readValue(buffer)!);
+        return OktaAuthenticationResult.decode(readValue(buffer)!);
       case 131: 
+        return OktaAuthenticationResult.decode(readValue(buffer)!);
+      case 132: 
+        return OktaToken.decode(readValue(buffer)!);
+      case 133: 
         return UserInfo.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
@@ -391,6 +427,60 @@ class HssOktaFlutterPluginApi {
       );
     } else {
       return (replyList[0] as OktaAuthenticationResult?);
+    }
+  }
+
+  Future<DeviceAuthorizationSession> startDeviceAuthorizationFlow() async {
+    final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
+        'dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.startDeviceAuthorizationFlow', codec,
+        binaryMessenger: _binaryMessenger);
+    final List<Object?>? replyList =
+        await channel.send(null) as List<Object?>?;
+    if (replyList == null) {
+      throw PlatformException(
+        code: 'channel-error',
+        message: 'Unable to establish connection on channel.',
+      );
+    } else if (replyList.length > 1) {
+      throw PlatformException(
+        code: replyList[0]! as String,
+        message: replyList[1] as String?,
+        details: replyList[2],
+      );
+    } else if (replyList[0] == null) {
+      throw PlatformException(
+        code: 'null-error',
+        message: 'Host platform returned null value for non-null return value.',
+      );
+    } else {
+      return (replyList[0] as DeviceAuthorizationSession?)!;
+    }
+  }
+
+  Future<OktaAuthenticationResult> resumeDeviceAuthorizationFlow() async {
+    final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
+        'dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.resumeDeviceAuthorizationFlow', codec,
+        binaryMessenger: _binaryMessenger);
+    final List<Object?>? replyList =
+        await channel.send(null) as List<Object?>?;
+    if (replyList == null) {
+      throw PlatformException(
+        code: 'channel-error',
+        message: 'Unable to establish connection on channel.',
+      );
+    } else if (replyList.length > 1) {
+      throw PlatformException(
+        code: replyList[0]! as String,
+        message: replyList[1] as String?,
+        details: replyList[2],
+      );
+    } else if (replyList[0] == null) {
+      throw PlatformException(
+        code: 'null-error',
+        message: 'Host platform returned null value for non-null return value.',
+      );
+    } else {
+      return (replyList[0] as OktaAuthenticationResult?)!;
     }
   }
 }

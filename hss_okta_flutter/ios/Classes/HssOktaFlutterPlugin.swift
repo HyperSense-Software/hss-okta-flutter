@@ -10,14 +10,17 @@ import WebAuthenticationUI
 enum HssOktaError: Error {
 case configError(String)
 case credentialError(String)
+case generalError(String)
 }
 
 
 public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginApi {
+     
     
     let browserAuth = WebAuthentication.shared
-    var flow : DirectAuthenticationFlow?
+    var flow : (any AuthenticationFlow)?
     var status : DirectAuthenticationFlow.Status?
+    var deviceAuthorizationFlowContext : DeviceAuthorizationFlow.Context?
     
     
     public static func register(with registrar: FlutterPluginRegistrar) {
@@ -47,19 +50,24 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
             
             Task{
                 do{
-                    
-                    let status = try await flow!.start(request.username, with: .password(request.password))
-                    self.status = status
-                    
-                    switch status{
-                    case .success(let token):
-                        Credential.default = try Credential.store(token)
-                        let userInfo = try await Credential.default?.userInfo()
+                  
+                    if let authFlow = flow as? DirectAuthenticationFlow{
                         
-                        completion(.success(constructAuthenticationResult(resultEnum: AuthenticationResult.success, token: token, userInfo: userInfo)))
+                        let status = try await authFlow.start(request.username, with: .password(request.password))
+                        self.status = status
                         
-                    case .mfaRequired(_):
-                        completion(.success(OktaAuthenticationResult(result: AuthenticationResult.mfaRequired,error: "MFA Required")))
+                        switch status{
+                        case .success(let token):
+                            Credential.default = try Credential.store(token)
+                            let userInfo = try await Credential.default?.userInfo()
+                            
+                            completion(.success(constructAuthenticationResult(resultEnum: AuthenticationResult.success, token: token, userInfo: userInfo)))
+                            
+                        case .mfaRequired(_):
+                            completion(.success(OktaAuthenticationResult(result: AuthenticationResult.mfaRequired,error: "MFA Required")))
+                        }
+                    }else{
+                        completion(.failure(HssOktaError.generalError("Incorrect flow")))
                     }
                     
                 }catch let error{
@@ -76,14 +84,18 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
     func continueDirectAuthenticationMfaFlow(otp: String, completion: @escaping (Result<OktaAuthenticationResult?, Error>) -> Void) {
         Task{
             do{
-                status = try await flow?.resume(self.status!, with: .otp(code: otp))
-                if case let .success(token) = status{
-                    Credential.default = try Credential.store(token)
-                    let userInfo = try await Credential.default?.userInfo()
-                    
-                    completion(.success(constructAuthenticationResult(resultEnum: AuthenticationResult.success, token: token, userInfo: userInfo)))
+                if let authFlow = flow as? DirectAuthenticationFlow{
+                    status = try await authFlow.resume(self.status!, with: .otp(code: otp))
+                    if case let .success(token) = status{
+                        Credential.default = try Credential.store(token)
+                        let userInfo = try await Credential.default?.userInfo()
+                        
+                        completion(.success(constructAuthenticationResult(resultEnum: AuthenticationResult.success, token: token, userInfo: userInfo)))
+                    }else{
+                        completion(.success(OktaAuthenticationResult(result: AuthenticationResult.error,error: "MFA Failed")))
+                    }
                 }else{
-                    completion(.success(OktaAuthenticationResult(result: AuthenticationResult.error,error: "MFA Failed")))
+                    completion(.failure(HssOktaError.generalError("Incorrect Flow")))
                 }
             }catch let error{
                 completion(.success(OktaAuthenticationResult(result: AuthenticationResult.error,error: "\(error)")))
@@ -139,6 +151,48 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
                 }
             }
         }
+    
+    func startDeviceAuthorizationFlow(completion: @escaping (Result<DeviceAuthorizationSession, Error>) -> Void) {
+        if let config = try? OAuth2Client.PropertyListConfiguration(){
+            let flow = DeviceAuthorizationFlow(
+                issuer: config.issuer,
+                clientId: config.clientId,
+                scopes: config.scopes)
+            
+            Task{@MainActor in
+                do{
+                    deviceAuthorizationFlowContext = try await flow.start()
+
+                    completion(.success(DeviceAuthorizationSession(
+                        userCode: deviceAuthorizationFlowContext?.userCode,
+                        verificationUri: deviceAuthorizationFlowContext?.verificationUri.absoluteString
+                    )))
+                    
+                }catch let e{
+                    completion(.failure(e))
+                }
+            }
+        }
+    }
+    
+    func resumeDeviceAuthorizationFlow(completion: @escaping (Result<OktaAuthenticationResult, Error>) -> Void) {
+        
+        Task{@MainActor in
+            
+            do{
+                if let authFlow = flow as? DeviceAuthorizationFlow{
+                    if let context = deviceAuthorizationFlowContext{
+                        var token = try await authFlow.resume(with: context)
+                        Credential.default = try Credential.store(token)
+                    }
+                }
+            }catch let e{
+                completion(.failure(e))
+            }
+        }
+    }
+    
+    //    Helper methods
         
         func constructAuthenticationResult(resultEnum : AuthenticationResult, token : Token,userInfo : AuthFoundation.UserInfo?) -> OktaAuthenticationResult{
             return OktaAuthenticationResult(

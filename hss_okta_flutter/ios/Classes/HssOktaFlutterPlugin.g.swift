@@ -209,16 +209,42 @@ struct DirectAuthRequest {
   }
 }
 
+/// Generated class from Pigeon that represents data sent in messages.
+struct DeviceAuthorizationSession {
+  var userCode: String? = nil
+  var verificationUri: String? = nil
+
+  static func fromList(_ list: [Any?]) -> DeviceAuthorizationSession? {
+    let userCode: String? = nilOrValue(list[0])
+    let verificationUri: String? = nilOrValue(list[1])
+
+    return DeviceAuthorizationSession(
+      userCode: userCode,
+      verificationUri: verificationUri
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      userCode,
+      verificationUri,
+    ]
+  }
+}
+
 private class HssOktaFlutterPluginApiCodecReader: FlutterStandardReader {
   override func readValue(ofType type: UInt8) -> Any? {
     switch type {
       case 128:
-        return DirectAuthRequest.fromList(self.readValue() as! [Any?])
+        return DeviceAuthorizationSession.fromList(self.readValue() as! [Any?])
       case 129:
-        return OktaAuthenticationResult.fromList(self.readValue() as! [Any?])
+        return DirectAuthRequest.fromList(self.readValue() as! [Any?])
       case 130:
-        return OktaToken.fromList(self.readValue() as! [Any?])
+        return OktaAuthenticationResult.fromList(self.readValue() as! [Any?])
       case 131:
+        return OktaAuthenticationResult.fromList(self.readValue() as! [Any?])
+      case 132:
+        return OktaToken.fromList(self.readValue() as! [Any?])
+      case 133:
         return UserInfo.fromList(self.readValue() as! [Any?])
       default:
         return super.readValue(ofType: type)
@@ -228,17 +254,23 @@ private class HssOktaFlutterPluginApiCodecReader: FlutterStandardReader {
 
 private class HssOktaFlutterPluginApiCodecWriter: FlutterStandardWriter {
   override func writeValue(_ value: Any) {
-    if let value = value as? DirectAuthRequest {
+    if let value = value as? DeviceAuthorizationSession {
       super.writeByte(128)
       super.writeValue(value.toList())
-    } else if let value = value as? OktaAuthenticationResult {
+    } else if let value = value as? DirectAuthRequest {
       super.writeByte(129)
       super.writeValue(value.toList())
-    } else if let value = value as? OktaToken {
+    } else if let value = value as? OktaAuthenticationResult {
       super.writeByte(130)
       super.writeValue(value.toList())
-    } else if let value = value as? UserInfo {
+    } else if let value = value as? OktaAuthenticationResult {
       super.writeByte(131)
+      super.writeValue(value.toList())
+    } else if let value = value as? OktaToken {
+      super.writeByte(132)
+      super.writeValue(value.toList())
+    } else if let value = value as? UserInfo {
+      super.writeByte(133)
       super.writeValue(value.toList())
     } else {
       super.writeValue(value)
@@ -268,6 +300,8 @@ protocol HssOktaFlutterPluginApi {
   func refreshDefaultToken(completion: @escaping (Result<Bool?, Error>) -> Void)
   func revokeDefaultToken(completion: @escaping (Result<Bool?, Error>) -> Void)
   func getCredential(completion: @escaping (Result<OktaAuthenticationResult?, Error>) -> Void)
+  func startDeviceAuthorizationFlow(completion: @escaping (Result<DeviceAuthorizationSession, Error>) -> Void)
+  func resumeDeviceAuthorizationFlow(completion: @escaping (Result<OktaAuthenticationResult, Error>) -> Void)
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -373,6 +407,36 @@ class HssOktaFlutterPluginApiSetup {
       }
     } else {
       getCredentialChannel.setMessageHandler(nil)
+    }
+    let startDeviceAuthorizationFlowChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.startDeviceAuthorizationFlow", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      startDeviceAuthorizationFlowChannel.setMessageHandler { _, reply in
+        api.startDeviceAuthorizationFlow() { result in
+          switch result {
+            case .success(let res):
+              reply(wrapResult(res))
+            case .failure(let error):
+              reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      startDeviceAuthorizationFlowChannel.setMessageHandler(nil)
+    }
+    let resumeDeviceAuthorizationFlowChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.resumeDeviceAuthorizationFlow", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      resumeDeviceAuthorizationFlowChannel.setMessageHandler { _, reply in
+        api.resumeDeviceAuthorizationFlow() { result in
+          switch result {
+            case .success(let res):
+              reply(wrapResult(res))
+            case .failure(let error):
+              reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      resumeDeviceAuthorizationFlowChannel.setMessageHandler(nil)
     }
   }
 }
