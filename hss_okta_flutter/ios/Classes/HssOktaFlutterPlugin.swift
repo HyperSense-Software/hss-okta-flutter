@@ -140,14 +140,19 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
         func getCredential(completion: @escaping (Result<OktaAuthenticationResult?, Error>) -> Void) {
             Task{
                
-                if let result = Credential.default{
-                    let userInfo = try await result.userInfo()
-                    
-                    completion(.success(constructAuthenticationResult(resultEnum: AuthenticationResult.success, token: result.token, userInfo: userInfo)))
-                    
-                }else{
-                    
-                    completion(.failure(HssOktaError.configError("No default credential found")))
+                do{
+                    if let result = Credential.default{
+                        let userInfo = try await result.userInfo()
+                        
+                        completion(.success(constructAuthenticationResult(resultEnum: AuthenticationResult.success, token: result.token, userInfo: userInfo)))
+                        
+                    }else{
+                        
+                        completion(.failure(HssOktaError.generalError("No default credential found")))
+                    }
+                }catch let e{
+                    completion(.failure(HssOktaError.generalError(e.localizedDescription)))
+
                 }
             }
         }
