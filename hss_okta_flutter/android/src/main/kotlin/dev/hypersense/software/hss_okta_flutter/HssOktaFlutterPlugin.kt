@@ -30,7 +30,7 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
         HssOktaFlutterPluginApi.setUp(binding.binaryMessenger, this)
         context = binding.applicationContext
     }
-
+    
     override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
         HssOktaFlutterPluginApi.setUp(binding.binaryMessenger, null)
     }
@@ -79,7 +79,7 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
             }
         }
     }
-
+    
     override fun continueDirectAuthenticationMfaFlow(
         otp: String,
         callback: (Result<OktaAuthenticationResult?>) -> Unit
@@ -90,7 +90,7 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
 
     private suspend fun directAuthFlow(request : DirectAuthRequest): OktaAuthenticationResult {
         val flow = CredentialBootstrap.oidcClient.createResourceOwnerFlow()
-
+        
         when(val res = flow.start(request.username,request.password)){
             is OidcClientResult.Error -> {
                 return OktaAuthenticationResult(
