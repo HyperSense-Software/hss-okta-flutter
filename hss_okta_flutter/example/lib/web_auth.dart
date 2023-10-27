@@ -9,26 +9,27 @@ class WebSignInExample extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-      body: SafeArea(
-          child: HssOktaBrowserSignInWidget(
-        onResult: (v) {
-          if (v) {
-            Navigator.pop(context, v);
-          }
-        },
-        onError: (value) {
-          print(value);
-        },
-        builder: (context, child) {
-          return Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              child,
-              const Center(child: CircularProgressIndicator.adaptive())
-            ],
-          );
-        },
-      )),
+      body: Container(
+        child: HssOktaBrowserSignInWidget(
+          onResult: (v) {
+            if (v) {
+              Navigator.pop(context, v);
+            }
+          },
+          onError: (value) {
+            print(value);
+          },
+          builder: (context, child) {
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Flexible(child: child),
+                const Center(child: CircularProgressIndicator.adaptive())
+              ],
+            );
+          },
+        ),
+      ),
     );
   }
 }

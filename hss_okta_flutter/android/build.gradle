@@ -24,7 +24,21 @@ allprojects {
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
+def oktaProperties = new Properties()
+rootProject.file("okta.properties").withInputStream { oktaProperties.load(it) }
+
+
 android {
+    
+    defaultConfig{
+          
+        buildConfigField "String", 'ISSUER', "\"${oktaProperties.getProperty('issuer')}\""
+        buildConfigField "String", 'CLIENT_ID', "\"${oktaProperties.getProperty('clientId')}\""
+        buildConfigField "String", 'SIGN_IN_REDIRECT_URI', "\"${oktaProperties.getProperty('signInRedirectUri')}\""
+        buildConfigField "String", 'SIGN_OUT_REDIRECT_URI', "\"${oktaProperties.getProperty('signOutRedirectUri')}\""
+        buildConfigField "String", 'SCOPES', "\"${oktaProperties.getProperty('scopes')}\""
+    }
+
     if (project.android.hasProperty("namespace")) {
         namespace 'dev.hypersense.software.hss_okta_flutter'
     }
@@ -54,15 +68,15 @@ android {
         testImplementation 'org.mockito:mockito-core:5.0.0'
 
         implementation 'com.okta.android:okta-idx-kotlin:2.4.0'
-        
-         // Ensure all dependencies are compatible using the Bill of Materials (BOM).
+
+        // Ensure all dependencies are compatible using the Bill of Materials (BOM).
         implementation(platform('com.okta.kotlin:bom:1.1.5'))
 
         // Add the dependencies to your project.
         implementation('com.okta.kotlin:auth-foundation')
         implementation('com.okta.kotlin:auth-foundation-bootstrap')
         implementation('com.okta.kotlin:oauth2')
-        implementation('com.google.crypto.tink:tink-android:1.8.0')
+        implementation('com.okta.kotlin:web-authentication-ui')
 
     }
     

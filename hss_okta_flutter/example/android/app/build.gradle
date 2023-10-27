@@ -12,6 +12,9 @@ if (localPropertiesFile.exists()) {
     }
 }
 
+def oktaProperties = new Properties()
+rootProject.file("okta.properties").withInputStream { oktaProperties.load(it) }
+
 def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
 if (flutterVersionCode == null) {
     flutterVersionCode = '1'
@@ -26,7 +29,7 @@ android {
     namespace "dev.hypersense.software.hss_okta_flutter_example"
     compileSdkVersion flutter.compileSdkVersion
     ndkVersion flutter.ndkVersion
-
+    
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -49,6 +52,9 @@ android {
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
+        
+
+        manifestPlaceholders = ["webAuthenticationRedirectScheme": "{com.okta.dev-88611703}"]
     }
 
     buildTypes {
