@@ -25,16 +25,12 @@ class _MyAppState extends State<MyApp> {
   String res = 'None';
   String username = "";
   String password = "";
-  final TextEditingController _controller = TextEditingController();
-  // final TextEditingController _usernamecontroller =
-  //     TextEditingController(text: "aldrin.francisco@designli.co");
-  // final TextEditingController _passwordcontroller =
-  //     TextEditingController(text: "tZTEvb2vZNrFTVB");
 
+  final TextEditingController _controller = TextEditingController();
   final TextEditingController _usernamecontroller =
-      TextEditingController(text: "AldrinFrancisco@ntsafety.com");
+      TextEditingController(text: "aldrin.francisco@designli.co");
   final TextEditingController _passwordcontroller =
-      TextEditingController(text: "http://ntsafety.okta.com/");
+      TextEditingController(text: "tZTEvb2vZNrFTVB");
 
   final PageController _pageController = PageController(initialPage: 0);
 
