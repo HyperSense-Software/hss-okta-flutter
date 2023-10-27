@@ -15,6 +15,8 @@ case generalError(String)
 
 
 public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginApi {
+  
+    
      
     
     let browserAuth = WebAuthentication.shared
@@ -157,45 +159,60 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
             }
         }
     
-    func startDeviceAuthorizationFlow(completion: @escaping (Result<DeviceAuthorizationSession, Error>) -> Void) {
-        if let config = try? OAuth2Client.PropertyListConfiguration(){
-            let flow = DeviceAuthorizationFlow(
-                issuer: config.issuer,
-                clientId: config.clientId,
-                scopes: config.scopes)
-            
-            Task{@MainActor in
-                do{
-                    deviceAuthorizationFlowContext = try await flow.start()
+    func startDeviceAuthorizationFlow(completion: @escaping (Result<DeviceAuthorizationSession?, Error>) -> Void) {
+        do{
+            if (try? OAuth2Client.PropertyListConfiguration()) != nil{
+                
+                 flow = try DeviceAuthorizationFlow()
+                
+                Task{
+                    do{
+                        
+                        if let authFlow = flow as? DeviceAuthorizationFlow{
+                            
+                            deviceAuthorizationFlowContext = try await authFlow.start()
 
-                    completion(.success(DeviceAuthorizationSession(
-                        userCode: deviceAuthorizationFlowContext?.userCode,
-                        verificationUri: deviceAuthorizationFlowContext?.verificationUri.absoluteString
-                    )))
-                    
-                }catch let e{
-                    completion(.failure(e))
+                            completion(.success(DeviceAuthorizationSession(
+                                userCode: deviceAuthorizationFlowContext?.userCode,
+                                verificationUri: deviceAuthorizationFlowContext?.verificationUri.absoluteString
+                            )))
+                        }
+                        
+                        
+                    }catch let e{
+                        completion(.failure(e))
+                    }
                 }
+            }
+        }catch let e{
+            completion(.failure(e))
+        }
+    }
+    
+    func resumeDeviceAuthorizationFlow(completion: @escaping (Result<OktaAuthenticationResult?, Error>) -> Void) {
+        
+        Task{
+            do{
+                if let authFlow = flow as? DeviceAuthorizationFlow{
+                    if let context = deviceAuthorizationFlowContext{
+                        
+                        let token = try await authFlow.resume(with: context)
+                        Credential.default = try Credential.store(token)
+                        
+                        if let userInfo = try await Credential.default?.userInfo(){
+                            completion(.success(constructAuthenticationResult(resultEnum: AuthenticationResult.success, token: token, userInfo: userInfo)))
+                        }
+                    }
+                }
+                
+            }catch let e{
+                
+                completion(.failure(HssOktaError.generalError("Failed to Sign in : \(e.localizedDescription)")))
             }
         }
     }
     
-    func resumeDeviceAuthorizationFlow(completion: @escaping (Result<OktaAuthenticationResult, Error>) -> Void) {
-        
-        Task{@MainActor in
-            
-            do{
-                if let authFlow = flow as? DeviceAuthorizationFlow{
-                    if let context = deviceAuthorizationFlowContext{
-                        var token = try await authFlow.resume(with: context)
-                        Credential.default = try Credential.store(token)
-                    }
-                }
-            }catch let e{
-                completion(.failure(e))
-            }
-        }
-    }
+    
     
     //    Helper methods
         

@@ -7,6 +7,8 @@ import 'package:hss_okta_flutter/hss_okta_flutter.dart';
 import 'package:hss_okta_flutter_example/web_auth.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 
+import 'screens/device_sso_confirmation_screen.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -54,7 +56,6 @@ class _MyAppState extends State<MyApp> {
   Future<void> getCredential(BuildContext context) async {
     try {
       result = await _plugin.getCredential();
-      print(result?.token?.accessToken.toString());
 
       debugPrint(result?.token?.accessToken.toString());
     } catch (e, s) {
@@ -144,7 +145,33 @@ class _MyAppState extends State<MyApp> {
                   });
                 }
               },
-              child: const Text('Browser sign in'))
+              child: const Text('Browser sign in')),
+          const SizedBox(
+            height: 24,
+          ),
+          OutlinedButton(
+              onPressed: () async => await _plugin
+                      .startDeviceAuthorizationFlow()
+                      .then((value) async {
+                    await Navigator.of(formContext)
+                        .push(
+                      MaterialPageRoute(
+                        builder: (c) => DeviceSSOConfirmationScreen(
+                          session: value,
+                          onConfirm: (innerContext) async {
+                            await _plugin.resumeDeviceAuthorizationFlow().then(
+                                (value) => Navigator.of(innerContext).pop());
+                          },
+                        ),
+                      ),
+                    )
+                        .then((value) async {
+                      await _plugin.getCredential().then((credential) =>
+                          _processResult(credential, formContext));
+                      setState(() {});
+                    });
+                  }),
+              child: const Text('Device SSO'))
         ],
       ),
     );

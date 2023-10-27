@@ -124,8 +124,8 @@ abstract class HssOktaFlutterPluginApi {
   OktaAuthenticationResult? getCredential();
 
   @async
-  DeviceAuthorizationSession startDeviceAuthorizationFlow();
+  DeviceAuthorizationSession? startDeviceAuthorizationFlow();
 
   @async
-  OktaAuthenticationResult resumeDeviceAuthorizationFlow();
+  OktaAuthenticationResult? resumeDeviceAuthorizationFlow();
 }

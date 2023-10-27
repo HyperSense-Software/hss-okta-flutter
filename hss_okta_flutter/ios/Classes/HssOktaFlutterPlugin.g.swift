@@ -241,10 +241,8 @@ private class HssOktaFlutterPluginApiCodecReader: FlutterStandardReader {
       case 130:
         return OktaAuthenticationResult.fromList(self.readValue() as! [Any?])
       case 131:
-        return OktaAuthenticationResult.fromList(self.readValue() as! [Any?])
-      case 132:
         return OktaToken.fromList(self.readValue() as! [Any?])
-      case 133:
+      case 132:
         return UserInfo.fromList(self.readValue() as! [Any?])
       default:
         return super.readValue(ofType: type)
@@ -263,14 +261,11 @@ private class HssOktaFlutterPluginApiCodecWriter: FlutterStandardWriter {
     } else if let value = value as? OktaAuthenticationResult {
       super.writeByte(130)
       super.writeValue(value.toList())
-    } else if let value = value as? OktaAuthenticationResult {
+    } else if let value = value as? OktaToken {
       super.writeByte(131)
       super.writeValue(value.toList())
-    } else if let value = value as? OktaToken {
-      super.writeByte(132)
-      super.writeValue(value.toList())
     } else if let value = value as? UserInfo {
-      super.writeByte(133)
+      super.writeByte(132)
       super.writeValue(value.toList())
     } else {
       super.writeValue(value)
@@ -300,8 +295,8 @@ protocol HssOktaFlutterPluginApi {
   func refreshDefaultToken(completion: @escaping (Result<Bool?, Error>) -> Void)
   func revokeDefaultToken(completion: @escaping (Result<Bool?, Error>) -> Void)
   func getCredential(completion: @escaping (Result<OktaAuthenticationResult?, Error>) -> Void)
-  func startDeviceAuthorizationFlow(completion: @escaping (Result<DeviceAuthorizationSession, Error>) -> Void)
-  func resumeDeviceAuthorizationFlow(completion: @escaping (Result<OktaAuthenticationResult, Error>) -> Void)
+  func startDeviceAuthorizationFlow(completion: @escaping (Result<DeviceAuthorizationSession?, Error>) -> Void)
+  func resumeDeviceAuthorizationFlow(completion: @escaping (Result<OktaAuthenticationResult?, Error>) -> Void)
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.

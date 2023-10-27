@@ -47,6 +47,18 @@ class HssOktaFlutter {
     return result;
   }
 
+  Future<DeviceAuthorizationSession> startDeviceAuthorizationFlow() async {
+    var result = await HssOktaFlutterPluginPlatform.instance
+        .startDeviceAuthorizationFlow();
+    return result;
+  }
+
+  Future<OktaAuthenticationResult> resumeDeviceAuthorizationFlow() async {
+    var result = await HssOktaFlutterPluginPlatform.instance
+        .resumeDeviceAuthorizationFlow();
+    return result;
+  }
+
   void init(
     String clientid,
     String signInRedirectUrl,

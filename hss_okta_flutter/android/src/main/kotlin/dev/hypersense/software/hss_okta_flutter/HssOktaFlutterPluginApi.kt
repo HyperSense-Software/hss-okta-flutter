@@ -257,15 +257,10 @@ private object HssOktaFlutterPluginApiCodec : StandardMessageCodec() {
       }
       131.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          OktaAuthenticationResult.fromList(it)
-        }
-      }
-      132.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
           OktaToken.fromList(it)
         }
       }
-      133.toByte() -> {
+      132.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
           UserInfo.fromList(it)
         }
@@ -287,16 +282,12 @@ private object HssOktaFlutterPluginApiCodec : StandardMessageCodec() {
         stream.write(130)
         writeValue(stream, value.toList())
       }
-      is OktaAuthenticationResult -> {
+      is OktaToken -> {
         stream.write(131)
         writeValue(stream, value.toList())
       }
-      is OktaToken -> {
-        stream.write(132)
-        writeValue(stream, value.toList())
-      }
       is UserInfo -> {
-        stream.write(133)
+        stream.write(132)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)
@@ -312,8 +303,8 @@ interface HssOktaFlutterPluginApi {
   fun refreshDefaultToken(callback: (Result<Boolean?>) -> Unit)
   fun revokeDefaultToken(callback: (Result<Boolean?>) -> Unit)
   fun getCredential(callback: (Result<OktaAuthenticationResult?>) -> Unit)
-  fun startDeviceAuthorizationFlow(callback: (Result<DeviceAuthorizationSession>) -> Unit)
-  fun resumeDeviceAuthorizationFlow(callback: (Result<OktaAuthenticationResult>) -> Unit)
+  fun startDeviceAuthorizationFlow(callback: (Result<DeviceAuthorizationSession?>) -> Unit)
+  fun resumeDeviceAuthorizationFlow(callback: (Result<OktaAuthenticationResult?>) -> Unit)
 
   companion object {
     /** The codec used by HssOktaFlutterPluginApi. */
@@ -444,7 +435,7 @@ interface HssOktaFlutterPluginApi {
         val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.startDeviceAuthorizationFlow", codec)
         if (api != null) {
           channel.setMessageHandler { _, reply ->
-            api.startDeviceAuthorizationFlow() { result: Result<DeviceAuthorizationSession> ->
+            api.startDeviceAuthorizationFlow() { result: Result<DeviceAuthorizationSession?> ->
               val error = result.exceptionOrNull()
               if (error != null) {
                 reply.reply(wrapError(error))
@@ -462,7 +453,7 @@ interface HssOktaFlutterPluginApi {
         val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.resumeDeviceAuthorizationFlow", codec)
         if (api != null) {
           channel.setMessageHandler { _, reply ->
-            api.resumeDeviceAuthorizationFlow() { result: Result<OktaAuthenticationResult> ->
+            api.resumeDeviceAuthorizationFlow() { result: Result<OktaAuthenticationResult?> ->
               val error = result.exceptionOrNull()
               if (error != null) {
                 reply.reply(wrapError(error))

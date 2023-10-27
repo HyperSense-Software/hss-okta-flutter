@@ -46,6 +46,26 @@ class HssOktaFlutterChannel extends HssOktaFlutterPluginPlatform {
   }
 
   @override
+  Future<DeviceAuthorizationSession> startDeviceAuthorizationFlow() async {
+    var res = await _api.startDeviceAuthorizationFlow();
+    if (res == null) {
+      throw Exception("Null result from startDeviceAuthorizationFlow");
+    }
+
+    return res;
+  }
+
+  @override
+  Future<OktaAuthenticationResult> resumeDeviceAuthorizationFlow() async {
+    var res = await _api.resumeDeviceAuthorizationFlow();
+    if (res == null) {
+      throw Exception("Null result from resumeDeviceAuthorizationFlow");
+    }
+
+    return res;
+  }
+
+  @override
   void init(
     String clientid,
     String signInRedirectUrl,

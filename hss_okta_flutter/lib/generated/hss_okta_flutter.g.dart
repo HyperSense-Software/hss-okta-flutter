@@ -253,14 +253,11 @@ class _HssOktaFlutterPluginApiCodec extends StandardMessageCodec {
     } else if (value is OktaAuthenticationResult) {
       buffer.putUint8(130);
       writeValue(buffer, value.encode());
-    } else if (value is OktaAuthenticationResult) {
+    } else if (value is OktaToken) {
       buffer.putUint8(131);
       writeValue(buffer, value.encode());
-    } else if (value is OktaToken) {
-      buffer.putUint8(132);
-      writeValue(buffer, value.encode());
     } else if (value is UserInfo) {
-      buffer.putUint8(133);
+      buffer.putUint8(132);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -277,10 +274,8 @@ class _HssOktaFlutterPluginApiCodec extends StandardMessageCodec {
       case 130: 
         return OktaAuthenticationResult.decode(readValue(buffer)!);
       case 131: 
-        return OktaAuthenticationResult.decode(readValue(buffer)!);
-      case 132: 
         return OktaToken.decode(readValue(buffer)!);
-      case 133: 
+      case 132: 
         return UserInfo.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
@@ -430,7 +425,7 @@ class HssOktaFlutterPluginApi {
     }
   }
 
-  Future<DeviceAuthorizationSession> startDeviceAuthorizationFlow() async {
+  Future<DeviceAuthorizationSession?> startDeviceAuthorizationFlow() async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
         'dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.startDeviceAuthorizationFlow', codec,
         binaryMessenger: _binaryMessenger);
@@ -447,17 +442,12 @@ class HssOktaFlutterPluginApi {
         message: replyList[1] as String?,
         details: replyList[2],
       );
-    } else if (replyList[0] == null) {
-      throw PlatformException(
-        code: 'null-error',
-        message: 'Host platform returned null value for non-null return value.',
-      );
     } else {
-      return (replyList[0] as DeviceAuthorizationSession?)!;
+      return (replyList[0] as DeviceAuthorizationSession?);
     }
   }
 
-  Future<OktaAuthenticationResult> resumeDeviceAuthorizationFlow() async {
+  Future<OktaAuthenticationResult?> resumeDeviceAuthorizationFlow() async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
         'dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.resumeDeviceAuthorizationFlow', codec,
         binaryMessenger: _binaryMessenger);
@@ -474,13 +464,8 @@ class HssOktaFlutterPluginApi {
         message: replyList[1] as String?,
         details: replyList[2],
       );
-    } else if (replyList[0] == null) {
-      throw PlatformException(
-        code: 'null-error',
-        message: 'Host platform returned null value for non-null return value.',
-      );
     } else {
-      return (replyList[0] as OktaAuthenticationResult?)!;
+      return (replyList[0] as OktaAuthenticationResult?);
     }
   }
 }

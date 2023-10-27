@@ -24,11 +24,14 @@ PODS:
   - OktaWebAuthenticationUI (1.4.3):
     - OktaAuthFoundation (= 1.4.3)
     - OktaOAuth2 (= 1.4.3)
+  - url_launcher_ios (0.0.1):
+    - Flutter
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
   - hss_okta_flutter (from `.symlinks/plugins/hss_okta_flutter/ios`)
   - integration_test (from `.symlinks/plugins/integration_test/ios`)
+  - url_launcher_ios (from `.symlinks/plugins/url_launcher_ios/ios`)
 
 SPEC REPOS:
   trunk:
@@ -46,6 +49,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/hss_okta_flutter/ios"
   integration_test:
     :path: ".symlinks/plugins/integration_test/ios"
+  url_launcher_ios:
+    :path: ".symlinks/plugins/url_launcher_ios/ios"
 
 SPEC CHECKSUMS:
   Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
@@ -57,7 +62,8 @@ SPEC CHECKSUMS:
   OktaOAuth2: d063c4e91ab2ad7927fdf95a8f9454019d91eb47
   OktaOidc: 15fb3d494103d4f07ba8a523b3347d02c4d30486
   OktaWebAuthenticationUI: 1dd167e623e169e83fd8783682feef02c594d110
+  url_launcher_ios: 68d46cc9766d0c41dbdc884310529557e3cd7a86
 
 PODFILE CHECKSUM: 70d9d25280d0dd177a5f637cdb0f0b0b12c6a189
 
-COCOAPODS: 1.12.1
+COCOAPODS: 1.10.0
