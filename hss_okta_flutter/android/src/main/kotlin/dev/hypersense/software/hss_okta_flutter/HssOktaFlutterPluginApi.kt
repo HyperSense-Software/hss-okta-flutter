@@ -297,7 +297,6 @@ private object HssOktaFlutterPluginApiCodec : StandardMessageCodec() {
 
 /** Generated interface from Pigeon that represents a handler of messages from Flutter. */
 interface HssOktaFlutterPluginApi {
-  fun initializeConfiguration(clientid: String, signInRedirectUrl: String, signOutRedirectUrl: String, issuer: String, scopes: String)
   fun startDirectAuthenticationFlow(request: DirectAuthRequest, callback: (Result<OktaAuthenticationResult?>) -> Unit)
   fun continueDirectAuthenticationMfaFlow(otp: String, callback: (Result<OktaAuthenticationResult?>) -> Unit)
   fun refreshDefaultToken(callback: (Result<Boolean?>) -> Unit)
@@ -314,29 +313,6 @@ interface HssOktaFlutterPluginApi {
     /** Sets up an instance of `HssOktaFlutterPluginApi` to handle messages through the `binaryMessenger`. */
     @Suppress("UNCHECKED_CAST")
     fun setUp(binaryMessenger: BinaryMessenger, api: HssOktaFlutterPluginApi?) {
-      run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.initializeConfiguration", codec)
-        if (api != null) {
-          channel.setMessageHandler { message, reply ->
-            val args = message as List<Any?>
-            val clientidArg = args[0] as String
-            val signInRedirectUrlArg = args[1] as String
-            val signOutRedirectUrlArg = args[2] as String
-            val issuerArg = args[3] as String
-            val scopesArg = args[4] as String
-            var wrapped: List<Any?>
-            try {
-              api.initializeConfiguration(clientidArg, signInRedirectUrlArg, signOutRedirectUrlArg, issuerArg, scopesArg)
-              wrapped = listOf<Any?>(null)
-            } catch (exception: Throwable) {
-              wrapped = wrapError(exception)
-            }
-            reply.reply(wrapped)
-          }
-        } else {
-          channel.setMessageHandler(null)
-        }
-      }
       run {
         val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.startDirectAuthenticationFlow", codec)
         if (api != null) {

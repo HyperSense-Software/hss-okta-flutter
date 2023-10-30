@@ -293,28 +293,6 @@ class HssOktaFlutterPluginApi {
 
   static const MessageCodec<Object?> codec = _HssOktaFlutterPluginApiCodec();
 
-  Future<void> initializeConfiguration(String arg_clientid, String arg_signInRedirectUrl, String arg_signOutRedirectUrl, String arg_issuer, String arg_scopes) async {
-    final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
-        'dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.initializeConfiguration', codec,
-        binaryMessenger: _binaryMessenger);
-    final List<Object?>? replyList =
-        await channel.send(<Object?>[arg_clientid, arg_signInRedirectUrl, arg_signOutRedirectUrl, arg_issuer, arg_scopes]) as List<Object?>?;
-    if (replyList == null) {
-      throw PlatformException(
-        code: 'channel-error',
-        message: 'Unable to establish connection on channel.',
-      );
-    } else if (replyList.length > 1) {
-      throw PlatformException(
-        code: replyList[0]! as String,
-        message: replyList[1] as String?,
-        details: replyList[2],
-      );
-    } else {
-      return;
-    }
-  }
-
   Future<OktaAuthenticationResult?> startDirectAuthenticationFlow(DirectAuthRequest arg_request) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
         'dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.startDirectAuthenticationFlow', codec,

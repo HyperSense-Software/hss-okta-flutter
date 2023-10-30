@@ -52,9 +52,8 @@ android {
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
+        manifestPlaceholders = ["webAuthenticationRedirectScheme": "com.okta.dev-88611703"]
         
-
-        manifestPlaceholders = ["webAuthenticationRedirectScheme": "{com.okta.dev-88611703}"]
     }
 
     buildTypes {

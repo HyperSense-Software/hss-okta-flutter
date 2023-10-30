@@ -289,7 +289,6 @@ class HssOktaFlutterPluginApiCodec: FlutterStandardMessageCodec {
 
 /// Generated protocol from Pigeon that represents a handler of messages from Flutter.
 protocol HssOktaFlutterPluginApi {
-  func initializeConfiguration(clientid: String, signInRedirectUrl: String, signOutRedirectUrl: String, issuer: String, scopes: String) throws
   func startDirectAuthenticationFlow(request: DirectAuthRequest, completion: @escaping (Result<OktaAuthenticationResult?, Error>) -> Void)
   func continueDirectAuthenticationMfaFlow(otp: String, completion: @escaping (Result<OktaAuthenticationResult?, Error>) -> Void)
   func refreshDefaultToken(completion: @escaping (Result<Bool?, Error>) -> Void)
@@ -305,25 +304,6 @@ class HssOktaFlutterPluginApiSetup {
   static var codec: FlutterStandardMessageCodec { HssOktaFlutterPluginApiCodec.shared }
   /// Sets up an instance of `HssOktaFlutterPluginApi` to handle messages through the `binaryMessenger`.
   static func setUp(binaryMessenger: FlutterBinaryMessenger, api: HssOktaFlutterPluginApi?) {
-    let initializeConfigurationChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.initializeConfiguration", binaryMessenger: binaryMessenger, codec: codec)
-    if let api = api {
-      initializeConfigurationChannel.setMessageHandler { message, reply in
-        let args = message as! [Any?]
-        let clientidArg = args[0] as! String
-        let signInRedirectUrlArg = args[1] as! String
-        let signOutRedirectUrlArg = args[2] as! String
-        let issuerArg = args[3] as! String
-        let scopesArg = args[4] as! String
-        do {
-          try api.initializeConfiguration(clientid: clientidArg, signInRedirectUrl: signInRedirectUrlArg, signOutRedirectUrl: signOutRedirectUrlArg, issuer: issuerArg, scopes: scopesArg)
-          reply(wrapResult(nil))
-        } catch {
-          reply(wrapError(error))
-        }
-      }
-    } else {
-      initializeConfigurationChannel.setMessageHandler(nil)
-    }
     let startDirectAuthenticationFlowChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.startDirectAuthenticationFlow", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       startDirectAuthenticationFlowChannel.setMessageHandler { message, reply in

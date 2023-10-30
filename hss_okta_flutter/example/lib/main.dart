@@ -41,6 +41,14 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+
+    // For android
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+      await getCredential(context);
+      if (result != null) {
+        _pageController.jumpToPage(2);
+      }
+    });
   }
 
   Future<void> getCredential(BuildContext context) async {

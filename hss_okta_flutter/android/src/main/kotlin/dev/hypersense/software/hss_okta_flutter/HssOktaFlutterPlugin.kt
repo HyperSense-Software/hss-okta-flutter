@@ -9,6 +9,7 @@ import com.okta.authfoundation.client.OidcClientResult
 import com.okta.authfoundation.client.OidcConfiguration
 import com.okta.authfoundation.credential.Credential
 import com.okta.authfoundation.credential.CredentialDataSource.Companion.createCredentialDataSource
+import com.okta.authfoundation.credential.RevokeTokenType
 import com.okta.authfoundationbootstrap.*
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import com.okta.oauth2.ResourceOwnerFlow.Companion.createResourceOwnerFlow
@@ -25,8 +26,36 @@ import kotlinx.coroutines.launch
 import okhttp3.HttpUrl.Companion.toHttpUrl
 
 class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
-    var context : Context? = null
+    private var context : Context? = null
 
+   private fun initializeOIDC() {
+       println("Initializing OIDC Configuration")
+       var credential: Credential
+
+       val oidcConfiguration = OidcConfiguration(
+           clientId =  BuildConfig.CLIENT_ID,
+           defaultScope = BuildConfig.SCOPES,
+       )
+
+       println("${BuildConfig.ISSUER.toHttpUrl()}")
+
+       val oidcClient = OidcClient.createFromDiscoveryUrl(
+           oidcConfiguration,
+           "${BuildConfig.ISSUER}/.well-known/openid-configuration".toHttpUrl(),)
+
+
+       if(context == null){
+           throw  Exception("Context is null")
+       }
+
+       CredentialBootstrap.initialize(oidcClient.createCredentialDataSource(context!!))
+
+       println("Done Initializing OIDC Configuration /()")
+
+       CoroutineScope(Dispatchers.IO).launch{
+           credential = CredentialBootstrap.defaultCredential()
+       }
+   }
 
 
     override fun onAttachedToEngine(binding: FlutterPlugin.FlutterPluginBinding) {
@@ -42,49 +71,15 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
             WebSignOutNativeViewFactory()
         )
         context = binding.applicationContext
+
+        initializeOIDC()
     }
     
     override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
         HssOktaFlutterPluginApi.setUp(binding.binaryMessenger, null)
 
     }
-    
-    override fun initializeConfiguration(
-        clientid: String,
-        signInRedirectUrl: String,
-        signOutRedirectUrl: String,
-        issuer: String,
-        scopes: String
-    ) {
 
-        println("Initializing OIDC Configuration")
-        var credential: Credential
-
-        val oidcConfiguration = OidcConfiguration(
-            clientId =  BuildConfig.CLIENT_ID,
-            defaultScope = BuildConfig.SCOPES,
-        )
-
-        println("${issuer.toHttpUrl()}")
-
-       val oidcClient = OidcClient.createFromDiscoveryUrl(
-            oidcConfiguration,
-           "${BuildConfig.ISSUER}/.well-known/openid-configuration".toHttpUrl(),)
-
-
-        if(context == null){
-            throw  Exception("Context is null")
-        }
-
-        CredentialBootstrap.initialize(oidcClient.createCredentialDataSource(context!!))
-
-        println("Done Initializing OIDC Configuration /()")
-
-        CoroutineScope(Dispatchers.IO).launch{
-             credential = CredentialBootstrap.defaultCredential()
-        }
-
-    }
 
     override fun startDirectAuthenticationFlow(
         request: DirectAuthRequest,
@@ -108,9 +103,7 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
         CoroutineScope(Dispatchers.IO).launch {
 
             try {
-
-
-
+//                TODO : CODE HERE
             }catch (e: java.lang.Exception){
                 callback.invoke(Result.failure(e))
             }
@@ -120,7 +113,7 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
 
     private suspend fun directAuthFlow(request : DirectAuthRequest): OktaAuthenticationResult {
         val flow = CredentialBootstrap.oidcClient.createResourceOwnerFlow()
-        
+
         when(val res = flow.start(request.username,request.password)){
             is OidcClientResult.Error -> {
                 return OktaAuthenticationResult(
@@ -171,7 +164,7 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
 
     override fun revokeDefaultToken(callback: (Result<Boolean?>) -> Unit) {
         CoroutineScope(Dispatchers.IO).launch {
-            when(val result = CredentialBootstrap.defaultCredential().refreshToken()){
+            when(val result = CredentialBootstrap.defaultCredential().revokeToken(RevokeTokenType.ACCESS_TOKEN)){
                 is OidcClientResult.Error -> callback.invoke(Result.failure(Exception("Failed to revoke token")))
                 is OidcClientResult.Success -> callback.invoke(Result.success(true))
             }
@@ -194,6 +187,11 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
                 null
             } ?: return@launch
 
+            if(credential.token?.idToken == null){
+                credential.delete()
+                callback.invoke(Result.failure(Exception("Token error : Previous token is empty and will be deleted")))
+            }
+
 
             callback.invoke(Result.success(OktaAuthenticationResult(
                 result = AuthenticationResult.SUCCESS,
@@ -202,7 +200,9 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
                     tokenType = credential.token?.tokenType,
                     scope = credential.token?.scope,
                     refreshToken = credential.token?.refreshToken,
-                    id = userInfo.userId,
+                    id = "",
+                    accessToken = credential.token?.accessToken,
+                    token = credential.token?.idToken
                 ),
                 userInfo = UserInfo(
                     userId = userInfo.userId?:"",
