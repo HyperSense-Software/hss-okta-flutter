@@ -8,10 +8,14 @@ import com.okta.authfoundation.claims.*
 import com.okta.authfoundation.client.OidcClient
 import com.okta.authfoundation.client.OidcClientResult
 import com.okta.authfoundation.client.OidcConfiguration
+import com.okta.authfoundation.client.dto.OidcUserInfo
 import com.okta.authfoundation.credential.Credential
 import com.okta.authfoundation.credential.CredentialDataSource.Companion.createCredentialDataSource
 import com.okta.authfoundation.credential.RevokeTokenType
+import com.okta.authfoundation.credential.Token
 import com.okta.authfoundationbootstrap.*
+import com.okta.oauth2.DeviceAuthorizationFlow
+import com.okta.oauth2.DeviceAuthorizationFlow.Companion.createDeviceAuthorizationFlow
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import com.okta.oauth2.ResourceOwnerFlow.Companion.createResourceOwnerFlow
 import dev.hypersense.software.hss_okta.AuthenticationResult
@@ -35,6 +39,9 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
 
     private lateinit var browserSignInEventChannel : EventChannel
     private lateinit var browserSignOutEventChannel : EventChannel
+
+    private lateinit var deviceAuthorizationFlow : DeviceAuthorizationFlow
+    private lateinit var deviceAuthorizationFlowContext : DeviceAuthorizationFlow.Context
 
    private fun initializeOIDC() {
        println("Initializing OIDC Configuration")
@@ -64,6 +71,31 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
            credential = CredentialBootstrap.defaultCredential()
        }
    }
+
+    private fun composeOktaResult(res : Token, userInfoResult : OidcUserInfo) : OktaAuthenticationResult{
+        return OktaAuthenticationResult(
+            result = AuthenticationResult.SUCCESS,
+            token = OktaToken(
+                id = "",
+                issuedAt = userInfoResult.issuedAt?.toLong(),
+                tokenType = res.tokenType,
+                scope = res.scope,
+                refreshToken = res.refreshToken,
+                accessToken = res.accessToken,
+                token = res.idToken
+            ),
+            userInfo = UserInfo(
+                userId = userInfoResult.userId?:"",
+                givenName = userInfoResult.givenName?:"",
+                middleName = userInfoResult.middleName?:"",
+                familyName = userInfoResult.familyName?:"",
+                gender = userInfoResult.gender?:"",
+                email = userInfoResult.email?:"",
+                phoneNumber = userInfoResult.phoneNumber?:"",
+                username = userInfoResult.username?:""
+            )
+        )
+    }
 
 
     override fun onAttachedToEngine(binding: FlutterPlugin.FlutterPluginBinding) {
@@ -141,26 +173,7 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
                 var userInfoResult = userInfo.getOrThrow()
 
 
-                return OktaAuthenticationResult(
-                    result = AuthenticationResult.SUCCESS,
-                    token = OktaToken(
-                        id = res.result.idToken,
-                        issuedAt = userInfoResult.issuedAt?.toLong(),
-                        tokenType = res.result.tokenType,
-                        scope = res.result.scope,
-                        refreshToken = res.result.refreshToken,
-                    ),
-                    userInfo = UserInfo(
-                        userId = userInfoResult.userId?:"",
-                        givenName = userInfoResult.givenName?:"",
-                        middleName = userInfoResult.middleName?:"",
-                        familyName = userInfoResult.familyName?:"",
-                        gender = userInfoResult.gender?:"",
-                        email = userInfoResult.email?:"",
-                        phoneNumber = userInfoResult.phoneNumber?:"",
-                        username = userInfoResult.username?:""
-                    )
-                )
+                return composeOktaResult(res.result,userInfoResult)
             }
         }
     }
@@ -206,38 +219,65 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
             }
 
 
-            callback.invoke(Result.success(OktaAuthenticationResult(
-                result = AuthenticationResult.SUCCESS,
-                token = OktaToken(
-                    issuedAt = userInfo.issuedAt?.toLong(),
-                    tokenType = credential.token?.tokenType,
-                    scope = credential.token?.scope,
-                    refreshToken = credential.token?.refreshToken,
-                    id = "",
-                    accessToken = credential.token?.accessToken,
-                    token = credential.token?.idToken
-                ),
-                userInfo = UserInfo(
-                    userId = userInfo.userId?:"",
-                    givenName = userInfo.givenName?:"",
-                    middleName = userInfo.middleName?:"",
-                    familyName = userInfo.familyName?:"",
-                    gender = userInfo.gender?:"",
-                    email = userInfo.email?:"",
-                    phoneNumber = userInfo.phoneNumber?:"",
-                    username = userInfo.username?:""
-                )
-            )))
-
+            callback.invoke(Result.success(composeOktaResult(credential.token!!,userInfo)))
         }
     }
 
     override fun startDeviceAuthorizationFlow(callback: (Result<DeviceAuthorizationSession?>) -> Unit) {
-        TODO("Not yet implemented")
+        try {
+        CoroutineScope(Dispatchers.IO).launch {
+            deviceAuthorizationFlow = CredentialBootstrap.oidcClient.createDeviceAuthorizationFlow()
+
+            when(val session = deviceAuthorizationFlow.start()){
+
+                is OidcClientResult.Error -> {
+                    callback.invoke(Result.failure(Exception("Failed to start session")))
+                }
+                is OidcClientResult.Success -> {
+                    deviceAuthorizationFlowContext = session.result
+
+                    callback.invoke(Result.success(
+                        DeviceAuthorizationSession(
+                            session.result.userCode,
+                            session.result.verificationUri
+                        )
+                    ))
+                }
+            }
+        }
+        }catch (exception : Exception){
+            callback.invoke(Result.failure(exception))
+        }
     }
 
     override fun resumeDeviceAuthorizationFlow(callback: (Result<OktaAuthenticationResult?>) -> Unit) {
-        TODO("Not yet implemented")
+        try {
+            CoroutineScope(Dispatchers.IO).launch {
+
+                when(val session = deviceAuthorizationFlow.resume(deviceAuthorizationFlowContext)){
+                    is OidcClientResult.Error -> {
+                        callback.invoke(Result.failure(Exception("Failed to start session")))
+                    }
+                    is OidcClientResult.Success -> {
+                        CredentialBootstrap.defaultCredential().storeToken(session.result)
+
+                        when(val userInfo = CredentialBootstrap.defaultCredential().getUserInfo()){
+                            is OidcClientResult.Error -> callback.invoke(Result.failure(Exception("Failed to get user info")))
+                            is OidcClientResult.Success ->{
+                                callback.invoke(Result.success(
+                                    composeOktaResult(session.result,userInfo.result)
+                                ))
+                            }
+                        }
+
+
+                    }
+                }
+            }
+        }catch (exception : Exception){
+            callback.invoke(Result.failure(exception))
+        }}
+
+
     }
 
-}
