@@ -1,15 +1,33 @@
+
 # hss_okta_flutter
 
-A new Flutter plugin project.
+  
+
+A Flutter plugin that wraps Okta's Native SDK to flutter
+
+  
+
+The Plugin supports Classic Engine Authentication flows.
+
+ 
+
+## How to Install
+
+    flutter pub add hss_okta_flutter
+
+
+## Features
+Feature | Android | IOS |
+|--|--|--|
+|**Resource Owner Flow / Direct Authentication**| ✅ (MFA Not Available)| ✅ |
+|**Browser Redirect Authentication**|✅|✅|
+|**Device Authorization**|✅|✅|
+
+  
+  
+  
 
 ## Getting Started
 
-This project is a starting point for a Flutter
-[plug-in package](https://flutter.dev/developing-packages/),
-a specialized package that includes platform-specific implementation code for
-Android and/or iOS.
-
-For help getting started with Flutter development, view the
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+  TBA
 

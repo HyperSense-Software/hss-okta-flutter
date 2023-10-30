@@ -51,6 +51,10 @@ class HssOktaFlutter {
     return result;
   }
 
+  /// To be used with DirectAuthentication Flow
+  /// returns [OktaAuthenticationResult] which contains the [OktaToken] and [UserInfo]
+  ///
+  /// This is only available for iOS
   Future<OktaAuthenticationResult> mfaOtpSignInWithCredentials(
       String otp) async {
     var result = await HssOktaFlutterPluginPlatform.instance
@@ -59,12 +63,19 @@ class HssOktaFlutter {
     return result;
   }
 
+  /// Starts the Device Authorization flow
+  /// returns [DeviceAuthorizationSession] which contains the [DeviceCode] and [VerificationUri]
+  /// Users will need to input the [DeviceCode] and [VerificationUri] on a browser
+  ///
+  /// Call on [resumeDeviceAuthorizationFlow] to continue the flow and access the [OktaAuthenticationResult]
   Future<DeviceAuthorizationSession> startDeviceAuthorizationFlow() async {
     var result = await HssOktaFlutterPluginPlatform.instance
         .startDeviceAuthorizationFlow();
     return result;
   }
 
+  /// Call this to continue the Device Authorization flow, this should be called once the user has inputted the [DeviceCode] and [VerificationUri] on a browser
+  /// returns [OktaAuthenticationResult] which contains the [OktaToken] and [UserInfo]
   Future<OktaAuthenticationResult> resumeDeviceAuthorizationFlow() async {
     var result = await HssOktaFlutterPluginPlatform.instance
         .resumeDeviceAuthorizationFlow();
