@@ -43,14 +43,4 @@ abstract class HssOktaFlutterPluginPlatform extends PlatformInterface {
   Future<OktaAuthenticationResult> resumeDeviceAuthorizationFlow() {
     throw UnimplementedError('platformVersion() has not been implemented.');
   }
-
-  void init(
-    String clientid,
-    String signInRedirectUrl,
-    String signOutRedirectUrl,
-    String issuer,
-    String scopes,
-  ) {
-    throw UnimplementedError('init() has not been implemented.');
-  }
 }

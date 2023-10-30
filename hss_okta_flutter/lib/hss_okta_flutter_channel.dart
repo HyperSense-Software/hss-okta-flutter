@@ -64,21 +64,4 @@ class HssOktaFlutterChannel extends HssOktaFlutterPluginPlatform {
 
     return res;
   }
-
-  @override
-  void init(
-    String clientid,
-    String signInRedirectUrl,
-    String signOutRedirectUrl,
-    String issuer,
-    String scopes,
-  ) {
-    _api.initializeConfiguration(
-      clientid,
-      signInRedirectUrl,
-      signOutRedirectUrl,
-      issuer,
-      scopes,
-    );
-  }
 }
