@@ -103,7 +103,7 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
         CoroutineScope(Dispatchers.IO).launch {
 
             try {
-//                TODO : CODE HERE
+                callback.invoke(Result.failure(Exception("Okta Android doesn't provide MFA OTP")))
             }catch (e: java.lang.Exception){
                 callback.invoke(Result.failure(e))
             }
