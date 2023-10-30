@@ -2,16 +2,28 @@ package dev.hypersense.software.hss_okta_flutter
 
 import android.content.Context
 import android.graphics.Color
+import android.os.Handler
+import android.os.Looper
 import android.view.View
 import android.widget.TextView
-import io.flutter.plugin.common.StandardMessageCodec
-import io.flutter.plugin.platform.PlatformView
-import io.flutter.plugin.platform.PlatformViewFactory
+import com.okta.authfoundation.client.OidcClientResult
+import com.okta.authfoundation.credential.Credential
+import com.okta.authfoundation.events.EventHandler
+import com.okta.authfoundationbootstrap.CredentialBootstrap
+import com.okta.webauthenticationui.WebAuthenticationClient.Companion.createWebAuthenticationClient
+import io.flutter.plugin.common.*
+import io.flutter.plugin.platform.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
-class WebSignOutNativeViewFactory : PlatformViewFactory(StandardMessageCodec.INSTANCE) {
+
+class WebSignOutNativeViewFactory constructor(private val signOutEventChannel: EventChannel) : PlatformViewFactory(StandardMessageCodec.INSTANCE) {
+
     override fun create(context: Context, viewId: Int, args: Any?): PlatformView {
+
         val creationParams = args as Map<String?, Any?>?
-        return WebSignOutNativeView(context, viewId, creationParams)
+        return WebSignOutNativeView(context, viewId, creationParams,signOutEventChannel)
     }
 
     companion object{
@@ -20,19 +32,48 @@ class WebSignOutNativeViewFactory : PlatformViewFactory(StandardMessageCodec.INS
     }
 }
 
-internal class WebSignOutNativeView(context: Context, id: Int, creationParams: Map<String?, Any?>?) : PlatformView {
-    private val textView: TextView
+internal class WebSignOutNativeView(private val context: Context,
+                                   id: Int,
+                                   creationParams: Map<String?, Any?>?,
+                                   private val channel : EventChannel) : PlatformView,EventChannel.StreamHandler {
+    private val textView: TextView = TextView(context)
+    private var eventSink: EventChannel.EventSink? = null
+
+    init {
+        channel.setStreamHandler(this)
+    }
 
     override fun getView(): View {
+
         return textView
     }
 
     override fun dispose() {}
-    
-    init {
-        textView = TextView(context)
-        textView.textSize = 72f
-        textView.setBackgroundColor(Color.rgb(255, 255, 255))
-        textView.text = "Rendered on a native Android view (id: $id)"
+
+    override fun onFlutterViewAttached(flutterView: View) {
+        super.onFlutterViewAttached(flutterView)
     }
+
+    override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
+        eventSink = events
+        CoroutineScope(Dispatchers.Main).launch {
+            val credential: Credential = CredentialBootstrap.defaultCredential()
+            val webAuthenticationClient =
+                CredentialBootstrap.oidcClient.createWebAuthenticationClient()
+            when(val result = webAuthenticationClient.logoutOfBrowser(context,BuildConfig.SIGN_OUT_REDIRECT_URI,"${credential.token?.idToken}")){
+                is OidcClientResult.Error -> {
+                    eventSink?.success(false)
+                }
+                is OidcClientResult.Success -> {
+                    eventSink?.success(true)
+                }
+            }
+        }
+    }
+
+    override fun onCancel(arguments: Any?) {
+        eventSink = null
+    }
+
 }
+

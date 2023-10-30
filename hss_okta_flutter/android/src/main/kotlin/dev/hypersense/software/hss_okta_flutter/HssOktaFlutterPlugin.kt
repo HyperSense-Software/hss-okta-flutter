@@ -22,7 +22,7 @@ import dev.hypersense.software.hss_okta.OktaAuthenticationResult
 import dev.hypersense.software.hss_okta.OktaToken
 import dev.hypersense.software.hss_okta.UserInfo
 import io.flutter.plugin.common.EventChannel
-import io.flutter.plugin.common.MethodChannel
+
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -30,9 +30,11 @@ import okhttp3.HttpUrl.Companion.toHttpUrl
 
 class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
     private var context : Context? = null
-    val browserSignInChannel = "dev.hypersense.software.hss_okta.channels.browser_signin";
-    val browserSignOutChannel = "dev.hypersense.software.hss_okta.channels.browser_signout"
-    private lateinit var browserSignInNativeChannel : EventChannel
+    private val browserSignInChannelName = "dev.hypersense.software.hss_okta.channels.browser_signin";
+    private val browserSignOutChannelName = "dev.hypersense.software.hss_okta.channels.browser_signout"
+
+    private lateinit var browserSignInEventChannel : EventChannel
+    private lateinit var browserSignOutEventChannel : EventChannel
 
    private fun initializeOIDC() {
        println("Initializing OIDC Configuration")
@@ -68,22 +70,17 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
 
         HssOktaFlutterPluginApi.setUp(binding.binaryMessenger, this)
 
-        browserSignInNativeChannel = EventChannel(binding.binaryMessenger,browserSignInChannel)
-
-        var signInViewFactory = WebSignInNativeViewFactory(browserSignInNativeChannel)
-
-        var signOutViewFactory = WebSignOutNativeViewFactory()
-
-
+        browserSignInEventChannel = EventChannel(binding.binaryMessenger,browserSignInChannelName)
+        browserSignOutEventChannel = EventChannel(binding.binaryMessenger,browserSignOutChannelName)
 
         binding.platformViewRegistry.registerViewFactory(
             WebSignInNativeViewFactory.platformViewName,
-            signInViewFactory
+            WebSignInNativeViewFactory(browserSignInEventChannel)
         )
 
         binding.platformViewRegistry.registerViewFactory(
             WebSignOutNativeViewFactory.platformViewName,
-            signOutViewFactory
+            WebSignOutNativeViewFactory(browserSignOutEventChannel)
         )
 
         context = binding.applicationContext

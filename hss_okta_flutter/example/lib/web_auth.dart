@@ -48,7 +48,7 @@ class WebSignOutExample extends StatelessWidget {
           return Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              child,
+              Flexible(child: child),
               const Center(child: CircularProgressIndicator.adaptive())
             ],
           );

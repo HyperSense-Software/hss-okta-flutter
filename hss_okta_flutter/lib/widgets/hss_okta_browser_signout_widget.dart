@@ -1,7 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 
 typedef AuthBrowserLogOutBuilder = Widget Function(
@@ -15,7 +13,7 @@ class HssOktaBrowserSignOutWidget extends StatelessWidget {
   final channel = const EventChannel(
       "dev.hypersense.software.hss_okta.channels.browser_signout");
   final platformViewName =
-      'dev.hypersense.software.hss_okta.views.browser.signin';
+      'dev.hypersense.software.hss_okta.views.browser.signout';
 
   const HssOktaBrowserSignOutWidget(
       {super.key, this.builder, this.onResult, this.onError});
@@ -27,7 +25,7 @@ class HssOktaBrowserSignOutWidget extends StatelessWidget {
   Widget get _iosNativeView {
     return SizedBox.shrink(
       child: UiKitView(
-        viewType: 'dev.hypersense.software.hss_okta.views.browser.signout',
+        viewType: platformViewName,
         layoutDirection: TextDirection.ltr,
         creationParams: const {},
         creationParamsCodec: const StandardMessageCodec(),
@@ -45,28 +43,17 @@ class HssOktaBrowserSignOutWidget extends StatelessWidget {
   Widget get _andrdoiNativeView {
     const Map<String, dynamic> creationParams = <String, dynamic>{};
 
-    return PlatformViewLink(
+    return AndroidView(
       viewType: platformViewName,
-      surfaceFactory: (context, controller) {
-        return AndroidViewSurface(
-          controller: controller as AndroidViewController,
-          gestureRecognizers: const <Factory<OneSequenceGestureRecognizer>>{},
-          hitTestBehavior: PlatformViewHitTestBehavior.opaque,
-        );
-      },
-      onCreatePlatformView: (params) {
-        return PlatformViewsService.initSurfaceAndroidView(
-          id: params.id,
-          viewType: platformViewName,
-          layoutDirection: TextDirection.ltr,
-          creationParams: creationParams,
-          creationParamsCodec: const StandardMessageCodec(),
-          onFocus: () {
-            params.onFocusChanged(true);
-          },
-        )
-          ..addOnPlatformViewCreatedListener(params.onPlatformViewCreated)
-          ..create();
+      layoutDirection: TextDirection.ltr,
+      creationParams: creationParams,
+      creationParamsCodec: const StandardMessageCodec(),
+      onPlatformViewCreated: (id) {
+        browserSignOutStream.listen((event) async {
+          if (event) {
+            onResult?.call(true);
+          }
+        }, onError: onError ?? (e) => throw e);
       },
     );
   }
