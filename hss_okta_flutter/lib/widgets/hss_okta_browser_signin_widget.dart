@@ -47,6 +47,13 @@ class HssOktaBrowserSignInWidget extends StatelessWidget {
       layoutDirection: TextDirection.ltr,
       creationParams: creationParams,
       creationParamsCodec: const StandardMessageCodec(),
+      onPlatformViewCreated: (id) {
+        browserSigninStream.listen((event) async {
+          if (event) {
+            onResult?.call(true);
+          }
+        }, onError: onError ?? (e) => throw e);
+      },
     );
   }
 

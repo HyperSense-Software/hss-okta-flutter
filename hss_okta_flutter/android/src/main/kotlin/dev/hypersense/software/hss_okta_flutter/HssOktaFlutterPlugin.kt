@@ -2,6 +2,7 @@ package dev.hypersense.software.hss_okta_flutter
 
 
 import android.content.Context
+import android.media.metrics.Event
 import android.os.Build
 import com.okta.authfoundation.claims.*
 import com.okta.authfoundation.client.OidcClient
@@ -20,6 +21,8 @@ import dev.hypersense.software.hss_okta.HssOktaFlutterPluginApi
 import dev.hypersense.software.hss_okta.OktaAuthenticationResult
 import dev.hypersense.software.hss_okta.OktaToken
 import dev.hypersense.software.hss_okta.UserInfo
+import io.flutter.plugin.common.EventChannel
+import io.flutter.plugin.common.MethodChannel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -27,6 +30,9 @@ import okhttp3.HttpUrl.Companion.toHttpUrl
 
 class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
     private var context : Context? = null
+    val browserSignInChannel = "dev.hypersense.software.hss_okta.channels.browser_signin";
+    val browserSignOutChannel = "dev.hypersense.software.hss_okta.channels.browser_signout"
+    private lateinit var browserSignInNativeChannel : EventChannel
 
    private fun initializeOIDC() {
        println("Initializing OIDC Configuration")
@@ -59,17 +65,27 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
 
 
     override fun onAttachedToEngine(binding: FlutterPlugin.FlutterPluginBinding) {
+
         HssOktaFlutterPluginApi.setUp(binding.binaryMessenger, this)
+
+        browserSignInNativeChannel = EventChannel(binding.binaryMessenger,browserSignInChannel)
+
+        var signInViewFactory = WebSignInNativeViewFactory(browserSignInNativeChannel)
+
+        var signOutViewFactory = WebSignOutNativeViewFactory()
+
+
 
         binding.platformViewRegistry.registerViewFactory(
             WebSignInNativeViewFactory.platformViewName,
-            WebSignInNativeViewFactory()
+            signInViewFactory
         )
 
         binding.platformViewRegistry.registerViewFactory(
             WebSignOutNativeViewFactory.platformViewName,
-            WebSignOutNativeViewFactory()
+            signOutViewFactory
         )
+
         context = binding.applicationContext
 
         initializeOIDC()
