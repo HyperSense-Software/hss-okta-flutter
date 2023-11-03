@@ -12,31 +12,26 @@ import 'package:pigeon/pigeon.dart';
 )
 
 // START OF ENUMS
-enum AuthenticationType { browser, sso, directAuth }
 
-enum AuthenticationResult { success, mfaRequired, error }
+enum DirectAuthenticationResult { success, mfaRequired, error }
 
-enum AuthenticationFactor {
+enum DirectAuthenticationFactor {
   otp("otp"),
   oob("oob");
 
   final String value;
-  const AuthenticationFactor(this.value);
+  const DirectAuthenticationFactor(this.value);
 }
 
 // END OF ENUMS
 
-class OktaAuthenticationResult {
-  final AuthenticationResult? result;
-  final String? error;
+class AuthenticationResult {
+  final DirectAuthenticationResult? result;
   final OktaToken? token;
   final UserInfo? userInfo;
 
-  OktaAuthenticationResult(
-      {required this.result, this.error, required this.token, this.userInfo
-      // required this.idToken,
-      // required this.context
-      });
+  AuthenticationResult(
+      {required this.result, required this.token, this.userInfo});
 }
 
 class OktaToken {
@@ -108,11 +103,11 @@ abstract class HssOktaFlutterPluginApi {
   // );
 
   @async
-  OktaAuthenticationResult? startDirectAuthenticationFlow(
+  AuthenticationResult? startDirectAuthenticationFlow(
       DirectAuthRequest request);
 
   @async
-  OktaAuthenticationResult? continueDirectAuthenticationMfaFlow(String otp);
+  AuthenticationResult? continueDirectAuthenticationMfaFlow(String otp);
 
   @async
   bool? refreshDefaultToken();
@@ -121,11 +116,11 @@ abstract class HssOktaFlutterPluginApi {
   bool? revokeDefaultToken();
 
   @async
-  OktaAuthenticationResult? getCredential();
+  AuthenticationResult? getCredential();
 
   @async
   DeviceAuthorizationSession? startDeviceAuthorizationFlow();
 
   @async
-  OktaAuthenticationResult? resumeDeviceAuthorizationFlow();
+  AuthenticationResult? resumeDeviceAuthorizationFlow();
 }

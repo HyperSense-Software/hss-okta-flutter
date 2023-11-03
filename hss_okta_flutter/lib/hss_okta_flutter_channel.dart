@@ -6,7 +6,7 @@ class HssOktaFlutterChannel extends HssOktaFlutterPluginPlatform {
   final _api = HssOktaFlutterPluginApi();
 
   @override
-  Future<OktaAuthenticationResult> startDirectAuthenticationFlow(
+  Future<AuthenticationResult> startDirectAuthenticationFlow(
       DirectAuthRequest request) async {
     var res = await _api.startDirectAuthenticationFlow(request);
     if (res == null) throw Exception("Null result from signInWithCredentials");
@@ -28,14 +28,13 @@ class HssOktaFlutterChannel extends HssOktaFlutterPluginPlatform {
   }
 
   @override
-  Future<OktaAuthenticationResult> getCredential() async {
+  Future<AuthenticationResult?> getCredential() async {
     var res = await _api.getCredential();
-    if (res == null) throw Exception("Null result from getCredential");
     return res;
   }
 
   @override
-  Future<OktaAuthenticationResult> continueDirectAuthenticationMfaFlow(
+  Future<AuthenticationResult?> continueDirectAuthenticationMfaFlow(
       String otp) async {
     var res = await _api.continueDirectAuthenticationMfaFlow(otp);
     if (res == null) {
@@ -46,7 +45,7 @@ class HssOktaFlutterChannel extends HssOktaFlutterPluginPlatform {
   }
 
   @override
-  Future<DeviceAuthorizationSession> startDeviceAuthorizationFlow() async {
+  Future<DeviceAuthorizationSession?> startDeviceAuthorizationFlow() async {
     var res = await _api.startDeviceAuthorizationFlow();
     if (res == null) {
       throw Exception("Null result from startDeviceAuthorizationFlow");
@@ -56,11 +55,8 @@ class HssOktaFlutterChannel extends HssOktaFlutterPluginPlatform {
   }
 
   @override
-  Future<OktaAuthenticationResult> resumeDeviceAuthorizationFlow() async {
+  Future<AuthenticationResult?> resumeDeviceAuthorizationFlow() async {
     var res = await _api.resumeDeviceAuthorizationFlow();
-    if (res == null) {
-      throw Exception("Null result from resumeDeviceAuthorizationFlow");
-    }
 
     return res;
   }

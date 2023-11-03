@@ -38,49 +38,40 @@ private func nilOrValue<T>(_ value: Any?) -> T? {
   return value as! T?
 }
 
-enum AuthenticationType: Int {
-  case browser = 0
-  case sso = 1
-  case directAuth = 2
-}
-
-enum AuthenticationResult: Int {
+enum DirectAuthenticationResult: Int {
   case success = 0
   case mfaRequired = 1
   case error = 2
 }
 
-enum AuthenticationFactor: Int {
+enum DirectAuthenticationFactor: Int {
   case otp = 0
   case oob = 1
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
-struct OktaAuthenticationResult {
-  var result: AuthenticationResult? = nil
-  var error: String? = nil
+struct AuthenticationResult {
+  var result: DirectAuthenticationResult? = nil
   var token: OktaToken? = nil
   var userInfo: UserInfo? = nil
 
-  static func fromList(_ list: [Any?]) -> OktaAuthenticationResult? {
-    var result: AuthenticationResult? = nil
+  static func fromList(_ list: [Any?]) -> AuthenticationResult? {
+    var result: DirectAuthenticationResult? = nil
     let resultEnumVal: Int? = nilOrValue(list[0])
     if let resultRawValue = resultEnumVal {
-      result = AuthenticationResult(rawValue: resultRawValue)!
+      result = DirectAuthenticationResult(rawValue: resultRawValue)!
     }
-    let error: String? = nilOrValue(list[1])
     var token: OktaToken? = nil
-    if let tokenList: [Any?] = nilOrValue(list[2]) {
+    if let tokenList: [Any?] = nilOrValue(list[1]) {
       token = OktaToken.fromList(tokenList)
     }
     var userInfo: UserInfo? = nil
-    if let userInfoList: [Any?] = nilOrValue(list[3]) {
+    if let userInfoList: [Any?] = nilOrValue(list[2]) {
       userInfo = UserInfo.fromList(userInfoList)
     }
 
-    return OktaAuthenticationResult(
+    return AuthenticationResult(
       result: result,
-      error: error,
       token: token,
       userInfo: userInfo
     )
@@ -88,7 +79,6 @@ struct OktaAuthenticationResult {
   func toList() -> [Any?] {
     return [
       result?.rawValue,
-      error,
       token?.toList(),
       userInfo?.toList(),
     ]
@@ -235,11 +225,11 @@ private class HssOktaFlutterPluginApiCodecReader: FlutterStandardReader {
   override func readValue(ofType type: UInt8) -> Any? {
     switch type {
       case 128:
-        return DeviceAuthorizationSession.fromList(self.readValue() as! [Any?])
+        return AuthenticationResult.fromList(self.readValue() as! [Any?])
       case 129:
-        return DirectAuthRequest.fromList(self.readValue() as! [Any?])
+        return DeviceAuthorizationSession.fromList(self.readValue() as! [Any?])
       case 130:
-        return OktaAuthenticationResult.fromList(self.readValue() as! [Any?])
+        return DirectAuthRequest.fromList(self.readValue() as! [Any?])
       case 131:
         return OktaToken.fromList(self.readValue() as! [Any?])
       case 132:
@@ -252,13 +242,13 @@ private class HssOktaFlutterPluginApiCodecReader: FlutterStandardReader {
 
 private class HssOktaFlutterPluginApiCodecWriter: FlutterStandardWriter {
   override func writeValue(_ value: Any) {
-    if let value = value as? DeviceAuthorizationSession {
+    if let value = value as? AuthenticationResult {
       super.writeByte(128)
       super.writeValue(value.toList())
-    } else if let value = value as? DirectAuthRequest {
+    } else if let value = value as? DeviceAuthorizationSession {
       super.writeByte(129)
       super.writeValue(value.toList())
-    } else if let value = value as? OktaAuthenticationResult {
+    } else if let value = value as? DirectAuthRequest {
       super.writeByte(130)
       super.writeValue(value.toList())
     } else if let value = value as? OktaToken {
@@ -289,13 +279,13 @@ class HssOktaFlutterPluginApiCodec: FlutterStandardMessageCodec {
 
 /// Generated protocol from Pigeon that represents a handler of messages from Flutter.
 protocol HssOktaFlutterPluginApi {
-  func startDirectAuthenticationFlow(request: DirectAuthRequest, completion: @escaping (Result<OktaAuthenticationResult?, Error>) -> Void)
-  func continueDirectAuthenticationMfaFlow(otp: String, completion: @escaping (Result<OktaAuthenticationResult?, Error>) -> Void)
+  func startDirectAuthenticationFlow(request: DirectAuthRequest, completion: @escaping (Result<AuthenticationResult?, Error>) -> Void)
+  func continueDirectAuthenticationMfaFlow(otp: String, completion: @escaping (Result<AuthenticationResult?, Error>) -> Void)
   func refreshDefaultToken(completion: @escaping (Result<Bool?, Error>) -> Void)
   func revokeDefaultToken(completion: @escaping (Result<Bool?, Error>) -> Void)
-  func getCredential(completion: @escaping (Result<OktaAuthenticationResult?, Error>) -> Void)
+  func getCredential(completion: @escaping (Result<AuthenticationResult?, Error>) -> Void)
   func startDeviceAuthorizationFlow(completion: @escaping (Result<DeviceAuthorizationSession?, Error>) -> Void)
-  func resumeDeviceAuthorizationFlow(completion: @escaping (Result<OktaAuthenticationResult?, Error>) -> Void)
+  func resumeDeviceAuthorizationFlow(completion: @escaping (Result<AuthenticationResult?, Error>) -> Void)
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.

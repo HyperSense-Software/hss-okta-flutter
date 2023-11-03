@@ -36,7 +36,7 @@ class _MyAppState extends State<MyApp> {
 
   final PageController _pageController = PageController(initialPage: 0);
 
-  OktaAuthenticationResult? result;
+  AuthenticationResult? result;
 
   @override
   void initState() {
@@ -79,7 +79,7 @@ class _MyAppState extends State<MyApp> {
               await _plugin
                   .mfaOtpSignInWithCredentials(_controller.text)
                   .then((value) async {
-                if (value.result == AuthenticationResult.success) {
+                if (value?.result == DirectAuthenticationResult.success) {
                   result = value;
 
                   await getCredential(context);
@@ -151,6 +151,8 @@ class _MyAppState extends State<MyApp> {
               onPressed: () async => await _plugin
                       .startDeviceAuthorizationFlow()
                       .then((value) async {
+                    if (value == null) return;
+
                     await Navigator.of(formContext)
                         .push(
                       MaterialPageRoute(
@@ -175,19 +177,23 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
-  void _processResult(OktaAuthenticationResult res, BuildContext context) {
-    if (res.result == AuthenticationResult.success) {
+  void _processResult(AuthenticationResult? res, BuildContext context) {
+    if (res == null) {
+      return;
+    }
+
+    if (res.result == DirectAuthenticationResult.success) {
       result = res;
       _pageController.animateToPage(2,
           duration: const Duration(milliseconds: 500), curve: Curves.ease);
     }
 
-    if (res.result == AuthenticationResult.error) {
+    if (res.result == DirectAuthenticationResult.error) {
       ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Error: ${res.error}')));
+          .showSnackBar(SnackBar(content: Text('Error: ${res.result}')));
     }
 
-    if (res.result == AuthenticationResult.mfaRequired) {
+    if (res.result == DirectAuthenticationResult.mfaRequired) {
       _pageController.animateToPage(1,
           duration: const Duration(milliseconds: 500), curve: Curves.ease);
     }
@@ -202,8 +208,8 @@ class _MyAppState extends State<MyApp> {
         onRefresh: () async => await getCredential(context),
         child: ListView(children: [
           Text('Authentication Result : ${result?.result}'),
-          if (result!.result != AuthenticationResult.success)
-            Text('error : ${result?.error}')
+          if (result!.result != DirectAuthenticationResult.success)
+            Text('error : ${result?.result}')
           else ...[
             Text('id : ${result?.token?.id}'),
             Text(

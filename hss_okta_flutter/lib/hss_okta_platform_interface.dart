@@ -14,7 +14,7 @@ abstract class HssOktaFlutterPluginPlatform extends PlatformInterface {
     _instance = instance;
   }
 
-  Future<OktaAuthenticationResult> startDirectAuthenticationFlow(
+  Future<AuthenticationResult?> startDirectAuthenticationFlow(
       DirectAuthRequest request) {
     throw UnimplementedError('platformVersion() has not been implemented.');
   }
@@ -27,20 +27,20 @@ abstract class HssOktaFlutterPluginPlatform extends PlatformInterface {
     throw UnimplementedError('platformVersion() has not been implemented.');
   }
 
-  Future<OktaAuthenticationResult> getCredential() {
+  Future<AuthenticationResult?> getCredential() {
     throw UnimplementedError('platformVersion() has not been implemented.');
   }
 
-  Future<OktaAuthenticationResult> continueDirectAuthenticationMfaFlow(
+  Future<AuthenticationResult?> continueDirectAuthenticationMfaFlow(
       String otp) {
     throw UnimplementedError('platformVersion() has not been implemented.');
   }
 
-  Future<DeviceAuthorizationSession> startDeviceAuthorizationFlow() {
+  Future<DeviceAuthorizationSession?> startDeviceAuthorizationFlow() {
     throw UnimplementedError('platformVersion() has not been implemented.');
   }
 
-  Future<OktaAuthenticationResult> resumeDeviceAuthorizationFlow() {
+  Future<AuthenticationResult?> resumeDeviceAuthorizationFlow() {
     throw UnimplementedError('platformVersion() has not been implemented.');
   }
 }

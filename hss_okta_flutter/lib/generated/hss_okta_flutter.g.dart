@@ -17,34 +17,25 @@ List<Object?> wrapResponse({Object? result, PlatformException? error, bool empty
   return <Object?>[error.code, error.message, error.details];
 }
 
-enum AuthenticationType {
-  browser,
-  sso,
-  directAuth,
-}
-
-enum AuthenticationResult {
+enum DirectAuthenticationResult {
   success,
   mfaRequired,
   error,
 }
 
-enum AuthenticationFactor {
+enum DirectAuthenticationFactor {
   otp,
   oob,
 }
 
-class OktaAuthenticationResult {
-  OktaAuthenticationResult({
+class AuthenticationResult {
+  AuthenticationResult({
     this.result,
-    this.error,
     this.token,
     this.userInfo,
   });
 
-  AuthenticationResult? result;
-
-  String? error;
+  DirectAuthenticationResult? result;
 
   OktaToken? token;
 
@@ -53,24 +44,22 @@ class OktaAuthenticationResult {
   Object encode() {
     return <Object?>[
       result?.index,
-      error,
       token?.encode(),
       userInfo?.encode(),
     ];
   }
 
-  static OktaAuthenticationResult decode(Object result) {
+  static AuthenticationResult decode(Object result) {
     result as List<Object?>;
-    return OktaAuthenticationResult(
+    return AuthenticationResult(
       result: result[0] != null
-          ? AuthenticationResult.values[result[0]! as int]
+          ? DirectAuthenticationResult.values[result[0]! as int]
           : null,
-      error: result[1] as String?,
-      token: result[2] != null
-          ? OktaToken.decode(result[2]! as List<Object?>)
+      token: result[1] != null
+          ? OktaToken.decode(result[1]! as List<Object?>)
           : null,
-      userInfo: result[3] != null
-          ? UserInfo.decode(result[3]! as List<Object?>)
+      userInfo: result[2] != null
+          ? UserInfo.decode(result[2]! as List<Object?>)
           : null,
     );
   }
@@ -244,13 +233,13 @@ class _HssOktaFlutterPluginApiCodec extends StandardMessageCodec {
   const _HssOktaFlutterPluginApiCodec();
   @override
   void writeValue(WriteBuffer buffer, Object? value) {
-    if (value is DeviceAuthorizationSession) {
+    if (value is AuthenticationResult) {
       buffer.putUint8(128);
       writeValue(buffer, value.encode());
-    } else if (value is DirectAuthRequest) {
+    } else if (value is DeviceAuthorizationSession) {
       buffer.putUint8(129);
       writeValue(buffer, value.encode());
-    } else if (value is OktaAuthenticationResult) {
+    } else if (value is DirectAuthRequest) {
       buffer.putUint8(130);
       writeValue(buffer, value.encode());
     } else if (value is OktaToken) {
@@ -268,11 +257,11 @@ class _HssOktaFlutterPluginApiCodec extends StandardMessageCodec {
   Object? readValueOfType(int type, ReadBuffer buffer) {
     switch (type) {
       case 128: 
-        return DeviceAuthorizationSession.decode(readValue(buffer)!);
+        return AuthenticationResult.decode(readValue(buffer)!);
       case 129: 
-        return DirectAuthRequest.decode(readValue(buffer)!);
+        return DeviceAuthorizationSession.decode(readValue(buffer)!);
       case 130: 
-        return OktaAuthenticationResult.decode(readValue(buffer)!);
+        return DirectAuthRequest.decode(readValue(buffer)!);
       case 131: 
         return OktaToken.decode(readValue(buffer)!);
       case 132: 
@@ -293,7 +282,7 @@ class HssOktaFlutterPluginApi {
 
   static const MessageCodec<Object?> codec = _HssOktaFlutterPluginApiCodec();
 
-  Future<OktaAuthenticationResult?> startDirectAuthenticationFlow(DirectAuthRequest arg_request) async {
+  Future<AuthenticationResult?> startDirectAuthenticationFlow(DirectAuthRequest arg_request) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
         'dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.startDirectAuthenticationFlow', codec,
         binaryMessenger: _binaryMessenger);
@@ -311,11 +300,11 @@ class HssOktaFlutterPluginApi {
         details: replyList[2],
       );
     } else {
-      return (replyList[0] as OktaAuthenticationResult?);
+      return (replyList[0] as AuthenticationResult?);
     }
   }
 
-  Future<OktaAuthenticationResult?> continueDirectAuthenticationMfaFlow(String arg_otp) async {
+  Future<AuthenticationResult?> continueDirectAuthenticationMfaFlow(String arg_otp) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
         'dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.continueDirectAuthenticationMfaFlow', codec,
         binaryMessenger: _binaryMessenger);
@@ -333,7 +322,7 @@ class HssOktaFlutterPluginApi {
         details: replyList[2],
       );
     } else {
-      return (replyList[0] as OktaAuthenticationResult?);
+      return (replyList[0] as AuthenticationResult?);
     }
   }
 
@@ -381,7 +370,7 @@ class HssOktaFlutterPluginApi {
     }
   }
 
-  Future<OktaAuthenticationResult?> getCredential() async {
+  Future<AuthenticationResult?> getCredential() async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
         'dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.getCredential', codec,
         binaryMessenger: _binaryMessenger);
@@ -399,7 +388,7 @@ class HssOktaFlutterPluginApi {
         details: replyList[2],
       );
     } else {
-      return (replyList[0] as OktaAuthenticationResult?);
+      return (replyList[0] as AuthenticationResult?);
     }
   }
 
@@ -425,7 +414,7 @@ class HssOktaFlutterPluginApi {
     }
   }
 
-  Future<OktaAuthenticationResult?> resumeDeviceAuthorizationFlow() async {
+  Future<AuthenticationResult?> resumeDeviceAuthorizationFlow() async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
         'dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.resumeDeviceAuthorizationFlow', codec,
         binaryMessenger: _binaryMessenger);
@@ -443,7 +432,7 @@ class HssOktaFlutterPluginApi {
         details: replyList[2],
       );
     } else {
-      return (replyList[0] as OktaAuthenticationResult?);
+      return (replyList[0] as AuthenticationResult?);
     }
   }
 }

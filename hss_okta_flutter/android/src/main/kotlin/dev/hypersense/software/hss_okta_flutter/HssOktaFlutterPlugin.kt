@@ -22,7 +22,7 @@ import dev.hypersense.software.hss_okta.AuthenticationResult
 import dev.hypersense.software.hss_okta.DeviceAuthorizationSession
 import dev.hypersense.software.hss_okta.DirectAuthRequest
 import dev.hypersense.software.hss_okta.HssOktaFlutterPluginApi
-import dev.hypersense.software.hss_okta.OktaAuthenticationResult
+import dev.hypersense.software.hss_okta.DirectAuthenticationResult
 import dev.hypersense.software.hss_okta.OktaToken
 import dev.hypersense.software.hss_okta.UserInfo
 import io.flutter.plugin.common.EventChannel
@@ -72,9 +72,9 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
        }
    }
 
-    private fun composeOktaResult(res : Token, userInfoResult : OidcUserInfo) : OktaAuthenticationResult{
-        return OktaAuthenticationResult(
-            result = AuthenticationResult.SUCCESS,
+    private fun composeOktaResult(res : Token, userInfoResult : OidcUserInfo) : AuthenticationResult{
+        return AuthenticationResult(
+            result = DirectAuthenticationResult.SUCCESS,
             token = OktaToken(
                 id = "",
                 issuedAt = userInfoResult.issuedAt?.toLong(),
@@ -128,7 +128,7 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
 
     override fun startDirectAuthenticationFlow(
         request: DirectAuthRequest,
-        callback: (Result<OktaAuthenticationResult?>) -> Unit
+        callback: (Result<AuthenticationResult?>) -> Unit
     ) {
         CoroutineScope(Dispatchers.IO).launch {
 
@@ -143,7 +143,7 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
     
     override fun continueDirectAuthenticationMfaFlow(
         otp: String,
-        callback: (Result<OktaAuthenticationResult?>) -> Unit
+        callback: (Result<AuthenticationResult?>) -> Unit
     ) {
         CoroutineScope(Dispatchers.IO).launch {
 
@@ -156,15 +156,12 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
     }
 
 
-    private suspend fun directAuthFlow(request : DirectAuthRequest): OktaAuthenticationResult {
+    private suspend fun directAuthFlow(request : DirectAuthRequest): AuthenticationResult {
         val flow = CredentialBootstrap.oidcClient.createResourceOwnerFlow()
 
         when(val res = flow.start(request.username,request.password)){
             is OidcClientResult.Error -> {
-                return OktaAuthenticationResult(
-                    result = AuthenticationResult.ERROR,
-                    error = res.exception.message
-                )
+                throw  Exception(res.exception.message)
             }
             is OidcClientResult.Success -> {
 
@@ -197,7 +194,7 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
         }
     }
 
-    override fun getCredential(callback: (Result<OktaAuthenticationResult?>) -> Unit) {
+    override fun getCredential(callback: (Result<AuthenticationResult?>) -> Unit) {
         CoroutineScope(Dispatchers.IO).launch {
             val credential = try{
                 CredentialBootstrap.defaultCredential();
@@ -250,7 +247,7 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
         }
     }
 
-    override fun resumeDeviceAuthorizationFlow(callback: (Result<OktaAuthenticationResult?>) -> Unit) {
+    override fun resumeDeviceAuthorizationFlow(callback: (Result<AuthenticationResult?>) -> Unit) {
         try {
             CoroutineScope(Dispatchers.IO).launch {
 
@@ -280,4 +277,10 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
 
 
     }
+
+enum class HssOktaError(value : String){
+    CONFIG_ERROR("Config Error"),
+    CREDENTIAL_ERROR("Credential Error"),
+    GENERAL_ERROR("General Error")
+}
 

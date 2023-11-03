@@ -43,69 +43,54 @@ class FlutterError (
   val details: Any? = null
 ) : Throwable()
 
-enum class AuthenticationType(val raw: Int) {
-  BROWSER(0),
-  SSO(1),
-  DIRECTAUTH(2);
-
-  companion object {
-    fun ofRaw(raw: Int): AuthenticationType? {
-      return values().firstOrNull { it.raw == raw }
-    }
-  }
-}
-
-enum class AuthenticationResult(val raw: Int) {
+enum class DirectAuthenticationResult(val raw: Int) {
   SUCCESS(0),
   MFAREQUIRED(1),
   ERROR(2);
 
   companion object {
-    fun ofRaw(raw: Int): AuthenticationResult? {
+    fun ofRaw(raw: Int): DirectAuthenticationResult? {
       return values().firstOrNull { it.raw == raw }
     }
   }
 }
 
-enum class AuthenticationFactor(val raw: Int) {
+enum class DirectAuthenticationFactor(val raw: Int) {
   OTP(0),
   OOB(1);
 
   companion object {
-    fun ofRaw(raw: Int): AuthenticationFactor? {
+    fun ofRaw(raw: Int): DirectAuthenticationFactor? {
       return values().firstOrNull { it.raw == raw }
     }
   }
 }
 
 /** Generated class from Pigeon that represents data sent in messages. */
-data class OktaAuthenticationResult (
-  val result: AuthenticationResult? = null,
-  val error: String? = null,
+data class AuthenticationResult (
+  val result: DirectAuthenticationResult? = null,
   val token: OktaToken? = null,
   val userInfo: UserInfo? = null
 
 ) {
   companion object {
     @Suppress("UNCHECKED_CAST")
-    fun fromList(list: List<Any?>): OktaAuthenticationResult {
-      val result: AuthenticationResult? = (list[0] as Int?)?.let {
-        AuthenticationResult.ofRaw(it)
+    fun fromList(list: List<Any?>): AuthenticationResult {
+      val result: DirectAuthenticationResult? = (list[0] as Int?)?.let {
+        DirectAuthenticationResult.ofRaw(it)
       }
-      val error = list[1] as String?
-      val token: OktaToken? = (list[2] as List<Any?>?)?.let {
+      val token: OktaToken? = (list[1] as List<Any?>?)?.let {
         OktaToken.fromList(it)
       }
-      val userInfo: UserInfo? = (list[3] as List<Any?>?)?.let {
+      val userInfo: UserInfo? = (list[2] as List<Any?>?)?.let {
         UserInfo.fromList(it)
       }
-      return OktaAuthenticationResult(result, error, token, userInfo)
+      return AuthenticationResult(result, token, userInfo)
     }
   }
   fun toList(): List<Any?> {
     return listOf<Any?>(
       result?.raw,
-      error,
       token?.toList(),
       userInfo?.toList(),
     )
@@ -242,17 +227,17 @@ private object HssOktaFlutterPluginApiCodec : StandardMessageCodec() {
     return when (type) {
       128.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          DeviceAuthorizationSession.fromList(it)
+          AuthenticationResult.fromList(it)
         }
       }
       129.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          DirectAuthRequest.fromList(it)
+          DeviceAuthorizationSession.fromList(it)
         }
       }
       130.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          OktaAuthenticationResult.fromList(it)
+          DirectAuthRequest.fromList(it)
         }
       }
       131.toByte() -> {
@@ -270,15 +255,15 @@ private object HssOktaFlutterPluginApiCodec : StandardMessageCodec() {
   }
   override fun writeValue(stream: ByteArrayOutputStream, value: Any?)   {
     when (value) {
-      is DeviceAuthorizationSession -> {
+      is AuthenticationResult -> {
         stream.write(128)
         writeValue(stream, value.toList())
       }
-      is DirectAuthRequest -> {
+      is DeviceAuthorizationSession -> {
         stream.write(129)
         writeValue(stream, value.toList())
       }
-      is OktaAuthenticationResult -> {
+      is DirectAuthRequest -> {
         stream.write(130)
         writeValue(stream, value.toList())
       }
@@ -297,13 +282,13 @@ private object HssOktaFlutterPluginApiCodec : StandardMessageCodec() {
 
 /** Generated interface from Pigeon that represents a handler of messages from Flutter. */
 interface HssOktaFlutterPluginApi {
-  fun startDirectAuthenticationFlow(request: DirectAuthRequest, callback: (Result<OktaAuthenticationResult?>) -> Unit)
-  fun continueDirectAuthenticationMfaFlow(otp: String, callback: (Result<OktaAuthenticationResult?>) -> Unit)
+  fun startDirectAuthenticationFlow(request: DirectAuthRequest, callback: (Result<AuthenticationResult?>) -> Unit)
+  fun continueDirectAuthenticationMfaFlow(otp: String, callback: (Result<AuthenticationResult?>) -> Unit)
   fun refreshDefaultToken(callback: (Result<Boolean?>) -> Unit)
   fun revokeDefaultToken(callback: (Result<Boolean?>) -> Unit)
-  fun getCredential(callback: (Result<OktaAuthenticationResult?>) -> Unit)
+  fun getCredential(callback: (Result<AuthenticationResult?>) -> Unit)
   fun startDeviceAuthorizationFlow(callback: (Result<DeviceAuthorizationSession?>) -> Unit)
-  fun resumeDeviceAuthorizationFlow(callback: (Result<OktaAuthenticationResult?>) -> Unit)
+  fun resumeDeviceAuthorizationFlow(callback: (Result<AuthenticationResult?>) -> Unit)
 
   companion object {
     /** The codec used by HssOktaFlutterPluginApi. */
@@ -319,7 +304,7 @@ interface HssOktaFlutterPluginApi {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
             val requestArg = args[0] as DirectAuthRequest
-            api.startDirectAuthenticationFlow(requestArg) { result: Result<OktaAuthenticationResult?> ->
+            api.startDirectAuthenticationFlow(requestArg) { result: Result<AuthenticationResult?> ->
               val error = result.exceptionOrNull()
               if (error != null) {
                 reply.reply(wrapError(error))
@@ -339,7 +324,7 @@ interface HssOktaFlutterPluginApi {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
             val otpArg = args[0] as String
-            api.continueDirectAuthenticationMfaFlow(otpArg) { result: Result<OktaAuthenticationResult?> ->
+            api.continueDirectAuthenticationMfaFlow(otpArg) { result: Result<AuthenticationResult?> ->
               val error = result.exceptionOrNull()
               if (error != null) {
                 reply.reply(wrapError(error))
@@ -393,7 +378,7 @@ interface HssOktaFlutterPluginApi {
         val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.getCredential", codec)
         if (api != null) {
           channel.setMessageHandler { _, reply ->
-            api.getCredential() { result: Result<OktaAuthenticationResult?> ->
+            api.getCredential() { result: Result<AuthenticationResult?> ->
               val error = result.exceptionOrNull()
               if (error != null) {
                 reply.reply(wrapError(error))
@@ -429,7 +414,7 @@ interface HssOktaFlutterPluginApi {
         val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.resumeDeviceAuthorizationFlow", codec)
         if (api != null) {
           channel.setMessageHandler { _, reply ->
-            api.resumeDeviceAuthorizationFlow() { result: Result<OktaAuthenticationResult?> ->
+            api.resumeDeviceAuthorizationFlow() { result: Result<AuthenticationResult?> ->
               val error = result.exceptionOrNull()
               if (error != null) {
                 reply.reply(wrapError(error))
