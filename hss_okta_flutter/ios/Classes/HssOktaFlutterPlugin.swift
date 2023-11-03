@@ -17,8 +17,7 @@ case generalError(String)
 public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginApi {
   
     
-     
-    
+
     let browserAuth = WebAuthentication.shared
     var flow : (any AuthenticationFlow)?
     var status : DirectAuthenticationFlow.Status?
@@ -106,6 +105,8 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
     }
     
     func refreshDefaultToken(completion: @escaping (Result<Bool?, Error>) -> Void){
+        
+        
         if let credential = Credential.default{
             Task{
                 do{
@@ -213,6 +214,36 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
             }
         }
     }
+   
+    func startTokenExchangeFlow(deviceSecret: String, idToken: String, completion: @escaping (Result<AuthenticationResult?, Error>) -> Void) {
+        Task{
+            do{
+                flow = try TokenExchangeFlow()
+                
+                if let authflow = flow as? TokenExchangeFlow{
+                    let token = try await authflow.start(with: [.actor(type: .deviceSecret, value: deviceSecret),.subject(type: .idToken, value: idToken)])
+                    
+                    Credential.default = try Credential.store(token)
+                    
+                    if let result = Credential.default{
+                        let userInfo = try await result.userInfo()
+                        
+                        completion(.success(
+                            constructAuthenticationResult(
+                                resultEnum: nil,
+                                token: result.token, userInfo: userInfo)))
+                        
+                    }
+                    
+                    completion(.failure(HssOktaError.credentialError("Failed to save credentials")))
+                }
+            }catch let error{
+                completion(.failure(HssOktaError.generalError(error.localizedDescription)))
+            }
+            
+        }
+    }
+    
     
     
     

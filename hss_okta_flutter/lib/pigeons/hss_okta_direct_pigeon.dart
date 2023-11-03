@@ -113,14 +113,6 @@ class DeviceAuthorizationSession {
 
 @HostApi()
 abstract class HssOktaFlutterPluginApi {
-  // void initializeConfiguration(
-  //   String clientid,
-  //   String signInRedirectUrl,
-  //   String signOutRedirectUrl,
-  //   String issuer,
-  //   String scopes,
-  // );
-
   @async
   AuthenticationResult? startDirectAuthenticationFlow(
       DirectAuthRequest request);
@@ -142,4 +134,10 @@ abstract class HssOktaFlutterPluginApi {
 
   @async
   AuthenticationResult? resumeDeviceAuthorizationFlow();
+
+  @async
+  AuthenticationResult? startTokenExchangeFlow(
+    String deviceSecret,
+    String idToken,
+  );
 }

@@ -80,4 +80,11 @@ class HssOktaFlutter {
         .resumeDeviceAuthorizationFlow();
     return result;
   }
+
+  /// Starts the Token Exchange flow
+  Future<AuthenticationResult?> startTokenExchangeFlow() async {
+    var result =
+        await HssOktaFlutterPluginPlatform.instance.startTokenExchangeFlow();
+    return result;
+  }
 }

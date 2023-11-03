@@ -177,13 +177,13 @@ packages:
     source: hosted
     version: "1.8.3"
   pigeon:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: pigeon
-      sha256: "4a1457f3abeff9fb7111250ec16ad1410f3ddfdd0572b071766cbbbc0b49163b"
+      sha256: "01596b51509667ec54cfba392785db6ae105a06340e4e3305d0861d36f2fb990"
       url: "https://pub.dev"
     source: hosted
-    version: "12.0.0"
+    version: "13.0.0"
   plugin_platform_interface:
     dependency: "direct main"
     description:

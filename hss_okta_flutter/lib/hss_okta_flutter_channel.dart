@@ -60,4 +60,11 @@ class HssOktaFlutterChannel extends HssOktaFlutterPluginPlatform {
 
     return res;
   }
+
+  @override
+  Future<AuthenticationResult?> startTokenExchangeFlow() async {
+    var res = await _api.startTokenExchangeFlow();
+
+    return res;
+  }
 }
