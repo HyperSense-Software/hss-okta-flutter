@@ -63,6 +63,10 @@ class HssOktaFlutter {
   }
 
   /// Starts the Device Authorization flow
+  ///
+  /// The Device Authorization Flow is designed for Internet connected devices that either lack a browser to perform a user-agent based authorization,
+  ///  or are input constrained to the extent that requiring the user to input text in order to authenticate during the authorization flow is impractical.
+  ///
   /// returns [DeviceAuthorizationSession] which contains the [DeviceCode] and [VerificationUri]
   /// Users will need to input the [DeviceCode] and [VerificationUri] on a browser
   ///
@@ -82,6 +86,7 @@ class HssOktaFlutter {
   }
 
   /// Starts the Token Exchange flow
+  /// The Token Exchange Flow exchanges an ID Token and a Device Secret for a new set of tokens.
   /// [deviceSecret] and [idToken] are obtained from the and Existing Session
   Future<AuthenticationResult?> startTokenExchangeFlow({
     required String deviceSecret,
