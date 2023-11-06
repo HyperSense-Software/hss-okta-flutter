@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hss_okta_flutter/generated/hss_okta_flutter.g.dart';
+import 'package:hss_okta_flutter/hss_okta_flutter_plugin.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class DeviceSSOConfirmationScreen extends StatelessWidget {

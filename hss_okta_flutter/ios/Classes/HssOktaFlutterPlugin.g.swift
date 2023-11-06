@@ -59,7 +59,7 @@ enum AuthenticationFactor: Int {
 /// return [AuthenticationResult.success] if the authentication was successful
 /// return [AuthenticationResult.mfaRequired] if the authentication requires MFA, Only for IOS does nothing for Android
 /// [error] returns the error message
-/// [OktaToken] contains the [Credential] from retrieved from okta
+/// [OktaToken] contains the Credential from retrieved from okta
 /// [UserInfo] contains the user information retrieved from okta
 ///
 /// Generated class from Pigeon that represents data sent in messages.

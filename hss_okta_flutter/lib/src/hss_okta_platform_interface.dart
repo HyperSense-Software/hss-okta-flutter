@@ -1,6 +1,6 @@
-import 'package:hss_okta_flutter/generated/hss_okta_flutter.g.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
+import 'generated/hss_okta_flutter.g.dart';
 import 'hss_okta_flutter_channel.dart';
 
 abstract class HssOktaFlutterPluginPlatform extends PlatformInterface {

@@ -1,12 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:hss_okta_flutter/enums/sign_in_factors.dart';
-
 import 'package:hss_okta_flutter/hss_okta_flutter_plugin.dart';
 import 'package:hss_okta_flutter_example/web_auth.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
-
 import 'screens/device_sso_confirmation_screen.dart';
 
 void main() {

@@ -1,6 +1,6 @@
-import 'package:hss_okta_flutter/hss_okta_platform_interface.dart';
-
-import 'hss_okta_flutter_plugin.dart';
+import 'enums/sign_in_factors.dart';
+import 'generated/hss_okta_flutter.g.dart';
+import 'hss_okta_platform_interface.dart';
 
 class HssOktaFlutter {
   /// Starts the Direct Authentication /Resource Owner Flow

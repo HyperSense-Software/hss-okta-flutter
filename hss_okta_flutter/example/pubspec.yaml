@@ -15,6 +15,7 @@ environment:
 # versions available, run `flutter pub outdated`.
 dependencies:
   jwt_decoder: ^2.0.1
+  url_launcher: ^6.2.1
   flutter:
     sdk: flutter
 
