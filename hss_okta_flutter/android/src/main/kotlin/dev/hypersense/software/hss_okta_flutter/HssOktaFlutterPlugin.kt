@@ -10,6 +10,7 @@ import com.okta.authfoundation.client.OidcClientResult
 import com.okta.authfoundation.client.OidcConfiguration
 import com.okta.authfoundation.client.dto.OidcUserInfo
 import com.okta.authfoundation.credential.Credential
+import com.okta.authfoundation.credential.CredentialDataSource
 import com.okta.authfoundation.credential.CredentialDataSource.Companion.createCredentialDataSource
 import com.okta.authfoundation.credential.RevokeTokenType
 import com.okta.authfoundation.credential.Token
@@ -18,6 +19,8 @@ import com.okta.oauth2.DeviceAuthorizationFlow
 import com.okta.oauth2.DeviceAuthorizationFlow.Companion.createDeviceAuthorizationFlow
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import com.okta.oauth2.ResourceOwnerFlow.Companion.createResourceOwnerFlow
+import com.okta.oauth2.TokenExchangeFlow
+import com.okta.oauth2.TokenExchangeFlow.Companion.createTokenExchangeFlow
 import dev.hypersense.software.hss_okta.AuthenticationResult
 import dev.hypersense.software.hss_okta.DeviceAuthorizationSession
 import dev.hypersense.software.hss_okta.DirectAuthRequest
@@ -72,32 +75,6 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
        }
    }
 
-    private fun composeOktaResult(res : Token, userInfoResult : OidcUserInfo) : AuthenticationResult{
-        return AuthenticationResult(
-            result = DirectAuthenticationResult.SUCCESS,
-            token = OktaToken(
-                id = "",
-                issuedAt = userInfoResult.issuedAt?.toLong(),
-                tokenType = res.tokenType,
-                scope = res.scope,
-                refreshToken = res.refreshToken,
-                accessToken = res.accessToken,
-                token = res.idToken
-            ),
-            userInfo = UserInfo(
-                userId = userInfoResult.userId?:"",
-                givenName = userInfoResult.givenName?:"",
-                middleName = userInfoResult.middleName?:"",
-                familyName = userInfoResult.familyName?:"",
-                gender = userInfoResult.gender?:"",
-                email = userInfoResult.email?:"",
-                phoneNumber = userInfoResult.phoneNumber?:"",
-                username = userInfoResult.username?:""
-            )
-        )
-    }
-
-
     override fun onAttachedToEngine(binding: FlutterPlugin.FlutterPluginBinding) {
 
         HssOktaFlutterPluginApi.setUp(binding.binaryMessenger, this)
@@ -131,12 +108,21 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
         callback: (Result<AuthenticationResult?>) -> Unit
     ) {
         CoroutineScope(Dispatchers.IO).launch {
+            val flow = CredentialBootstrap.oidcClient.createResourceOwnerFlow()
 
-            try {
-                var result = directAuthFlow(request)
-                callback.invoke(Result.success(result))
-            }catch (e: java.lang.Exception){
-                callback.invoke(Result.failure(e))
+            when(val res = flow.start(request.username,request.password)){
+                is OidcClientResult.Error -> {
+                    callback.invoke(Result.failure(res.exception))
+                }
+                is OidcClientResult.Success -> {
+
+                    CredentialBootstrap.defaultCredential().storeToken(token = res.result)
+                    var userInfo = CredentialBootstrap.defaultCredential().getUserInfo()
+                    var userInfoResult = userInfo.getOrThrow()
+
+
+                    callback.invoke(Result.success(composeOktaResult(res.result,userInfoResult)))
+                }
             }
         }
     }
@@ -146,7 +132,6 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
         callback: (Result<AuthenticationResult?>) -> Unit
     ) {
         CoroutineScope(Dispatchers.IO).launch {
-
             try {
                 callback.invoke(Result.failure(Exception("Okta Android doesn't provide MFA OTP")))
             }catch (e: java.lang.Exception){
@@ -156,30 +141,10 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
     }
 
 
-    private suspend fun directAuthFlow(request : DirectAuthRequest): AuthenticationResult {
-        val flow = CredentialBootstrap.oidcClient.createResourceOwnerFlow()
-
-        when(val res = flow.start(request.username,request.password)){
-            is OidcClientResult.Error -> {
-                throw  Exception(res.exception.message)
-            }
-            is OidcClientResult.Success -> {
-
-                CredentialBootstrap.defaultCredential().storeToken(token = res.result)
-                var userInfo = CredentialBootstrap.defaultCredential().getUserInfo()
-                var userInfoResult = userInfo.getOrThrow()
-
-
-                return composeOktaResult(res.result,userInfoResult)
-            }
-        }
-    }
-
-
     override fun refreshDefaultToken(callback: (Result<Boolean?>) -> Unit) {
         CoroutineScope(Dispatchers.IO).launch {
             when(val result = CredentialBootstrap.defaultCredential().refreshToken()){
-                is OidcClientResult.Error -> callback.invoke(Result.failure(Exception("Failed to refresh token")))
+                is OidcClientResult.Error -> callback.invoke(Result.failure(Exception(result.exception)))
                 is OidcClientResult.Success -> callback.invoke(Result.success(true))
             }
         }
@@ -188,7 +153,7 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
     override fun revokeDefaultToken(callback: (Result<Boolean?>) -> Unit) {
         CoroutineScope(Dispatchers.IO).launch {
             when(val result = CredentialBootstrap.defaultCredential().revokeToken(RevokeTokenType.ACCESS_TOKEN)){
-                is OidcClientResult.Error -> callback.invoke(Result.failure(Exception("Failed to revoke token")))
+                is OidcClientResult.Error -> callback.invoke(Result.failure(Exception(result.exception)))
                 is OidcClientResult.Success -> callback.invoke(Result.success(true))
             }
         }
@@ -228,7 +193,7 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
             when(val session = deviceAuthorizationFlow.start()){
 
                 is OidcClientResult.Error -> {
-                    callback.invoke(Result.failure(Exception("Failed to start session")))
+                    callback.invoke(Result.failure(Exception(session.exception)))
                 }
                 is OidcClientResult.Success -> {
                     deviceAuthorizationFlowContext = session.result
@@ -253,13 +218,13 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
 
                 when(val session = deviceAuthorizationFlow.resume(deviceAuthorizationFlowContext)){
                     is OidcClientResult.Error -> {
-                        callback.invoke(Result.failure(Exception("Failed to start session")))
+                        callback.invoke(Result.failure(Exception(session.exception)))
                     }
                     is OidcClientResult.Success -> {
                         CredentialBootstrap.defaultCredential().storeToken(session.result)
 
                         when(val userInfo = CredentialBootstrap.defaultCredential().getUserInfo()){
-                            is OidcClientResult.Error -> callback.invoke(Result.failure(Exception("Failed to get user info")))
+                            is OidcClientResult.Error -> callback.invoke(Result.failure(Exception(userInfo.exception)))
                             is OidcClientResult.Success ->{
                                 callback.invoke(Result.success(
                                     composeOktaResult(session.result,userInfo.result)
@@ -275,8 +240,62 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
             callback.invoke(Result.failure(exception))
         }}
 
+    override fun startTokenExchangeFlow(
+        deviceSecret: String,
+        idToken: String,
+        callback: (Result<AuthenticationResult?>) -> Unit
+    ) {
+        CoroutineScope(Dispatchers.IO).launch {
+            val credentialDataSource: CredentialDataSource = CredentialBootstrap.credentialDataSource
 
+            val tokenExchangeFlow: TokenExchangeFlow = CredentialBootstrap.oidcClient.createTokenExchangeFlow()
+            when(val result =tokenExchangeFlow.start(idToken, deviceSecret)){
+                is OidcClientResult.Error -> callback.invoke(Result.failure(result.exception))
+                is OidcClientResult.Success ->{
+                    CredentialBootstrap.defaultCredential().storeToken(token = result.result)
+
+                    when(val userInfo = CredentialBootstrap.defaultCredential().getUserInfo()){
+                        is OidcClientResult.Error -> callback.invoke(Result.failure(userInfo.exception))
+                        is OidcClientResult.Success ->{
+                            callback.invoke(Result.success(
+                                composeOktaResult(result.result,userInfo.result)
+                            ))
+                        }
+                    }
+                }
+            }
+        }
     }
+
+
+    private fun composeOktaResult(res : Token, userInfoResult : OidcUserInfo) : AuthenticationResult{
+        return AuthenticationResult(
+            result = DirectAuthenticationResult.SUCCESS,
+            token = OktaToken(
+                id = "",
+                issuedAt = userInfoResult.issuedAt?.toLong(),
+                tokenType = res.tokenType,
+                scope = res.scope,
+                refreshToken = res.refreshToken,
+                accessToken = res.accessToken,
+                token = res.idToken
+            ),
+            userInfo = UserInfo(
+                userId = userInfoResult.userId?:"",
+                givenName = userInfoResult.givenName?:"",
+                middleName = userInfoResult.middleName?:"",
+                familyName = userInfoResult.familyName?:"",
+                gender = userInfoResult.gender?:"",
+                email = userInfoResult.email?:"",
+                phoneNumber = userInfoResult.phoneNumber?:"",
+                username = userInfoResult.username?:""
+            )
+        )
+    }
+
+
+
+}
 
 enum class HssOktaError(value : String){
     CONFIG_ERROR("Config Error"),

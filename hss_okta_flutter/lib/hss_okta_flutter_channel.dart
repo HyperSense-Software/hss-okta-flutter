@@ -62,8 +62,11 @@ class HssOktaFlutterChannel extends HssOktaFlutterPluginPlatform {
   }
 
   @override
-  Future<AuthenticationResult?> startTokenExchangeFlow() async {
-    var res = await _api.startTokenExchangeFlow();
+  Future<AuthenticationResult?> startTokenExchangeFlow({
+    required String deviceSecret,
+    required String idToken,
+  }) async {
+    var res = await _api.startTokenExchangeFlow(deviceSecret, idToken);
 
     return res;
   }

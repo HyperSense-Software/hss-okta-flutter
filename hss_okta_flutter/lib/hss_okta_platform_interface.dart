@@ -44,7 +44,10 @@ abstract class HssOktaFlutterPluginPlatform extends PlatformInterface {
     throw UnimplementedError('platformVersion() has not been implemented.');
   }
 
-  Future<AuthenticationResult?> startTokenExchangeFlow() {
+  Future<AuthenticationResult?> startTokenExchangeFlow({
+    required String deviceSecret,
+    required String idToken,
+  }) {
     throw UnimplementedError('platformVersion() has not been implemented.');
   }
 }

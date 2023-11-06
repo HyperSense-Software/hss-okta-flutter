@@ -82,9 +82,16 @@ class HssOktaFlutter {
   }
 
   /// Starts the Token Exchange flow
-  Future<AuthenticationResult?> startTokenExchangeFlow() async {
+  /// [deviceSecret] and [idToken] are obtained from the and Existing Session
+  Future<AuthenticationResult?> startTokenExchangeFlow({
+    required String deviceSecret,
+    required String idToken,
+  }) async {
     var result =
-        await HssOktaFlutterPluginPlatform.instance.startTokenExchangeFlow();
+        await HssOktaFlutterPluginPlatform.instance.startTokenExchangeFlow(
+      deviceSecret: deviceSecret,
+      idToken: idToken,
+    );
     return result;
   }
 }
