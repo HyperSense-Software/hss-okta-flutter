@@ -1,15 +1,12 @@
-import 'dart:async';
-
-import 'package:hss_okta_flutter/enums/sign_in_factors.dart';
-import 'package:hss_okta_flutter/generated/hss_okta_flutter.g.dart';
 import 'package:hss_okta_flutter/hss_okta_platform_interface.dart';
+
+import 'hss_okta_flutter_plugin.dart';
 
 class HssOktaFlutter {
   /// Starts the Direct Authentication /Resource Owner Flow
   ///
-  /// [factors] is either [AuthenticationFactor.otp] or [AuthenticationFactor.oob] or both.
-  /// [factors] is not needed for Android as it cannot handle Directauthentication MFA
-  /// returns [OktaAuthenticationResult] which contains the [OktaToken] and [UserInfo]
+  /// factors is either [AuthenticationFactor.otp] or [AuthenticationFactor.oob] or both.
+  /// factors is not needed for Android as it cannot handle Directauthentication MFA
   /// Throws an [Exception] When used on Android
   Future<AuthenticationResult?> startDirectAuthenticationFlow(
       {required String email,
@@ -48,10 +45,10 @@ class HssOktaFlutter {
   }
 
   /// To be used with DirectAuthentication Flow
-  /// returns [OktaAuthenticationResult] which contains the [OktaToken] and [UserInfo]
+  /// returns [AuthenticationResult] which contains the [OktaToken] and [UserInfo]
   ///
   /// This can only be used for iOS and when using Identity Engine
-  /// [MFA OTP] or [MFA OBB] needs to be enabled on the Okta App.
+  /// [OktaSignInFactor.otp] or [OktaSignInFactor.oob] needs to be enabled on the Okta App.
   Future<AuthenticationResult?> mfaOtpSignInWithCredentials(String otp) async {
     var result = await HssOktaFlutterPluginPlatform.instance
         .continueDirectAuthenticationMfaFlow(otp);
@@ -64,17 +61,18 @@ class HssOktaFlutter {
   /// The Device Authorization Flow is designed for Internet connected devices that either lack a browser to perform a user-agent based authorization,
   ///  or are input constrained to the extent that requiring the user to input text in order to authenticate during the authorization flow is impractical.
   ///
-  /// returns [DeviceAuthorizationSession] which contains the [DeviceCode] and [VerificationUri]
-  /// Users will need to input the [DeviceCode] and [VerificationUri] on a browser
+  /// returns [DeviceAuthorizationSession] which contains the DeviceCode and VerificationUri
+  /// Users will need to input the DeviceCode and VerificationUri on a browser
   ///
-  /// Call on [resumeDeviceAuthorizationFlow] to continue the flow and access the [OktaAuthenticationResult]
+  /// Call on [resumeDeviceAuthorizationFlow] to continue the flow and access the [AuthenticationResult]
   Future<DeviceAuthorizationSession?> startDeviceAuthorizationFlow() async {
     var result = await HssOktaFlutterPluginPlatform.instance
         .startDeviceAuthorizationFlow();
     return result;
   }
 
-  /// Continues the [DeviceAuthorization] flow, this should be called once the user has inputted the [DeviceCode] and [VerificationUri] on a browser
+  /// Continues the DeviceAuthorization flow, this should be called once the user has inputted the DeviceCode and VerificationUri
+  ///  on a browser
   Future<AuthenticationResult?> resumeDeviceAuthorizationFlow() async {
     var result = await HssOktaFlutterPluginPlatform.instance
         .resumeDeviceAuthorizationFlow();

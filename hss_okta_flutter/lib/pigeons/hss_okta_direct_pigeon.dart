@@ -10,8 +10,6 @@ import 'package:pigeon/pigeon.dart';
       kotlinOptions:
           KotlinOptions(package: "dev.hypersense.software.hss_okta")),
 )
-
-// START OF ENUMS
 enum AuthenticationType { browser, sso, directAuth }
 
 enum DirectAuthenticationResult { success, mfaRequired, error }
@@ -24,14 +22,6 @@ enum AuthenticationFactor {
   const AuthenticationFactor(this.value);
 }
 
-// END OF ENUMS
-
-/// [AuthenticationResult] is used to determine the result of the authentication for all authentication flows
-/// return [AuthenticationResult.success] if the authentication was successful
-/// return [AuthenticationResult.mfaRequired] if the authentication requires MFA, Only for IOS does nothing for Android
-/// [error] returns the error message
-/// [OktaToken] contains the [Credential] from retrieved from okta
-/// [UserInfo] contains the user information retrieved from okta
 class AuthenticationResult {
   final DirectAuthenticationResult? result;
   final String? error;
@@ -45,7 +35,6 @@ class AuthenticationResult {
       });
 }
 
-/// Class for the credential retrieved information retrieved in okta
 class OktaToken {
   final String? id;
   final String? token;
@@ -65,7 +54,6 @@ class OktaToken {
       required this.refreshToken});
 }
 
-/// Class for the user information retrieved in okta
 class UserInfo {
   final String userId;
   final String givenName;
@@ -88,9 +76,6 @@ class UserInfo {
   });
 }
 
-/// Authentication request for ResourceOwnerFlow
-/// [Factors] should contain [AuthenticationFactor.otp] or [AuthenticationFactor.oob] this is not available for iOS
-/// [username] and [password] are Okta Credentials
 class DirectAuthRequest {
   final String username;
   final String password;
@@ -100,9 +85,6 @@ class DirectAuthRequest {
       {required this.username, required this.password, required this.factors});
 }
 
-/// Class for the device authorization flow containing the retrived session information
-/// [userCode] is the code that the user should enter in the browser
-/// [verificationUri] is the Url the user needs to navigate and insert the [userCode] to verify the login
 class DeviceAuthorizationSession {
   final String? userCode;
   final String? verificationUri;

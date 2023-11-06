@@ -90,7 +90,7 @@ Create **Okta.plist** in your iOS project
 ## Authentication Flows
 
 ### Browser Redirect
-The login is achieved through the **[Web-based OIDC flows]**, where the user is redirected to the Okta-Hosted login page. After the user authenticates, they are redirected back to the application.
+The login is achieved through the **Web-based OIDC flows**, where the user is redirected to the Okta-Hosted login page. After the user authenticates, they are redirected back to the application.
 
 This launches a popup web view where the user can login and interact with challenges.
 
