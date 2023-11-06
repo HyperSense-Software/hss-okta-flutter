@@ -5,6 +5,10 @@ import 'package:flutter/foundation.dart';
 typedef AuthBrowserLoginBuilder = Widget Function(
     BuildContext context, Widget child);
 
+/// Provides the native platform view for the browser signin
+/// returns a [Stream<bool>] which emits true when the user has successfully signed in,
+/// the [Credential] will be saved as teh default
+/// use [getCredential] to fetch the credential
 class HssOktaBrowserSignInWidget extends StatelessWidget {
   final AuthBrowserLoginBuilder? builder;
   final ValueSetter<bool>? onResult;

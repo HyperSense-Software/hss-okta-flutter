@@ -5,6 +5,9 @@ import 'package:flutter/services.dart';
 typedef AuthBrowserLogOutBuilder = Widget Function(
     BuildContext context, Widget child);
 
+/// Provides the native platform view for the browser signout
+/// returns a [Stream<bool>] which emits true when the user has successfully signed in,
+/// Deletes the default [Credential] and the [UserInfo] from the device
 class HssOktaBrowserSignOutWidget extends StatelessWidget {
   final AuthBrowserLogOutBuilder? builder;
   final ValueSetter<bool>? onResult;
