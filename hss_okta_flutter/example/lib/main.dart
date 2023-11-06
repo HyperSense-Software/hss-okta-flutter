@@ -23,16 +23,13 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   final _plugin = HssOktaFlutter();
 
-  String _errors = '';
   String res = 'None';
   String username = "";
   String password = "";
 
   final TextEditingController _controller = TextEditingController();
-  final TextEditingController _usernamecontroller =
-      TextEditingController(text: "aldrin.francisco@designli.co");
-  final TextEditingController _passwordcontroller =
-      TextEditingController(text: "tZTEvb2vZNrFTVB");
+  final TextEditingController _usernamecontroller = TextEditingController();
+  final TextEditingController _passwordcontroller = TextEditingController();
 
   final PageController _pageController = PageController(initialPage: 0);
 
@@ -56,9 +53,7 @@ class _MyAppState extends State<MyApp> {
       result = await _plugin.getCredential();
 
       debugPrint(result?.token?.accessToken.toString());
-    } catch (e, s) {
-      _errors = '$e';
-      debugPrint(e.toString() + s.toString());
+    } catch (e) {
       if (mounted) {
         ScaffoldMessenger.maybeOf(context)
             ?.showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
