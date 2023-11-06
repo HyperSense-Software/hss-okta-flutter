@@ -1,6 +1,6 @@
 name: hss_okta_flutter
-description: A new Flutter plugin project.
-version: 0.0.1
+description: Okta Flutter plugin Wrapper for Okta Native SDKs
+version: 1.0.0
 homepage:
 
 environment:
