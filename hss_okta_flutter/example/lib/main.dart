@@ -49,7 +49,7 @@ class _MyAppState extends State<MyApp> {
     try {
       result = await _plugin.getCredential();
 
-      debugPrint(result?.token?.accessToken.toString());
+      debugPrint(result?.token?.token ?? '');
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.maybeOf(context)
@@ -199,72 +199,68 @@ class _MyAppState extends State<MyApp> {
       child: RefreshIndicator(
         onRefresh: () async => await getCredential(context),
         child: ListView(children: [
-          Text('Authentication Result : ${result?.result}'),
-          if (result!.result != DirectAuthenticationResult.success)
-            Text('error : ${result?.result}')
-          else ...[
-            Text('id : ${result?.token?.id}'),
-            Text(
-                'Issued At : ${DateTime.fromMillisecondsSinceEpoch(result?.token?.issuedAt ?? 0)}'),
-            SelectableText('refresh token : ${result?.token?.refreshToken}'),
-            Text('Scope : ${result?.token?.scope}'),
-            Text('Token Type: ${result?.token?.tokenType}'),
-            SelectableText('Access Token : ${result?.token?.accessToken}'),
-            const Divider(
-              thickness: 4,
-            ),
-            if (result?.token?.token != null)
-              Text(
-                  'JWT Token: ${JwtDecoder.decode(result?.token?.token ?? '')}'),
-            const Divider(
-              thickness: 4,
-            ),
-            if (result!.userInfo != null) ...[
-              Text('User ID : ${result?.userInfo!.userId ?? ''}'),
-              Text('Given name : ${result?.userInfo!.givenName ?? ''}'),
-              Text('Middle name : ${result?.userInfo!.middleName ?? ''}'),
-              Text('Family Name : ${result?.userInfo!.familyName ?? ''}'),
-              Text('Gender : ${result?.userInfo!.gender ?? ''}'),
-              Text('Phone Number : ${result?.userInfo!.phoneNumber ?? ''}'),
-              Text('Email : ${result?.userInfo!.email ?? ''}'),
-              Text('Username : ${result?.userInfo!.username ?? ''}'),
-            ],
-            const SizedBox(
-              height: 24,
-            ),
-            if (result != null) ...[
-              OutlinedButton(
-                  onPressed: () async {
-                    try {
-                      var result = await Navigator.of(profileContext).push(
-                          MaterialPageRoute(
-                              builder: (c) => const WebSignOutExample()));
+          if (result?.result != null)
+            Text('DirectAuthentication Result : ${result?.result}'),
+          Text('id : ${result?.token?.id}'),
+          Text(
+              'Issued At : ${DateTime.fromMillisecondsSinceEpoch(result?.token?.issuedAt ?? 0)}'),
+          SelectableText('refresh token : ${result?.token?.refreshToken}'),
+          Text('Scope : ${result?.token?.scope}'),
+          Text('Token Type: ${result?.token?.tokenType}'),
+          SelectableText('Access Token : ${result?.token?.accessToken}'),
+          const Divider(
+            thickness: 4,
+          ),
+          if (result?.token?.token != null)
+            Text('JWT Token: ${JwtDecoder.decode(result?.token?.token ?? '')}'),
+          const Divider(
+            thickness: 4,
+          ),
+          if (result!.userInfo != null) ...[
+            Text('User ID : ${result?.userInfo!.userId ?? ''}'),
+            Text('Given name : ${result?.userInfo!.givenName ?? ''}'),
+            Text('Middle name : ${result?.userInfo!.middleName ?? ''}'),
+            Text('Family Name : ${result?.userInfo!.familyName ?? ''}'),
+            Text('Gender : ${result?.userInfo!.gender ?? ''}'),
+            Text('Phone Number : ${result?.userInfo!.phoneNumber ?? ''}'),
+            Text('Email : ${result?.userInfo!.email ?? ''}'),
+            Text('Username : ${result?.userInfo!.username ?? ''}'),
+          ],
+          const SizedBox(
+            height: 24,
+          ),
+          if (result != null) ...[
+            OutlinedButton(
+                onPressed: () async {
+                  try {
+                    var result = await Navigator.of(profileContext).push(
+                        MaterialPageRoute(
+                            builder: (c) => const WebSignOutExample()));
 
-                      if (result) {
+                    if (result) {
+                      _pageController.jumpTo(0);
+                    }
+                  } catch (e) {
+                    ScaffoldMessenger.of(profileContext).showSnackBar(
+                        SnackBar(content: Text('Error: ${e.toString()}')));
+                  }
+                },
+                child: const Text('WebAuth Signout')),
+            OutlinedButton(
+                onPressed: () async {
+                  try {
+                    await _plugin.revokeDefaultToken().then((value) {
+                      if (value) {
+                        result = null;
                         _pageController.jumpTo(0);
                       }
-                    } catch (e) {
-                      ScaffoldMessenger.of(profileContext).showSnackBar(
-                          SnackBar(content: Text('Error: ${e.toString()}')));
-                    }
-                  },
-                  child: const Text('WebAuth Signout')),
-              OutlinedButton(
-                  onPressed: () async {
-                    try {
-                      await _plugin.revokeDefaultToken().then((value) {
-                        if (value) {
-                          result = null;
-                          _pageController.jumpTo(0);
-                        }
-                      });
-                    } catch (e) {
-                      ScaffoldMessenger.of(profileContext).showSnackBar(
-                          SnackBar(content: Text('Error: ${e.toString()}')));
-                    }
-                  },
-                  child: const Text('Revoke token'))
-            ]
+                    });
+                  } catch (e) {
+                    ScaffoldMessenger.of(profileContext).showSnackBar(
+                        SnackBar(content: Text('Error: ${e.toString()}')));
+                  }
+                },
+                child: const Text('Revoke token'))
           ]
         ]),
       ),

@@ -40,9 +40,6 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
         
     }
     
-    func initializeConfiguration(clientid: String, signInRedirectUrl: String, signOutRedirectUrl: String, issuer: String, scopes: String) throws {
-    }
-    
     func startDirectAuthenticationFlow(request: DirectAuthRequest, completion: @escaping (Result<AuthenticationResult?, Error>) -> Void) {
         
         
@@ -61,7 +58,7 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
                         case .success(let token):
                             Credential.default = try Credential.store(token)
                             let userInfo = try await Credential.default?.userInfo()
-                            
+                            completion(.success(constructAuthenticationResult(resultEnum: DirectAuthenticationResult.success, token: token, userInfo: userInfo)))
                            
                             
                         case .mfaRequired(_):
