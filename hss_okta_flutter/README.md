@@ -1,16 +1,15 @@
 
 # HSS Okta Flutter
 
-The presented plugin functions as an abstraction layer, seamlessly integrating Okta's Native SDKs into the Flutter ecosystem, thereby enabling the utilization of Okta's robust security framework within a cross-platform Flutter environment. This encapsulation endows Flutter-based iOS and Android applications with the capability to leverage Okta's Classic Engine Authentication workflows, ensuring a secure and efficient user authentication experience. The plugin is architecturally designed to interface fluently with native platform capabilities, harnessing the power of Dart's asynchronous features to provide a non-blocking, streamlined authentication process that is both platform-agnostic and performance-optimized.
+  
 
-🤝 **Contributors & Maintainers**:
+A Flutter plugin that wraps Okta's Native SDK to flutter
 
-This project is proudly developed and maintained by [HyperSense Software](https://hypersense-software.com/).
+  
 
-📄 **License**:
+The Plugin supports Classic Engine Authentication flows.
 
-Distributed under the MIT License. See LICENSE for more information.
-
+ 
 
 ## How to Install
 
