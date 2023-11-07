@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hss_okta_flutter/hss_okta_flutter_plugin.dart';
+import 'package:hss_okta_flutter/hss_okta_flutter.dart';
 
 class WebSignInExample extends StatelessWidget {
   const WebSignInExample({super.key});
