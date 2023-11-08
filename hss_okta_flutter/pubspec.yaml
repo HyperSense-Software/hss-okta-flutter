@@ -1,5 +1,5 @@
 name: hss_okta_flutter
-description: The presented plugin functions as an abstraction layer, seamlessly integrating Okta's Native SDKs into the Flutter ecosystem, thereby enabling the utilization of Okta's robust security framework within a cross-platform Flutter environment.
+description: A Flutter plugin that functions as an abstraction layer, seamlessly integrating Okta's Native SDKs into the Flutter ecosystem.
 version: 1.0.1
 homepage: https://github.com/HyperSense-Software/hss-okta-flutter.git
 
