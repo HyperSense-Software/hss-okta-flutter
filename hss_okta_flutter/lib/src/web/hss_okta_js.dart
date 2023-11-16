@@ -85,7 +85,7 @@ class TokenManager {
   external Future<void> renew(String key);
 }
 
-/// Options used in [OktaAuth.token.getWithPopup] and [OktaAuth.token.getWithRedirect]
+/// Options used in getWithPopup and getWithRedirect
 @JS()
 @staticInterop
 @anonymous
@@ -109,7 +109,7 @@ extension AuthorizeOptionsExtension on AuthorizeOptions {
   external List<String>? scopes;
 }
 
-/// Web API Response from [OktaAuth.token.getWithPopup] and [OktaAuth.token.getWithRedirect]
+/// Web API Response from getWithPopup and getWithRedirect
 @JS()
 @anonymous
 class TokenResponse {
