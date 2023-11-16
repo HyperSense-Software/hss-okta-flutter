@@ -1,10 +1,10 @@
 @JS()
-library okta_js;
+library hss_okta_js;
 
-import 'dart:js_interop';
 // import 'package:js/js.dart';
 import 'package:js/js.dart';
 
+/// The Http Client used for all the Okta API calls
 @JS('OktaAuth')
 class OktaAuth {
   external factory OktaAuth(OktaConfig options);
@@ -12,6 +12,7 @@ class OktaAuth {
   external TokenManager get tokenManager;
 }
 
+/// Used With [OktaAuth]'s Initializer
 @JS()
 @anonymous
 class OktaConfig {
@@ -26,6 +27,7 @@ class OktaConfig {
   external String redirectUri;
 }
 
+/// Contains methods for accessing tokens.
 @JS()
 class Token {
   /// Create token with a popup.
@@ -71,6 +73,7 @@ class Token {
   //     {JSObject? accessTokenObject, JSObject idTokenObject});
 }
 
+/// Class that manages tokens.
 @JS()
 class TokenManager {
   external Future<void> add(String key, Token token);
@@ -82,6 +85,7 @@ class TokenManager {
   external Future<void> renew(String key);
 }
 
+/// Options used in [OktaAuth.token.getWithPopup] and [OktaAuth.token.getWithRedirect]
 @JS()
 @staticInterop
 @anonymous
@@ -93,17 +97,19 @@ class AuthorizeOptions {
   });
 }
 
+/// Extension Interop for [AuthorizeOptions]
 extension AuthorizeOptionsExtension on AuthorizeOptions {
   /// Specify an Okta sessionToken to skip reauthentication when the user already authenticated using the Authentication Flow.
   external List<String>? responseType;
 
-  /// Specify the response type for OIDC authentication when using the Implicit OAuth Flow. The default value is ['token', 'id_token'] which will request both an access token and ID token. If pkce is true, both the access and ID token will be requested and this option will be ignored.
+  /// Specify the response type for OIDC authentication when using the Implicit OAuth Flow. The default value is 'token', 'id_token' which will request both an access token and ID token. If pkce is true, both the access and ID token will be requested and this option will be ignored.
   external String? sessionToken;
 
-  ///Specify what information to make available in the returned id_token or access_token. For OIDC, you must include openid as one of the scopes. Defaults to ['openid', 'email']. For a list of available scopes, see Scopes and Claims.
+  ///Specify what information to make available in the returned id_token or access_token. For OIDC, you must include openid as one of the scopes. Defaults to 'openid', 'email'. For a list of available scopes, see Scopes and Claims.
   external List<String>? scopes;
 }
 
+/// Web API Response from [OktaAuth.token.getWithPopup] and [OktaAuth.token.getWithRedirect]
 @JS()
 @anonymous
 class TokenResponse {
@@ -112,12 +118,14 @@ class TokenResponse {
   external String? code;
 }
 
+/// Container for the two kinds of Token
 @JS()
 class Tokens {
   external AccessToken? accessToken;
   external IDToken? idToken;
 }
 
+/// An Access Token containing the user's Access token and UserInformation URL
 @JS()
 @anonymous
 class AccessToken {
@@ -131,6 +139,7 @@ class AccessToken {
   external String userinfoUrl;
 }
 
+/// An ID Token containing the user's ID token, issuer, and client ID
 @JS()
 class IDToken {
   external String idToken;
