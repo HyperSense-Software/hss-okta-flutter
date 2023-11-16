@@ -3,13 +3,13 @@ import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 import 'generated/hss_okta_flutter.g.dart';
 import 'hss_okta_flutter_channel.dart';
 
-abstract class HssOktaFlutterPluginPlatform extends PlatformInterface {
-  HssOktaFlutterPluginPlatform() : super(token: _token);
+abstract class HssOktaFlutterPlatformInterface extends PlatformInterface {
+  HssOktaFlutterPlatformInterface() : super(token: _token);
   static final Object _token = Object();
-  static HssOktaFlutterPluginPlatform _instance = HssOktaFlutterChannel();
-  static HssOktaFlutterPluginPlatform get instance => _instance;
+  static HssOktaFlutterPlatformInterface _instance = HssOktaFlutterChannel();
+  static HssOktaFlutterPlatformInterface get instance => _instance;
 
-  static set instance(HssOktaFlutterPluginPlatform instance) {
+  static set instance(HssOktaFlutterPlatformInterface instance) {
     PlatformInterface.verifyToken(instance, _token);
     _instance = instance;
   }
