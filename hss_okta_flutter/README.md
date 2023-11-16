@@ -1,4 +1,5 @@
 
+
 # HSS Okta Flutter
 
 The presented plugin functions as an abstraction layer, seamlessly integrating Okta's Native SDKs into the Flutter ecosystem, thereby enabling the utilization of Okta's robust security framework within a cross-platform Flutter environment. This encapsulation endows Flutter-based iOS and Android applications with the capability to leverage Okta's Classic Engine Authentication workflows, ensuring a secure and efficient user authentication experience. The plugin is architecturally designed to interface fluently with native platform capabilities, harnessing the power of Dart's asynchronous features to provide a non-blocking, streamlined authentication process that is both platform-agnostic and performance-optimized.
@@ -14,19 +15,39 @@ Distributed under the MIT License. See LICENSE for more information.
 
 ## How to Install
 
+**For mobile:**
+
     $ flutter pub add hss_okta_flutter
+---
+**For Web:**
+
+    $ flutter pub add hss_okta_flutter
+In your ***index.html*** header tag, add Okta's Javascript library.
+
+    <script src="https://global.oktacdn.com/okta-auth-js/7.4.1/okta-auth-js.min.js" type="text/javascript"></script>
 
 
 ## Features
+
+### Mobile
 Feature | Android | IOS |
 |--|--|--|
 |**Resource Owner Flow / Direct Authentication**| ✅ (MFA Not Available)| ✅ |
 |**Browser Redirect Authentication**|✅|✅|
 |**Device Authorization**|✅|✅|
 |**Device SSO**|✅|✅|
+---
+  ### Web
+  
+|Feature  |  |
+|--|--|
+|Authentication by Redirection|✅|
+|Authentication by Popup|✅|
+|Token Manager|✅|
+|Authentication Client Setup|🚧  Partially Implemented|
+|Authentication State Manager|🚧|
+|Fetch User info|🚧|
 
-  
-  
   
 
 ## Getting Started
@@ -88,7 +109,26 @@ Create **Okta.plist** in your iOS project
       )
     }
 
+Web:
+
+    import  'package:hss_okta_flutter/hss_okta_flutter.dart';
+    final oktaWeb = HssOktaFlutterWeb();
+    
+    void main(){
+    await oktaWeb.initializeClient({
+    issuer: 'com.dev.okta.myApp'
+    clientId: '123456'
+    redirectUri: 'https:localhost:8080/callback'
+    });
+    
+    final token = await oktaWeb.token.startPopUpAuthentication();
+    print(token.accessToken?.accessToken);
+    }
+
+
 ## Authentication Flows
+
+### Mobile
 
 ### Browser Redirect
 The login is achieved through the **Web-based OIDC flows**, where the user is redirected to the Okta-Hosted login page. After the user authenticates, they are redirected back to the application.
@@ -104,3 +144,11 @@ Allow the user to login via another device, the plugin will provide a access cod
 
 ### Device SSO 
 Allows Single sign on using a Device secret paired with the user's ID token
+
+### Web
+
+### Auth by Redirect
+Redirects the user to Okta's Issuer Url and prompts the user to login
+
+### Auth by Popup
+Launches a New window and prompts the user to login
