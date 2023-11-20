@@ -2,13 +2,15 @@ import 'package:pigeon/pigeon.dart';
 
 @ConfigurePigeon(
   PigeonOptions(
-      input: 'pigeons/hss_okta_pigeon.dart',
-      dartOut: 'lib/generated/hss_okta_flutter.g.dart',
-      swiftOut: 'ios/Classes/HssOktaFlutterPlugin.g.swift',
-      kotlinOut:
-          'android/src/main/kotlin/dev/hypersense/software/hss_okta_flutter/HssOktaFlutterPluginApi.kt',
-      kotlinOptions:
-          KotlinOptions(package: "dev.hypersense.software.hss_okta")),
+    input: 'pigeons/hss_okta_pigeon.dart',
+    dartOut: 'lib/generated/hss_okta_flutter.g.dart',
+    swiftOut: 'ios/Classes/HssOktaFlutterPlugin.g.swift',
+    kotlinOut:
+        'android/src/main/kotlin/dev/hypersense/software/hss_okta_flutter/HssOktaFlutterPluginApi.kt',
+    kotlinOptions: KotlinOptions(
+      package: "dev.hypersense.software.hss_okta",
+    ),
+  ),
 )
 enum AuthenticationType { browser, sso, directAuth }
 

@@ -1,7 +1,7 @@
 import 'generated/hss_okta_flutter.g.dart';
 import 'hss_okta_platform_interface.dart';
 
-class HssOktaFlutterChannel extends HssOktaFlutterPluginPlatform {
+class HssOktaFlutterChannel extends HssOktaFlutterPlatformInterface {
   final _api = HssOktaFlutterPluginApi();
 
   @override

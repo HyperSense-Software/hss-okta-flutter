@@ -14,7 +14,7 @@ class HssOktaFlutter {
       required List<OktaSignInFactor> factors}) async {
     var factorString = factors.map((e) => e.factor).toList();
 
-    var result = await HssOktaFlutterPluginPlatform.instance
+    var result = await HssOktaFlutterPlatformInterface.instance
         .startDirectAuthenticationFlow(DirectAuthRequest(
             username: email, password: password, factors: factorString));
 
@@ -24,7 +24,7 @@ class HssOktaFlutter {
   /// Revokes the default Credential stored on the device
   Future<bool> revokeDefaultToken() async {
     var result =
-        await HssOktaFlutterPluginPlatform.instance.revokeDefaultToken();
+        await HssOktaFlutterPlatformInterface.instance.revokeDefaultToken();
 
     return result;
   }
@@ -32,14 +32,14 @@ class HssOktaFlutter {
   /// Refreshes the default Credential stored on the device
   Future<bool> refreshDefaultToken() async {
     var result =
-        await HssOktaFlutterPluginPlatform.instance.refreshDefaultToken();
+        await HssOktaFlutterPlatformInterface.instance.refreshDefaultToken();
 
     return result;
   }
 
   /// tries to get the default Credential stored on the device
   Future<AuthenticationResult?> getCredential() async {
-    var result = await HssOktaFlutterPluginPlatform.instance.getCredential();
+    var result = await HssOktaFlutterPlatformInterface.instance.getCredential();
 
     return result;
   }
@@ -50,7 +50,7 @@ class HssOktaFlutter {
   /// This can only be used for iOS and when using Identity Engine
   /// [OktaSignInFactor.otp] or [OktaSignInFactor.oob] needs to be enabled on the Okta App.
   Future<AuthenticationResult?> mfaOtpSignInWithCredentials(String otp) async {
-    var result = await HssOktaFlutterPluginPlatform.instance
+    var result = await HssOktaFlutterPlatformInterface.instance
         .continueDirectAuthenticationMfaFlow(otp);
 
     return result;
@@ -66,7 +66,7 @@ class HssOktaFlutter {
   ///
   /// Call on [resumeDeviceAuthorizationFlow] to continue the flow and access the [AuthenticationResult]
   Future<DeviceAuthorizationSession?> startDeviceAuthorizationFlow() async {
-    var result = await HssOktaFlutterPluginPlatform.instance
+    var result = await HssOktaFlutterPlatformInterface.instance
         .startDeviceAuthorizationFlow();
     return result;
   }
@@ -74,7 +74,7 @@ class HssOktaFlutter {
   /// Continues the DeviceAuthorization flow, this should be called once the user has inputted the DeviceCode and VerificationUri
   ///  on a browser
   Future<AuthenticationResult?> resumeDeviceAuthorizationFlow() async {
-    var result = await HssOktaFlutterPluginPlatform.instance
+    var result = await HssOktaFlutterPlatformInterface.instance
         .resumeDeviceAuthorizationFlow();
     return result;
   }
@@ -87,7 +87,7 @@ class HssOktaFlutter {
     required String idToken,
   }) async {
     var result =
-        await HssOktaFlutterPluginPlatform.instance.startTokenExchangeFlow(
+        await HssOktaFlutterPlatformInterface.instance.startTokenExchangeFlow(
       deviceSecret: deviceSecret,
       idToken: idToken,
     );
