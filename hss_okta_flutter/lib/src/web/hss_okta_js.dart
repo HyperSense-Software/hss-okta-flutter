@@ -161,3 +161,11 @@ class IDToken {
 ///AuthStateManager evaluates and emits AuthState based on the events from TokenManager for downstream clients to consume.
 @JS()
 class AuthStateManager {}
+
+@JS()
+class AuthState {
+  external bool isAuthenticated;
+  external String accessToken;
+  external String idToken;
+  external String error;
+}
