@@ -21,6 +21,15 @@ class OktaAuth {
   /// The default behavior can be overrided by providing options.restoreOriginalUri.
   /// By default, originalUri will be retrieved from storage, but this can be overridden by specifying originalUri in the first parameter to this function.
   external Future<void> handleRedirect({String? originalUri});
+
+  /// Check window.location to verify if the app is in OAuth callback state or not. This function is synchronous and returns true or false.
+  external bool isRedirect();
+
+  /// Returns the access token string retrieved from [AuthState] if it exists.
+  external String getAccessToken();
+
+  ///Returns the id token string retrieved from [AuthState] if it exists.
+  external String getIdToken();
 }
 
 /// Used With [OktaAuth]'s Initializer
@@ -160,7 +169,9 @@ class IDToken {
 
 ///AuthStateManager evaluates and emits AuthState based on the events from TokenManager for downstream clients to consume.
 @JS()
-class AuthStateManager {}
+class AuthStateManager {
+  external Future<AuthState?> getAuthState();
+}
 
 @JS()
 class AuthState {
