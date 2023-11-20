@@ -17,8 +17,10 @@ class _RedirectFormState extends State<RedirectForm> {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
       final res = await PluginProvider.of(context).pluginWeb.parseFromUrl();
 
-      Navigator.of(context).pushNamed('/web-profile',
-          arguments: {'token': res.tokens.accessToken?.accessToken ?? ''});
+      if (mounted) {
+        Navigator.of(context).pushNamed('/web-profile',
+            arguments: {'token': res.tokens.accessToken?.accessToken ?? ''});
+      }
     });
   }
 

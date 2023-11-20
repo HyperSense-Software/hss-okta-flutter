@@ -17,14 +17,20 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  String res = 'None';
-  String username = "";
-  String password = "";
   final TextEditingController _controller = TextEditingController();
   final TextEditingController _usernamecontroller = TextEditingController();
   final TextEditingController _passwordcontroller = TextEditingController();
   final PageController _pageController = PageController(initialPage: 0);
   AuthenticationResult? result;
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    _usernamecontroller.dispose();
+    _passwordcontroller.dispose();
+    _pageController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
