@@ -142,13 +142,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         responseType: ['token', 'id_token'],
                       ));
 
-                  if (value.tokens.accessToken?.accessToken != null) {
-                    if (mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                          content: Text(
-                              'Access Token: ${value.tokens.accessToken?.accessToken}')));
-                    }
-                  }
+                  debugPrint(value.tokens.accessToken?.accessToken);
                 } else {
                   var result = await Navigator.of(formContext).push(
                       MaterialPageRoute(

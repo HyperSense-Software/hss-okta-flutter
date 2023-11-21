@@ -36,11 +36,20 @@ class OktaAuth {
 @JS()
 @anonymous
 class OktaConfig {
-  external factory OktaConfig({
-    String? issuer,
-    String? clientId,
-    String? redirectUri,
-  });
+  external factory OktaConfig(
+      {String? issuer,
+      String? clientId,
+      String? redirectUri,
+      String? scopes,
+      String? state,
+      bool? pkce,
+      String? authorizeUrl,
+      String? userinfoUrl,
+      String? tokenUrl,
+      String? revokeUrl,
+      String? logoutUrl,
+      String? clientSecret,
+      String? responseType});
 
   external String? issuer;
   external String? clientId;
@@ -53,6 +62,10 @@ class OktaConfig {
   external String? tokenUrl;
   external String? revokeUrl;
   external String? logoutUrl;
+  external String? responseType;
+
+  /// For server-side web applications ONLY!
+  external String? clientSecret;
 }
 
 /// Contains methods for accessing tokens.
