@@ -17,14 +17,20 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  String res = 'None';
-  String username = "";
-  String password = "";
   final TextEditingController _controller = TextEditingController();
   final TextEditingController _usernamecontroller = TextEditingController();
   final TextEditingController _passwordcontroller = TextEditingController();
   final PageController _pageController = PageController(initialPage: 0);
   AuthenticationResult? result;
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    _usernamecontroller.dispose();
+    _passwordcontroller.dispose();
+    _pageController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -135,7 +141,14 @@ class _HomeScreenState extends State<HomeScreen> {
                           options: AuthorizeOptions(
                         responseType: ['token', 'id_token'],
                       ));
-                  debugPrint(value.tokens.accessToken?.accessToken ?? '');
+
+                  if (value.tokens.accessToken?.accessToken != null) {
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Text(
+                              'Access Token: ${value.tokens.accessToken?.accessToken}')));
+                    }
+                  }
                 } else {
                   var result = await Navigator.of(formContext).push(
                       MaterialPageRoute(
@@ -265,8 +278,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       _pageController.jumpTo(0);
                     }
                   } catch (e) {
-                    ScaffoldMessenger.of(profileContext).showSnackBar(
-                        SnackBar(content: Text('Error: ${e.toString()}')));
+                    if (mounted) {
+                      ScaffoldMessenger.of(profileContext).showSnackBar(
+                          SnackBar(content: Text('Error: ${e.toString()}')));
+                    }
                   }
                 },
                 child: const Text('WebAuth Signout')),
@@ -285,8 +300,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         }
                       });
                     } catch (e) {
-                      ScaffoldMessenger.of(profileContext).showSnackBar(
-                          SnackBar(content: Text('Error: ${e.toString()}')));
+                      if (mounted) {
+                        ScaffoldMessenger.of(profileContext).showSnackBar(
+                            SnackBar(content: Text('Error: ${e.toString()}')));
+                      }
                     }
                   }
                 },

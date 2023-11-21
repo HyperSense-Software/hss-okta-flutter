@@ -31,7 +31,11 @@ class _MyAppState extends State<MyApp> {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
       if (kIsWeb) {
         await _pluginWeb.initializeClient(
-            issuer: '', clientId: '', redirectUri: '');
+            oktaConfig: OktaConfig(
+          issuer: '',
+          clientId: '',
+          redirectUri: '',
+        ));
       }
     });
   }

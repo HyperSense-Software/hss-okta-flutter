@@ -10,4 +10,14 @@
 * Updated readme.md
 
 # 1.1.1
-* Updated readme.md 
+* Updated readme.md
+
+# 1.2.2
+* Made OktaAuth private
+* Added getter for OktaAuth
+* Removed OktaConfig
+* Added AuthStateManager
+* Added TokenManager
+* Added Helper methods for OktaAuth
+* Changed initialize auth client parameters to OktaConfig
+* Added additional okta config parameters
