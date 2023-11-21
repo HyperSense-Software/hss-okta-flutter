@@ -24,3 +24,4 @@
 
 # 1.2.3
 * Updated OktaConfig constructor
+* Added additional OktaConfig properties
