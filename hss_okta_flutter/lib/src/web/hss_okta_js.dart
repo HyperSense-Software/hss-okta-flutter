@@ -40,6 +40,14 @@ class OktaConfig {
     String? issuer,
     String? clientId,
     String? redirectUri,
+    String? scopes,
+    String? state,
+    bool? pkce,
+    String? authorizeUrl,
+    String? userinfoUrl,
+    String? tokenUrl,
+    String? revokeUrl,
+    String? logoutUrl,
   });
 
   external String? issuer;

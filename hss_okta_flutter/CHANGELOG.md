@@ -21,3 +21,6 @@
 * Added Helper methods for OktaAuth
 * Changed initialize auth client parameters to OktaConfig
 * Added additional okta config parameters
+
+# 1.2.3
+* Updated OktaConfig constructor
