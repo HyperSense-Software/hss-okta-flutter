@@ -115,11 +115,11 @@ Web:
     final oktaWeb = HssOktaFlutterWeb();
     
     void main(){
-    await oktaWeb.initializeClient({
+    await oktaWeb.initializeClient(OktaConfig({
     issuer: 'com.dev.okta.myApp'
     clientId: '123456'
     redirectUri: 'https:localhost:8080/callback'
-    });
+    }));
     
     final token = await oktaWeb.token.startPopUpAuthentication();
     print(token.accessToken?.accessToken);

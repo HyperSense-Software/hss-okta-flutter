@@ -10,26 +10,15 @@ class HssOktaFlutterWeb extends HssOktaFlutterWebPlatformInterface {
   }
 
   late OktaAuth _auth;
-  late OktaConfig _config;
 
   /// Getter for the OktaAuth JS Object
   ///
   /// For general use, You should use the methods provided by this class instead of accessing the JS object directly.
   OktaAuth? get oktaAuth => _auth;
-  OktaConfig? get oktaConfig => _config;
 
   /// Initialize the Okta client with the provided configuration.
-  Future<void> initializeClient({
-    required String issuer,
-    required String clientId,
-    required String redirectUri,
-  }) async {
-    _config = OktaConfig(
-      issuer: issuer,
-      clientId: clientId,
-      redirectUri: redirectUri,
-    );
-    _auth = OktaAuth(_config);
+  Future<void> initializeClient({required OktaConfig oktaConfig}) async {
+    _auth = OktaAuth(oktaConfig);
   }
 
   /// Create token using a redirect.

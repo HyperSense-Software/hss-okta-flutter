@@ -20,7 +20,7 @@ class OktaAuth {
   /// By default it calls window.location.replace for the redirection.
   /// The default behavior can be overrided by providing options.restoreOriginalUri.
   /// By default, originalUri will be retrieved from storage, but this can be overridden by specifying originalUri in the first parameter to this function.
-  external Future<void> handleRedirect({String? originalUri});
+  external Future<void> handleRedirect(String? originalUri);
 
   /// Check window.location to verify if the app is in OAuth callback state or not. This function is synchronous and returns true or false.
   external bool isRedirect();
@@ -42,9 +42,17 @@ class OktaConfig {
     String? redirectUri,
   });
 
-  external String issuer;
-  external String clientId;
-  external String redirectUri;
+  external String? issuer;
+  external String? clientId;
+  external String? redirectUri;
+  external String? scopes;
+  external String? state;
+  external bool? pkce;
+  external String? authorizeUrl;
+  external String? userinfoUrl;
+  external String? tokenUrl;
+  external String? revokeUrl;
+  external String? logoutUrl;
 }
 
 /// Contains methods for accessing tokens.
