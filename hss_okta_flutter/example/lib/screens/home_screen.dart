@@ -142,7 +142,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         responseType: ['token', 'id_token'],
                       ));
 
-                  debugPrint(value.tokens.accessToken?.accessToken);
+                  debugPrint(value.tokens.accessToken?.accessToken ?? '');
                 } else {
                   var result = await Navigator.of(formContext).push(
                       MaterialPageRoute(
