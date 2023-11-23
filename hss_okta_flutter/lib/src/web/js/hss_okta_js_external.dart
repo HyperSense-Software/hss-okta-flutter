@@ -5,7 +5,7 @@ library hss_okta_js;
 import 'package:js/js.dart';
 
 /// The Http Client used for all the Okta API calls
-@JS('OktaAuth')
+
 class OktaAuth {
   external factory OktaAuth(OktaConfig options);
   external Token get token;

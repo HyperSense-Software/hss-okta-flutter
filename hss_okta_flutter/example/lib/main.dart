@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:hss_okta_flutter/hss_okta_flutter.dart';
 import 'package:hss_okta_flutter_example/provider/plugin_provider.dart';
 import 'package:hss_okta_flutter_example/screens/home_screen.dart';
@@ -8,7 +7,6 @@ import 'package:hss_okta_flutter_example/web/redirect_form.dart';
 import 'package:hss_okta_flutter_example/web/web_profile_screen.dart';
 
 void main() {
-  setUrlStrategy(PathUrlStrategy());
   runApp(const MyApp());
 }
 
