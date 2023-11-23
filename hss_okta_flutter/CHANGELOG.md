@@ -26,3 +26,6 @@
 * Updated OktaConfig constructor
 * Added additional OktaConfig properties
 * Fixed Bug regarding mishandling of mobile and web exports
+
+# 1.2.4
+* Fixed missing extension for export barrel
