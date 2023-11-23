@@ -25,6 +25,4 @@
 # 1.2.3
 * Updated OktaConfig constructor
 * Added additional OktaConfig properties
-
-# 1.2.4
 * Fixed Bug regarding mishandling of mobile and web exports
