@@ -16,38 +16,38 @@ abstract class HssOktaFlutterPlatformInterface extends PlatformInterface {
 
   Future<AuthenticationResult?> startDirectAuthenticationFlow(
       DirectAuthRequest request) {
-    throw UnimplementedError('platformVersion() has not been implemented.');
+    throw UnimplementedError();
   }
 
   Future<bool> revokeDefaultToken() {
-    throw UnimplementedError('platformVersion() has not been implemented.');
+    throw UnimplementedError();
   }
 
   Future<bool> refreshDefaultToken() {
-    throw UnimplementedError('platformVersion() has not been implemented.');
+    throw UnimplementedError();
   }
 
   Future<AuthenticationResult?> getCredential() {
-    throw UnimplementedError('platformVersion() has not been implemented.');
+    throw UnimplementedError();
   }
 
   Future<AuthenticationResult?> continueDirectAuthenticationMfaFlow(
       String otp) {
-    throw UnimplementedError('platformVersion() has not been implemented.');
+    throw UnimplementedError();
   }
 
   Future<DeviceAuthorizationSession?> startDeviceAuthorizationFlow() {
-    throw UnimplementedError('platformVersion() has not been implemented.');
+    throw UnimplementedError();
   }
 
   Future<AuthenticationResult?> resumeDeviceAuthorizationFlow() {
-    throw UnimplementedError('platformVersion() has not been implemented.');
+    throw UnimplementedError();
   }
 
   Future<AuthenticationResult?> startTokenExchangeFlow({
     required String deviceSecret,
     required String idToken,
   }) {
-    throw UnimplementedError('platformVersion() has not been implemented.');
+    throw UnimplementedError();
   }
 }
