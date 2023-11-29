@@ -5,7 +5,7 @@ library hss_okta_js;
 import 'package:js/js.dart';
 
 /// The Http Client used for all the Okta API calls
-
+@JS()
 class OktaAuth {
   external factory OktaAuth(OktaConfig options);
   external Token get token;
@@ -110,8 +110,8 @@ class Token {
   ///By default, if no parameters are passed, both the access token and ID token objects will be retrieved from the TokenManager.
   /// It is assumed that the access token is stored using the key "accessToken" and the ID token is stored under the key "idToken".
   ///  If you have stored either token in a non-standard location, this logic can be skipped by passing the access and ID token objects directly.
-  // external JSPromise getUserInfo(
-  //     {JSObject? accessTokenObject, JSObject idTokenObject});
+  external Future getUserInfo(
+      AccessToken? accessTokenObject, IDToken? idTokenObject);
 }
 
 /// Class that manages tokens.
@@ -119,8 +119,8 @@ class Token {
 class TokenManager {
   external Future<void> add(String key, Token token);
   external Future<Token> get(String key);
-  external Future<Map<String, String>> getTokens();
-  external Future<void> setTokens(Map<String, String> tokens);
+  external Future<Tokens> getTokens();
+  external void setTokens(Tokens tokens);
   external Future<void> remove(String key);
   external Future<void> clear();
   external Future<void> renew(String key);

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 
 import 'package:hss_okta_flutter/src/web/hss_okta_flutter_web_platform_interface.dart';
@@ -86,6 +88,17 @@ class HssOktaFlutterWeb extends HssOktaFlutterWebPlatformInterface {
     await promiseToFuture(_auth.tokenManager.add(key, token));
   }
 
+  ///Adds storage key agnostic tokens to storage. It uses default token storage keys (idToken, accessToken) in storage.
+  void setTokens(Tokens tokens) async {
+    _auth.tokenManager.setTokens(tokens);
+  }
+
+  /// Returns storage key agnostic tokens set for available tokens from storage. It returns empty object ({}) if no token is in storage.
+  Future<Tokens> getTokens(Tokens tokens) async {
+    final res = await promiseToFuture(_auth.tokenManager.getTokens());
+    return res;
+  }
+
   ///Get a [Token] that you have previously added to the tokenManager with the given key.
   /// The [Token] object will be returned if it exists in storage. Tokens will be removed from storage if they have expired and autoRenew is false or if there was an error while renewing the token.
   /// The [TokenManager] will emit a removed event when tokens are removed.
@@ -126,13 +139,18 @@ class HssOktaFlutterWeb extends HssOktaFlutterWebPlatformInterface {
     return _auth.getIdToken();
   }
 
-  Future<TokenResponse> getUserInfo({required String accessToken}) {
-    // TODO: implement getUserInfo
-    throw UnimplementedError();
+  Future<Map> getUserInfo(
+      {AccessToken? accessTokenObject, IDToken? idTokenObject}) async {
+    final res = await promiseToFuture(_auth.token.getUserInfo(
+      accessTokenObject,
+      idTokenObject,
+    ));
+    final jsObject = dartify(res);
+
+    return jsObject as Map;
   }
 
   Future<TokenResponse> renewToken({required String refreshToken}) {
-    // TODO: implement renewToken
     throw UnimplementedError();
   }
 }

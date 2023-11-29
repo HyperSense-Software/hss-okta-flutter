@@ -22,6 +22,20 @@ class OktaAuth {
 
   ///Returns the id token string retrieved from [AuthState] if it exists.
   String getIdToken() => throw UnimplementedError();
+
+  ///Retrieve the details about a user.
+  ///
+  ///accessTokenObject - (optional) an access token returned by this library. Note: this is not the raw access token.
+  ///idTokenObject - (optional) an ID token returned by this library. Note: this is not the raw ID token.
+  ///
+  ///By default, if no parameters are passed, both the access token and ID token objects will be retrieved from the TokenManager.
+  /// It is assumed that the access token is stored using the key "accessToken" and the ID token is stored under the key "idToken".
+  ///  If you have stored either token in a non-standard location, this logic can be skipped by passing the access and ID token objects directly.
+  Future getUserInfo({
+    AccessToken? accessTokenObject,
+    IDToken? idTokenObject,
+  }) =>
+      throw UnimplementedError();
 }
 
 class OktaConfig {
@@ -123,9 +137,8 @@ class TokenResponse {
 class TokenManager {
   Future<void> add(String key, Token token) => throw UnimplementedError();
   Future<Token> get(String key) => throw UnimplementedError();
-  Future<Map<String, String>> getTokens() => throw UnimplementedError();
-  Future<void> setTokens(Map<String, String> tokens) =>
-      throw UnimplementedError();
+  Future<Tokens> getTokens() => throw UnimplementedError();
+  Future<void> setTokens(Tokens tokens) => throw UnimplementedError();
   Future<void> remove(String key) => throw UnimplementedError();
   Future<void> clear() => throw UnimplementedError();
   Future<void> renew(String key) => throw UnimplementedError();

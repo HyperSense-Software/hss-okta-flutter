@@ -30,9 +30,9 @@ class _MyAppState extends State<MyApp> {
       if (kIsWeb) {
         await _pluginWeb.initializeClient(
             oktaConfig: OktaConfig(
-          issuer: '',
-          clientId: '',
-          redirectUri: '',
+          issuer: 'https://dev-88611703.okta.com',
+          clientId: '0oad8wsnzgY3tu5bV5d7',
+          redirectUri: 'http://localhost:8080/login',
         ));
       }
     });

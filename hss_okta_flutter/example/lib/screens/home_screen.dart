@@ -142,7 +142,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         responseType: ['token', 'id_token'],
                       ));
 
-                  debugPrint(value.tokens.accessToken?.accessToken ?? '');
+                  PluginProvider.of(context).pluginWeb.setTokens(value.tokens);
+                  final info =
+                      await PluginProvider.of(context).pluginWeb.getUserInfo();
+                  print(info);
                 } else {
                   var result = await Navigator.of(formContext).push(
                       MaterialPageRoute(
