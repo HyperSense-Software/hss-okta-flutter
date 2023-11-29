@@ -142,10 +142,16 @@ class _HomeScreenState extends State<HomeScreen> {
                         responseType: ['token', 'id_token'],
                       ));
 
-                  PluginProvider.of(context).pluginWeb.setTokens(value.tokens);
-                  final info =
-                      await PluginProvider.of(context).pluginWeb.getUserInfo();
-                  print(info);
+                  if (mounted) {
+                    PluginProvider.of(context)
+                        .pluginWeb
+                        .setTokens(value.tokens);
+                    final info = await PluginProvider.of(context)
+                        .pluginWeb
+                        .getUserInfo();
+                    debugPrint('$info');
+                    // TODO : Show info
+                  }
                 } else {
                   var result = await Navigator.of(formContext).push(
                       MaterialPageRoute(
