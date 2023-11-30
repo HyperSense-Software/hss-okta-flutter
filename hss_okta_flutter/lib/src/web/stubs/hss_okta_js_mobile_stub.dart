@@ -113,8 +113,9 @@ class TokenResponse {
 }
 
 class TokenManager {
-  Future<void> add(String key, Token token) => throw UnimplementedError();
-  Future<Token> get(String key) => throw UnimplementedError();
+  Future<void> add(String key, AbstractToken token) =>
+      throw UnimplementedError();
+  Future<AbstractToken> get(String key) => throw UnimplementedError();
   Future<Tokens> getTokens() => throw UnimplementedError();
   Future<void> setTokens(Tokens tokens) => throw UnimplementedError();
   Future<void> remove(String key) => throw UnimplementedError();
@@ -122,6 +123,7 @@ class TokenManager {
   Future<void> renew(String key) => throw UnimplementedError();
 }
 
+/// Superclass for [AccessToken], [IDToken], and [RefreshToken]
 class AbstractToken {
   int expiresAt;
   String authorizeUrl;

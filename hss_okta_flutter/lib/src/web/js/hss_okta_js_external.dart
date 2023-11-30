@@ -118,13 +118,37 @@ class Token {
 /// Class that manages tokens.
 @JS()
 class TokenManager {
-  external Future<void> add(String key, Token token);
-  external Future<Token> get(String key);
+  /// After receiving an access_token or id_token
+  ///  add it to the tokenManager to manage token expiration and renew operations.
+  ///  When a token is added to the tokenManager, it is automatically renewed when it expires.
+  ///
+  /// [key] - Unique key to store the token in the tokenManager. This is used later when you want to get, delete, or renew the token.
+  /// [token] - Token object that will be added
+
+  external Future<void> add(String key, AbstractToken token);
+
+  /// Get a token that you have previously added to the tokenManager with the given key.
+  ///  The token object will be returned if it exists in storage.
+  /// Tokens will be removed from storage if they have expired and autoRenew is false or if there was an error while renewing the token.
+  ///  The tokenManager will emit a removed event when tokens are removed.
+  external Future<AbstractToken> get(String key);
+
+  ///Returns storage key agnostic tokens set for available tokens from storage.
+  /// It returns empty object ({}) if no token is in storage.
+
   external Future<Tokens> getTokens();
+
+  /// Adds storage key agnostic tokens to storage. It uses default token storage keys (idToken, accessToken) in storage.
   external void setTokens(Tokens tokens);
   external Future<void> remove(String key);
   external Future<void> clear();
   external Future<void> renew(String key);
+
+  /// A synchronous method which returns true if the token has expired.
+  ///  The tokenManager will automatically remove expired tokens in the background.
+  ///  However, when the app first loads this background process may not have completed,
+  ///  so there is a chance that an expired token may exist in storage. This method can be called to avoid this potential race condition.
+  external bool hasExpired(AbstractToken token);
 }
 
 /// Options used in getWithPopup and getWithRedirect
@@ -181,6 +205,7 @@ class AuthState {
   external String error;
 }
 
+/// Superclass for [AccessToken], [IDToken], and [RefreshToken]
 @JS()
 abstract class AbstractToken {
   external int expiresAt;

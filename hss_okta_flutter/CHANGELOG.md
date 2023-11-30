@@ -40,3 +40,5 @@
 * Changed getUserInfo return type to Map
 * Update Token abstractons
 * Added refresh token
+* Added hasExpired in TokenManager
+* Updated getToken to return Abstract token
