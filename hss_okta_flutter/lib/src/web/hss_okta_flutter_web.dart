@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 
 import 'package:hss_okta_flutter/src/web/hss_okta_flutter_web_platform_interface.dart';

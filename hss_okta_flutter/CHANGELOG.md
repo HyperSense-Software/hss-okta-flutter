@@ -30,7 +30,7 @@
 # 1.2.4
 * Fixed missing extension for export barrel
 
-# 1.2.5
+# 1.3.0
 * Fixed Missing Interop tag for OktaAuth
 * Added getUserInfo call
 * Removed misleading UnImplemented Exception message
