@@ -142,20 +142,30 @@ class _HomeScreenState extends State<HomeScreen> {
                         responseType: ['token', 'id_token'],
                       ));
 
-                  debugPrint(value.tokens.accessToken?.accessToken ?? '');
+                  if (mounted) {
+                    PluginProvider.of(context)
+                        .pluginWeb
+                        .setTokens(value.tokens);
+                    final info = await PluginProvider.of(context)
+                        .pluginWeb
+                        .getUserInfo();
+                    debugPrint('$info');
+                  }
                 } else {
                   var result = await Navigator.of(formContext).push(
                       MaterialPageRoute(
                           builder: (c) => const WebSignInExample()));
 
                   if (result) {
-                    await PluginProvider.of(context)
-                        .plugin
-                        .getCredential()
-                        .then((cred) {
-                      _processResult(cred, formContext);
-                      setState(() {});
-                    });
+                    if (mounted) {
+                      await PluginProvider.of(context)
+                          .plugin
+                          .getCredential()
+                          .then((cred) {
+                        _processResult(cred, formContext);
+                        setState(() {});
+                      });
+                    }
                   }
                 }
               },

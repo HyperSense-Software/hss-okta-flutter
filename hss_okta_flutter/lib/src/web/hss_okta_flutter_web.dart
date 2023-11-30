@@ -63,9 +63,11 @@ class HssOktaFlutterWeb extends HssOktaFlutterWebPlatformInterface {
   }
 
   /// Returns a new token if the Okta session is still valid.
-
-  Future<TokenResponse> renew(String tokenToRenew) async {
-    final res = await promiseToFuture(_auth.token.renew(tokenToRenew));
+  /// Manually renew a token before it expires and update the stored value.
+  ///
+  ///[key] - Key for the token you want to renew
+  Future<TokenResponse> renew(String key) async {
+    final res = await promiseToFuture(_auth.token.renew(key));
     return res;
   }
 
@@ -82,15 +84,26 @@ class HssOktaFlutterWeb extends HssOktaFlutterWebPlatformInterface {
   ///[key]- Unique key to store the token in the tokenManager. This is used later when you want to get, delete, or renew the token.
   /// [token] - Token object that will be added
 
-  void addToken(String key, Token token) async {
+  void addToken(String key, AbstractToken token) async {
     await promiseToFuture(_auth.tokenManager.add(key, token));
+  }
+
+  ///Adds storage key agnostic tokens to storage. It uses default token storage keys (idToken, accessToken) in storage.
+  void setTokens(Tokens tokens) async {
+    _auth.tokenManager.setTokens(tokens);
+  }
+
+  /// Returns storage key agnostic tokens set for available tokens from storage. It returns empty object ({}) if no token is in storage.
+  Future<Tokens> getTokens(Tokens tokens) async {
+    final res = await promiseToFuture(_auth.tokenManager.getTokens());
+    return res;
   }
 
   ///Get a [Token] that you have previously added to the tokenManager with the given key.
   /// The [Token] object will be returned if it exists in storage. Tokens will be removed from storage if they have expired and autoRenew is false or if there was an error while renewing the token.
   /// The [TokenManager] will emit a removed event when tokens are removed.
 
-  Future<Token> getToken(String key) async {
+  Future<AbstractToken> getToken(String key) async {
     final res = await promiseToFuture(_auth.tokenManager.get(key));
     return res;
   }
@@ -126,13 +139,30 @@ class HssOktaFlutterWeb extends HssOktaFlutterWebPlatformInterface {
     return _auth.getIdToken();
   }
 
-  Future<TokenResponse> getUserInfo({required String accessToken}) {
-    // TODO: implement getUserInfo
-    throw UnimplementedError();
+  /// Retrieve the details about a user.
+  ///
+  /// [accessTokenObject] - (optional) an access token returned by this library.
+  ///  [idTokenObject] - (optional) an ID token.
+  ///
+  /// By default, if no parameters are passed, both the access token and ID token objects will be retrieved from the TokenManager.
+  ///  It is assumed that the access token is stored using the key "accessToken" and the ID token is stored under the key "idToken".
+  ///  If you have stored either token in a non-standard location, this logic can be skipped by passing the access and ID token objects directly.
+
+  Future<Map> getUserInfo(
+      {AccessToken? accessTokenObject, IDToken? idTokenObject}) async {
+    final res = await promiseToFuture(_auth.token.getUserInfo(
+      accessTokenObject,
+      idTokenObject,
+    ));
+    final jsObject = dartify(res);
+
+    return jsObject as Map;
   }
 
   Future<TokenResponse> renewToken({required String refreshToken}) {
-    // TODO: implement renewToken
     throw UnimplementedError();
   }
+
+  Future<bool> hasTokenExpired(AbstractToken token) async =>
+      _auth.tokenManager.hasExpired(token);
 }

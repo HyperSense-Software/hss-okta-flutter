@@ -1,3 +1,4 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 class OktaAuth {
   Token get token => throw UnimplementedError();
   TokenManager get tokenManager => throw UnimplementedError();
@@ -22,6 +23,20 @@ class OktaAuth {
 
   ///Returns the id token string retrieved from [AuthState] if it exists.
   String getIdToken() => throw UnimplementedError();
+
+  ///Retrieve the details about a user.
+  ///
+  ///accessTokenObject - (optional) an access token returned by this library. Note: this is not the raw access token.
+  ///idTokenObject - (optional) an ID token returned by this library. Note: this is not the raw ID token.
+  ///
+  ///By default, if no parameters are passed, both the access token and ID token objects will be retrieved from the TokenManager.
+  /// It is assumed that the access token is stored using the key "accessToken" and the ID token is stored under the key "idToken".
+  ///  If you have stored either token in a non-standard location, this logic can be skipped by passing the access and ID token objects directly.
+  Future getUserInfo({
+    AccessToken? accessTokenObject,
+    IDToken? idTokenObject,
+  }) =>
+      throw UnimplementedError();
 }
 
 class OktaConfig {
@@ -63,7 +78,7 @@ class Token {
       throw UnimplementedError();
   Future parseFromUrl() => throw UnimplementedError();
   Future decode(String idTokenString) => throw UnimplementedError();
-  Future renew(String tokenToRenew) => throw UnimplementedError();
+  Future renew(AbstractToken tokenToRenew) => throw UnimplementedError();
 }
 
 class AuthorizeOptions {
@@ -87,28 +102,6 @@ class Tokens {
   });
 }
 
-class AccessToken {
-  String accessToken;
-  String tokenType;
-  String userinfoUrl;
-  AccessToken({
-    required this.accessToken,
-    required this.tokenType,
-    required this.userinfoUrl,
-  });
-}
-
-class IDToken {
-  String? idToken;
-  String? issuer;
-  String? clientId;
-  IDToken({
-    this.idToken,
-    this.issuer,
-    this.clientId,
-  });
-}
-
 class TokenResponse {
   Tokens tokens;
   String state;
@@ -121,12 +114,135 @@ class TokenResponse {
 }
 
 class TokenManager {
-  Future<void> add(String key, Token token) => throw UnimplementedError();
-  Future<Token> get(String key) => throw UnimplementedError();
-  Future<Map<String, String>> getTokens() => throw UnimplementedError();
-  Future<void> setTokens(Map<String, String> tokens) =>
+  Future<void> add(String key, AbstractToken token) =>
       throw UnimplementedError();
+  Future<AbstractToken> get(String key) => throw UnimplementedError();
+  Future<Tokens> getTokens() => throw UnimplementedError();
+  Future<void> setTokens(Tokens tokens) => throw UnimplementedError();
   Future<void> remove(String key) => throw UnimplementedError();
   Future<void> clear() => throw UnimplementedError();
   Future<void> renew(String key) => throw UnimplementedError();
+}
+
+/// Superclass for [AccessToken], [IDToken], and [RefreshToken]
+class AbstractToken {
+  int expiresAt;
+  String authorizeUrl;
+  List<String> scopes;
+  bool? pendingRemove;
+
+  AbstractToken({
+    required this.expiresAt,
+    required this.authorizeUrl,
+    required this.scopes,
+    this.pendingRemove,
+  });
+}
+
+/// An Access Token containing the user's Access token and UserInformation URL
+
+class AccessToken extends AbstractToken {
+  AccessToken({
+    required this.accessToken,
+    required this.tokenType,
+    required this.userinfoUrl,
+    required super.expiresAt,
+    required super.authorizeUrl,
+    required super.scopes,
+    required this.claims,
+    super.pendingRemove,
+  });
+
+  String accessToken;
+  String tokenType;
+  String userinfoUrl;
+  UserClaims claims;
+}
+
+/// An ID Token containing the user's ID token, issuer, and client ID
+
+class IDToken extends AbstractToken {
+  IDToken({
+    required this.idToken,
+    required this.issuer,
+    required this.clientId,
+    required super.expiresAt,
+    required super.authorizeUrl,
+    required super.scopes,
+    required this.claims,
+    super.pendingRemove,
+  });
+
+  String idToken;
+  String issuer;
+  String clientId;
+  UserClaims claims;
+  // TODO: Add user claims
+}
+
+class RefreshToken extends AbstractToken {
+  RefreshToken({
+    required this.refreshToken,
+    required this.tokenUrl,
+    required this.issuer,
+    required super.expiresAt,
+    required super.authorizeUrl,
+    required super.scopes,
+    super.pendingRemove,
+  });
+
+  String refreshToken;
+  String tokenUrl;
+  String issuer;
+}
+
+class UserClaims {
+  String authTtime;
+  String aud;
+  String email;
+
+  String emailVerified;
+  String exp;
+
+  String familyName;
+
+  String givenName;
+  String iat;
+  String iss;
+  String jti;
+  String locale;
+  String name;
+  String nonce;
+
+  String preferredUsername;
+  String sub;
+
+  String updatedAt;
+  String ver;
+  String zoneinfo;
+
+  String atHash;
+  String acr;
+  UserClaims({
+    required this.authTtime,
+    required this.aud,
+    required this.email,
+    required this.emailVerified,
+    required this.exp,
+    required this.familyName,
+    required this.givenName,
+    required this.iat,
+    required this.iss,
+    required this.jti,
+    required this.locale,
+    required this.name,
+    required this.nonce,
+    required this.preferredUsername,
+    required this.sub,
+    required this.updatedAt,
+    required this.ver,
+    required this.zoneinfo,
+    required this.atHash,
+    required this.acr,
+  });
 }

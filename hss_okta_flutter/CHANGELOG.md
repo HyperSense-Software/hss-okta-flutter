@@ -26,3 +26,21 @@
 * Updated OktaConfig constructor
 * Added additional OktaConfig properties
 * Fixed Bug regarding mishandling of mobile and web exports
+
+# 1.2.4
+* Fixed missing extension for export barrel
+
+# 1.3.0
+* Fixed Missing Interop tag for OktaAuth
+* Added getUserInfo call
+* Removed misleading UnImplemented Exception message
+* Updated setTokens to accept Tokens
+* Updated getTokens return type to Tokens
+* Changed setTokens from Future<void> to void
+* Changed getUserInfo return type to Map
+* Update Token abstractons
+* Added refresh token
+* Added hasExpired in TokenManager
+* Updated getToken to return Abstract token
+* Added Userclaims 
+* Added Userclaims to AbstractToken

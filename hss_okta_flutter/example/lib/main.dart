@@ -65,7 +65,7 @@ class _MyAppState extends State<MyApp> {
                   return WebProfileScreen(token: args['token'] as String);
                 }
 
-                return WebProfileScreen(token: '');
+                return const WebProfileScreen(token: '');
               },
             );
         }
