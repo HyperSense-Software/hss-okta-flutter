@@ -101,7 +101,7 @@ class Token {
   external Future decode(String idTokenString);
 
   /// Returns a new token if the Okta session is still valid.
-  external Future renew(AbstractToken tokenToRenew);
+  external Future renew(String key);
 
   ///Retrieve the details about a user.
   ///
@@ -140,8 +140,8 @@ class TokenManager {
 
   /// Adds storage key agnostic tokens to storage. It uses default token storage keys (idToken, accessToken) in storage.
   external void setTokens(Tokens tokens);
-  external Future<void> remove(String key);
-  external Future<void> clear();
+  external void remove(String key);
+  external void clear();
   external Future<void> renew(String key);
 
   /// A synchronous method which returns true if the token has expired.

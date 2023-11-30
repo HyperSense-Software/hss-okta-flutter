@@ -63,9 +63,11 @@ class HssOktaFlutterWeb extends HssOktaFlutterWebPlatformInterface {
   }
 
   /// Returns a new token if the Okta session is still valid.
-
-  Future<TokenResponse> renew(AbstractToken tokenToRenew) async {
-    final res = await promiseToFuture(_auth.token.renew(tokenToRenew));
+  /// Manually renew a token before it expires and update the stored value.
+  ///
+  ///[key] - Key for the token you want to renew
+  Future<TokenResponse> renew(String key) async {
+    final res = await promiseToFuture(_auth.token.renew(key));
     return res;
   }
 
