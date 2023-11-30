@@ -158,13 +158,15 @@ class _HomeScreenState extends State<HomeScreen> {
                           builder: (c) => const WebSignInExample()));
 
                   if (result) {
-                    await PluginProvider.of(context)
-                        .plugin
-                        .getCredential()
-                        .then((cred) {
-                      _processResult(cred, formContext);
-                      setState(() {});
-                    });
+                    if (mounted) {
+                      await PluginProvider.of(context)
+                          .plugin
+                          .getCredential()
+                          .then((cred) {
+                        _processResult(cred, formContext);
+                        setState(() {});
+                      });
+                    }
                   }
                 }
               },

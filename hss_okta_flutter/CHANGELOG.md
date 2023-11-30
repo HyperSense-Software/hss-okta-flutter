@@ -38,3 +38,5 @@
 * Updated getTokens return type to Tokens
 * Changed setTokens from Future<void> to void
 * Changed getUserInfo return type to Map
+* Update Token abstractons
+* Added refresh token

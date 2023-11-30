@@ -41,7 +41,7 @@ class HssOktaFlutterWeb {
 
   void removeToken(String key) => throw UnimplementedError();
 
-  Future<TokenResponse> renew(String tokenToRenew) {
+  Future<TokenResponse> renew(AbstractToken tokenToRenew) {
     throw UnimplementedError();
   }
 

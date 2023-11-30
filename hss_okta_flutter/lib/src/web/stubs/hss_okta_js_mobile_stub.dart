@@ -77,7 +77,7 @@ class Token {
       throw UnimplementedError();
   Future parseFromUrl() => throw UnimplementedError();
   Future decode(String idTokenString) => throw UnimplementedError();
-  Future renew(String tokenToRenew) => throw UnimplementedError();
+  Future renew(AbstractToken tokenToRenew) => throw UnimplementedError();
 }
 
 class AuthorizeOptions {
@@ -101,28 +101,6 @@ class Tokens {
   });
 }
 
-class AccessToken {
-  String accessToken;
-  String tokenType;
-  String userinfoUrl;
-  AccessToken({
-    required this.accessToken,
-    required this.tokenType,
-    required this.userinfoUrl,
-  });
-}
-
-class IDToken {
-  String? idToken;
-  String? issuer;
-  String? clientId;
-  IDToken({
-    this.idToken,
-    this.issuer,
-    this.clientId,
-  });
-}
-
 class TokenResponse {
   Tokens tokens;
   String state;
@@ -142,4 +120,72 @@ class TokenManager {
   Future<void> remove(String key) => throw UnimplementedError();
   Future<void> clear() => throw UnimplementedError();
   Future<void> renew(String key) => throw UnimplementedError();
+}
+
+class AbstractToken {
+  int expiresAt;
+  String authorizeUrl;
+  List<String> scopes;
+  bool? pendingRemove;
+
+  AbstractToken({
+    required this.expiresAt,
+    required this.authorizeUrl,
+    required this.scopes,
+    this.pendingRemove,
+  });
+}
+
+/// An Access Token containing the user's Access token and UserInformation URL
+
+class AccessToken extends AbstractToken {
+  AccessToken({
+    required this.accessToken,
+    required this.tokenType,
+    required this.userinfoUrl,
+    required super.expiresAt,
+    required super.authorizeUrl,
+    required super.scopes,
+    super.pendingRemove,
+  });
+
+  String accessToken;
+  String tokenType;
+  String userinfoUrl;
+  // TODO: Add user claims
+}
+
+/// An ID Token containing the user's ID token, issuer, and client ID
+
+class IDToken extends AbstractToken {
+  IDToken({
+    required this.idToken,
+    required this.issuer,
+    required this.clientId,
+    required super.expiresAt,
+    required super.authorizeUrl,
+    required super.scopes,
+    super.pendingRemove,
+  });
+
+  String idToken;
+  String issuer;
+  String clientId;
+  // TODO: Add user claims
+}
+
+class RefreshToken extends AbstractToken {
+  RefreshToken({
+    required this.refreshToken,
+    required this.tokenUrl,
+    required this.issuer,
+    required super.expiresAt,
+    required super.authorizeUrl,
+    required super.scopes,
+    super.pendingRemove,
+  });
+
+  String refreshToken;
+  String tokenUrl;
+  String issuer;
 }

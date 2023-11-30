@@ -1,3 +1,4 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 @JS()
 library hss_okta_js;
 
@@ -100,7 +101,7 @@ class Token {
   external Future decode(String idTokenString);
 
   /// Returns a new token if the Okta session is still valid.
-  external Future renew(String tokenToRenew);
+  external Future renew(AbstractToken tokenToRenew);
 
   ///Retrieve the details about a user.
   ///
@@ -166,28 +167,6 @@ class Tokens {
   external IDToken? idToken;
 }
 
-/// An Access Token containing the user's Access token and UserInformation URL
-@JS()
-@anonymous
-class AccessToken {
-  external factory AccessToken({
-    String? accessToken,
-    String? tokenType,
-    String? userinfoUrl,
-  });
-  external String accessToken;
-  external String tokenType;
-  external String userinfoUrl;
-}
-
-/// An ID Token containing the user's ID token, issuer, and client ID
-@JS()
-class IDToken {
-  external String idToken;
-  external String issuer;
-  external String clientId;
-}
-
 ///AuthStateManager evaluates and emits AuthState based on the events from TokenManager for downstream clients to consume.
 @JS()
 class AuthStateManager {
@@ -200,4 +179,70 @@ class AuthState {
   external String accessToken;
   external String idToken;
   external String error;
+}
+
+@JS()
+abstract class AbstractToken {
+  external int expiresAt;
+  external String authorizeUrl;
+  external List<String> scopes;
+  external bool? pendingRemove;
+}
+
+/// An Access Token containing the user's Access token and UserInformation URL
+@JS()
+@anonymous
+class AccessToken extends AbstractToken {
+  external factory AccessToken({
+    String? accessToken,
+    String? tokenType,
+    String? userinfoUrl,
+    expiresAt,
+    authorizeUrl,
+    scopes,
+    pendingRemove,
+  });
+
+  external String accessToken;
+  external String tokenType;
+  external String userinfoUrl;
+  // TODO: Add user claims
+}
+
+/// An ID Token containing the user's ID token, issuer, and client ID
+@JS()
+@anonymous
+class IDToken extends AbstractToken {
+  external factory IDToken({
+    required idToken,
+    required issuer,
+    required clientId,
+    expiresAt,
+    authorizeUrl,
+    scopes,
+    pendingRemove,
+  });
+
+  external String idToken;
+  external String issuer;
+  external String clientId;
+  // TODO: Add user claims
+}
+
+@JS()
+@anonymous
+class RefreshToken extends AbstractToken {
+  external factory RefreshToken({
+    required refreshToken,
+    required tokenUrl,
+    required issuer,
+    expiresAt,
+    authorizeUrl,
+    scopes,
+    pendingRemove,
+  });
+
+  external String refreshToken;
+  external String tokenUrl;
+  external String issuer;
 }
