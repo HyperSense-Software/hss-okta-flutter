@@ -1,3 +1,4 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 class OktaAuth {
   Token get token => throw UnimplementedError();
   TokenManager get tokenManager => throw UnimplementedError();
@@ -148,13 +149,14 @@ class AccessToken extends AbstractToken {
     required super.expiresAt,
     required super.authorizeUrl,
     required super.scopes,
+    required this.claims,
     super.pendingRemove,
   });
 
   String accessToken;
   String tokenType;
   String userinfoUrl;
-  // TODO: Add user claims
+  UserClaims claims;
 }
 
 /// An ID Token containing the user's ID token, issuer, and client ID
@@ -167,12 +169,14 @@ class IDToken extends AbstractToken {
     required super.expiresAt,
     required super.authorizeUrl,
     required super.scopes,
+    required this.claims,
     super.pendingRemove,
   });
 
   String idToken;
   String issuer;
   String clientId;
+  UserClaims claims;
   // TODO: Add user claims
 }
 
@@ -190,4 +194,55 @@ class RefreshToken extends AbstractToken {
   String refreshToken;
   String tokenUrl;
   String issuer;
+}
+
+class UserClaims {
+  String authTtime;
+  String aud;
+  String email;
+
+  String emailVerified;
+  String exp;
+
+  String familyName;
+
+  String givenName;
+  String iat;
+  String iss;
+  String jti;
+  String locale;
+  String name;
+  String nonce;
+
+  String preferredUsername;
+  String sub;
+
+  String updatedAt;
+  String ver;
+  String zoneinfo;
+
+  String atHash;
+  String acr;
+  UserClaims({
+    required this.authTtime,
+    required this.aud,
+    required this.email,
+    required this.emailVerified,
+    required this.exp,
+    required this.familyName,
+    required this.givenName,
+    required this.iat,
+    required this.iss,
+    required this.jti,
+    required this.locale,
+    required this.name,
+    required this.nonce,
+    required this.preferredUsername,
+    required this.sub,
+    required this.updatedAt,
+    required this.ver,
+    required this.zoneinfo,
+    required this.atHash,
+    required this.acr,
+  });
 }

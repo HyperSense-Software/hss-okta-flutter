@@ -231,7 +231,7 @@ class AccessToken extends AbstractToken {
   external String accessToken;
   external String tokenType;
   external String userinfoUrl;
-  // TODO: Add user claims
+  external UserClaims claims;
 }
 
 /// An ID Token containing the user's ID token, issuer, and client ID
@@ -251,7 +251,7 @@ class IDToken extends AbstractToken {
   external String idToken;
   external String issuer;
   external String clientId;
-  // TODO: Add user claims
+  external UserClaims claims;
 }
 
 @JS()
@@ -270,4 +270,35 @@ class RefreshToken extends AbstractToken {
   external String refreshToken;
   external String tokenUrl;
   external String issuer;
+}
+
+@JS()
+class UserClaims {
+  @JS('auth_time')
+  external String authTtime;
+  external String aud;
+  external String email;
+  @JS('email_verified')
+  external String emailVerified;
+  external String exp;
+  @JS('family_name')
+  external String familyName;
+  @JS('given_name')
+  external String givenName;
+  external String iat;
+  external String iss;
+  external String jti;
+  external String locale;
+  external String name;
+  external String nonce;
+  @JS('preferred_username')
+  external String preferredUsername;
+  external String sub;
+  @JS('updated_at')
+  external String updatedAt;
+  external String ver;
+  external String zoneinfo;
+  @JS('at_hash')
+  external String atHash;
+  external String acr;
 }

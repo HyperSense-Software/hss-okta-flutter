@@ -42,3 +42,5 @@
 * Added refresh token
 * Added hasExpired in TokenManager
 * Updated getToken to return Abstract token
+* Added Userclaims 
+* Added Userclaims to AbstractToken
