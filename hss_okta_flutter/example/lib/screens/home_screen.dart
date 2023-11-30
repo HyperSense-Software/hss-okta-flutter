@@ -149,6 +149,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     final info = await PluginProvider.of(context)
                         .pluginWeb
                         .getUserInfo();
+                    debugPrint('$info');
                   }
                 } else {
                   var result = await Navigator.of(formContext).push(
