@@ -1,3 +1,4 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 @JS()
 library hss_okta_js;
 
@@ -5,7 +6,7 @@ library hss_okta_js;
 import 'package:js/js.dart';
 
 /// The Http Client used for all the Okta API calls
-
+@JS()
 class OktaAuth {
   external factory OktaAuth(OktaConfig options);
   external Token get token;
@@ -100,7 +101,7 @@ class Token {
   external Future decode(String idTokenString);
 
   /// Returns a new token if the Okta session is still valid.
-  external Future renew(String tokenToRenew);
+  external Future renew(String key);
 
   ///Retrieve the details about a user.
   ///
@@ -110,20 +111,44 @@ class Token {
   ///By default, if no parameters are passed, both the access token and ID token objects will be retrieved from the TokenManager.
   /// It is assumed that the access token is stored using the key "accessToken" and the ID token is stored under the key "idToken".
   ///  If you have stored either token in a non-standard location, this logic can be skipped by passing the access and ID token objects directly.
-  // external JSPromise getUserInfo(
-  //     {JSObject? accessTokenObject, JSObject idTokenObject});
+  external Future getUserInfo(
+      AccessToken? accessTokenObject, IDToken? idTokenObject);
 }
 
 /// Class that manages tokens.
 @JS()
 class TokenManager {
-  external Future<void> add(String key, Token token);
-  external Future<Token> get(String key);
-  external Future<Map<String, String>> getTokens();
-  external Future<void> setTokens(Map<String, String> tokens);
-  external Future<void> remove(String key);
-  external Future<void> clear();
+  /// After receiving an access_token or id_token
+  ///  add it to the tokenManager to manage token expiration and renew operations.
+  ///  When a token is added to the tokenManager, it is automatically renewed when it expires.
+  ///
+  /// [key] - Unique key to store the token in the tokenManager. This is used later when you want to get, delete, or renew the token.
+  /// [token] - Token object that will be added
+
+  external Future<void> add(String key, AbstractToken token);
+
+  /// Get a token that you have previously added to the tokenManager with the given key.
+  ///  The token object will be returned if it exists in storage.
+  /// Tokens will be removed from storage if they have expired and autoRenew is false or if there was an error while renewing the token.
+  ///  The tokenManager will emit a removed event when tokens are removed.
+  external Future<AbstractToken> get(String key);
+
+  ///Returns storage key agnostic tokens set for available tokens from storage.
+  /// It returns empty object ({}) if no token is in storage.
+
+  external Future<Tokens> getTokens();
+
+  /// Adds storage key agnostic tokens to storage. It uses default token storage keys (idToken, accessToken) in storage.
+  external void setTokens(Tokens tokens);
+  external void remove(String key);
+  external void clear();
   external Future<void> renew(String key);
+
+  /// A synchronous method which returns true if the token has expired.
+  ///  The tokenManager will automatically remove expired tokens in the background.
+  ///  However, when the app first loads this background process may not have completed,
+  ///  so there is a chance that an expired token may exist in storage. This method can be called to avoid this potential race condition.
+  external bool hasExpired(AbstractToken token);
 }
 
 /// Options used in getWithPopup and getWithRedirect
@@ -166,28 +191,6 @@ class Tokens {
   external IDToken? idToken;
 }
 
-/// An Access Token containing the user's Access token and UserInformation URL
-@JS()
-@anonymous
-class AccessToken {
-  external factory AccessToken({
-    String? accessToken,
-    String? tokenType,
-    String? userinfoUrl,
-  });
-  external String accessToken;
-  external String tokenType;
-  external String userinfoUrl;
-}
-
-/// An ID Token containing the user's ID token, issuer, and client ID
-@JS()
-class IDToken {
-  external String idToken;
-  external String issuer;
-  external String clientId;
-}
-
 ///AuthStateManager evaluates and emits AuthState based on the events from TokenManager for downstream clients to consume.
 @JS()
 class AuthStateManager {
@@ -200,4 +203,102 @@ class AuthState {
   external String accessToken;
   external String idToken;
   external String error;
+}
+
+/// Superclass for [AccessToken], [IDToken], and [RefreshToken]
+@JS()
+abstract class AbstractToken {
+  external int expiresAt;
+  external String authorizeUrl;
+  external List<String> scopes;
+  external bool? pendingRemove;
+}
+
+/// An Access Token containing the user's Access token and UserInformation URL
+@JS()
+@anonymous
+class AccessToken extends AbstractToken {
+  external factory AccessToken({
+    String? accessToken,
+    String? tokenType,
+    String? userinfoUrl,
+    expiresAt,
+    authorizeUrl,
+    scopes,
+    pendingRemove,
+  });
+
+  external String accessToken;
+  external String tokenType;
+  external String userinfoUrl;
+  external UserClaims claims;
+}
+
+/// An ID Token containing the user's ID token, issuer, and client ID
+@JS()
+@anonymous
+class IDToken extends AbstractToken {
+  external factory IDToken({
+    required idToken,
+    required issuer,
+    required clientId,
+    expiresAt,
+    authorizeUrl,
+    scopes,
+    pendingRemove,
+  });
+
+  external String idToken;
+  external String issuer;
+  external String clientId;
+  external UserClaims claims;
+}
+
+@JS()
+@anonymous
+class RefreshToken extends AbstractToken {
+  external factory RefreshToken({
+    required refreshToken,
+    required tokenUrl,
+    required issuer,
+    expiresAt,
+    authorizeUrl,
+    scopes,
+    pendingRemove,
+  });
+
+  external String refreshToken;
+  external String tokenUrl;
+  external String issuer;
+}
+
+@JS()
+class UserClaims {
+  @JS('auth_time')
+  external String authTtime;
+  external String aud;
+  external String email;
+  @JS('email_verified')
+  external String emailVerified;
+  external String exp;
+  @JS('family_name')
+  external String familyName;
+  @JS('given_name')
+  external String givenName;
+  external String iat;
+  external String iss;
+  external String jti;
+  external String locale;
+  external String name;
+  external String nonce;
+  @JS('preferred_username')
+  external String preferredUsername;
+  external String sub;
+  @JS('updated_at')
+  external String updatedAt;
+  external String ver;
+  external String zoneinfo;
+  @JS('at_hash')
+  external String atHash;
+  external String acr;
 }
