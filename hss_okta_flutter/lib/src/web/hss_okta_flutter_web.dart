@@ -23,7 +23,8 @@ class HssOktaFlutterWeb extends HssOktaFlutterWebPlatformInterface {
   ///  After a successful authentication, the browser will be redirected to the configured redirectUri.
   ///  The authorization code, access, or ID Tokens will be available as parameters appended to this URL.
   ///  Values will be returned in either the search query or hash fragment portion of the URL depending on the responseMode
-
+  ///
+  /// To process the result of the redirect, use the parseFromUrl method.
   Future<void> startRedirectAuthentication({AuthorizeOptions? options}) async {
     await promiseToFuture<void>(_auth.token.getWithRedirect(options));
   }
