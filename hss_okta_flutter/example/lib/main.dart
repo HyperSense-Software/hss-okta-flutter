@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:hss_okta_flutter/enums/sign_in_factors.dart';
 import 'package:hss_okta_flutter/generated/hss_okta_flutter.g.dart';
 import 'package:hss_okta_flutter/hss_okta_flutter.dart';
+import 'package:hss_okta_flutter_example/constants.dart';
 import 'package:hss_okta_flutter_example/web_auth.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 
@@ -46,8 +47,13 @@ class _MyAppState extends State<MyApp> {
 
     // For android
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
-      _plugin.init("0oa7vbqbudjoR9zMX697", "com.okta.ntsafety:/callback",
-          "com.okta.ntsafety:/", "https://ntsafety.okta.com", "openid profile");
+      _plugin.init(
+        clientId: Constants.clientId,
+        signInRedirectUrl: Constants.signInRedirectUrl,
+        signOutRedirectUrl: Constants.signOutRedirectUrl,
+        issuer: Constants.issuer,
+        scopes: Constants.scopes,
+      );
       await getCredential(context);
       if (result != null) {
         _pageController.jumpToPage(2);

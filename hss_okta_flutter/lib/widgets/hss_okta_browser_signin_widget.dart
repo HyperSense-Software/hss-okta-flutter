@@ -1,3 +1,4 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -11,10 +12,24 @@ const _viewType = 'dev.hypersense.software.hss_okta.views.browser.signin';
 class HssOktaBrowserSignInWidget extends StatelessWidget {
   final AuthBrowserLoginBuilder? builder;
   final ValueSetter<bool>? onResult;
+  final String clientId;
+  final String issuer;
+  final String scopes;
+  final String signInRedirectUrl;
+  final String signOutRedirectUrl;
   final channel = const EventChannel(
       "dev.hypersense.software.hss_okta.channels.browser_signin");
 
-  const HssOktaBrowserSignInWidget({super.key, this.builder, this.onResult});
+  const HssOktaBrowserSignInWidget({
+    Key? key,
+    this.builder,
+    this.onResult,
+    required this.clientId,
+    required this.issuer,
+    required this.scopes,
+    required this.signInRedirectUrl,
+    required this.signOutRedirectUrl,
+  }) : super(key: key);
 
   Stream<bool> get browserSigninStream {
     return channel.receiveBroadcastStream().map((event) => event);
@@ -25,7 +40,7 @@ class HssOktaBrowserSignInWidget extends StatelessWidget {
     /// iOS version
     return Column(
       children: [
-        Flexible(
+        Expanded(
           child: SizedBox(
             child: _platformView(),
           ),
@@ -36,7 +51,13 @@ class HssOktaBrowserSignInWidget extends StatelessWidget {
 
   Widget? _platformView() {
     // This is used in the platform side to register the view.
-    const Map<String, dynamic> creationParams = <String, dynamic>{};
+    Map<String, dynamic> creationParams = <String, dynamic>{
+      'clientId': clientId,
+      'issuer': issuer,
+      'scopes': scopes,
+      'signInRedirectUrl': signInRedirectUrl,
+      'signOutRedirectUrl': signOutRedirectUrl,
+    };
 
     switch (defaultTargetPlatform) {
       case TargetPlatform.linux:
@@ -52,18 +73,33 @@ class HssOktaBrowserSignInWidget extends StatelessWidget {
       /// TODO: Use Hybrid composition for Android
       /// TLHC is still under investigation
       case TargetPlatform.android:
-        return const SizedBox.shrink();
+        return AndroidWebSignIn(
+          creationParams: creationParams,
+          onPlatformViewCreated: (i) {
+            browserSigninStream.listen((event) async {
+              if (event) {
+                onResult?.call(true);
+              }
+            }, onError: (e) {
+              debugPrint('$e');
+              onResult?.call(false);
+            });
+          },
+        );
       case TargetPlatform.iOS:
         return UiKitView(
           viewType: _viewType,
           layoutDirection: TextDirection.ltr,
-          creationParams: const {},
+          creationParams: creationParams,
           creationParamsCodec: const StandardMessageCodec(),
           onPlatformViewCreated: (i) {
             browserSigninStream.listen((event) async {
               if (event) {
                 onResult?.call(true);
               }
+            }, onError: (e) {
+              debugPrint('$e');
+              onResult?.call(false);
             });
           },
         );
@@ -72,15 +108,18 @@ class HssOktaBrowserSignInWidget extends StatelessWidget {
 }
 
 class AndroidWebSignIn extends StatefulWidget {
-  const AndroidWebSignIn({super.key});
-
+  const AndroidWebSignIn({
+    required this.creationParams,
+    required this.onPlatformViewCreated,
+    super.key,
+  });
+  final Map<String, dynamic> creationParams;
+  final void Function(int id) onPlatformViewCreated;
   @override
   State<AndroidWebSignIn> createState() => _AndroidWebSignInState();
 }
 
 class _AndroidWebSignInState extends State<AndroidWebSignIn> {
-  static const Map<String, dynamic> creationParams = <String, dynamic>{};
-
   @override
   void initState() {
     super.initState();
@@ -102,13 +141,16 @@ class _AndroidWebSignInState extends State<AndroidWebSignIn> {
           id: params.id,
           viewType: _viewType,
           layoutDirection: TextDirection.ltr,
-          creationParams: creationParams,
+          creationParams: widget.creationParams,
           creationParamsCodec: const StandardMessageCodec(),
           onFocus: () {
             params.onFocusChanged(true);
           },
         )
-          ..addOnPlatformViewCreatedListener(params.onPlatformViewCreated)
+          ..addOnPlatformViewCreatedListener((int listener) {
+            params.onPlatformViewCreated(listener);
+            widget.onPlatformViewCreated.call(listener);
+          })
           ..create();
         return platformView;
       },

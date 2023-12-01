@@ -46,16 +46,16 @@ class HssOktaFlutter {
     return result;
   }
 
-  void init(
-    String clientid,
-    String signInRedirectUrl,
-    String signOutRedirectUrl,
-    String issuer,
-    String scopes,
-  ) {
+  void init({
+    required String clientId,
+    required String signInRedirectUrl,
+    required String signOutRedirectUrl,
+    required String issuer,
+    required String scopes,
+  }) {
     try {
       HssOktaFlutterPluginPlatform.instance.init(
-        clientid,
+        clientId,
         signInRedirectUrl,
         signOutRedirectUrl,
         issuer,

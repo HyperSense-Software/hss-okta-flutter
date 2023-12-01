@@ -1,6 +1,7 @@
 package dev.hypersense.software.hss_okta_flutter
 
 
+import android.app.Activity
 import android.content.Context
 import com.okta.authfoundation.claims.*
 import com.okta.authfoundation.client.OidcClient
@@ -10,6 +11,7 @@ import com.okta.authfoundation.credential.CredentialDataSource.Companion.createC
 import com.okta.authfoundationbootstrap.*
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import com.okta.oauth2.ResourceOwnerFlow.Companion.createResourceOwnerFlow
+import com.okta.webauthenticationui.WebAuthenticationClient.Companion.createWebAuthenticationClient
 import dev.hypersense.software.hss_okta.AuthenticationResult
 import dev.hypersense.software.hss_okta.DirectAuthRequest
 import dev.hypersense.software.hss_okta.HssOktaFlutterPluginApi
@@ -25,15 +27,21 @@ import kotlinx.coroutines.launch
 import okhttp3.HttpUrl.Companion.toHttpUrl
 
 const val SIGN_IN_EVENT_VIEW_TYPE = "dev.hypersense.software.hss_okta.views.browser.signin"
-class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
+const val SIGN_OUT_EVENT_VIEW_TYPE = "dev.hypersense.software.hss_okta.views.browser.signout"
+class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin,ActivityAware{
     var context : Context? = null
     private lateinit var oidcClient: OidcClient;
+    private var flutterActivity: Activity? = null
     override fun onAttachedToEngine(binding: FlutterPlugin.FlutterPluginBinding) {
         binding
             .platformViewRegistry
-            .registerViewFactory(SIGN_IN_EVENT_VIEW_TYPE, HssOktaFlutterWebSignInFactory())
+            .registerViewFactory(SIGN_IN_EVENT_VIEW_TYPE, HssOktaFlutterWebSignInNativeView(binding.binaryMessenger))
 
-            context = binding.applicationContext
+        binding
+            .platformViewRegistry
+            .registerViewFactory(SIGN_OUT_EVENT_VIEW_TYPE, HssOktaFlutterWebSignOutNativeView(binding.binaryMessenger))
+
+        context = binding.applicationContext
         try {
 
             HssOktaFlutterPluginApi.setUp(binding.binaryMessenger, this)
@@ -200,4 +208,20 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
         }
     }
 
- }
+    override fun onAttachedToActivity(binding: ActivityPluginBinding) {
+        flutterActivity = binding.activity
+    }
+
+    override fun onDetachedFromActivityForConfigChanges() {
+        TODO("Not yet implemented")
+    }
+
+    override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
+        TODO("Not yet implemented")
+    }
+
+    override fun onDetachedFromActivity() {
+        TODO("Not yet implemented")
+    }
+
+}

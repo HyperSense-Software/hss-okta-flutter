@@ -4,6 +4,9 @@ plugins {
     id "dev.flutter.flutter-gradle-plugin"
 }
 
+def oktaProperties = new Properties()
+rootProject.file("okta.properties").withInputStream { oktaProperties.load(it) }
+
 def localProperties = new Properties()
 def localPropertiesFile = rootProject.file('local.properties')
 if (localPropertiesFile.exists()) {
@@ -40,6 +43,8 @@ android {
         main.java.srcDirs += 'src/main/kotlin'
     }
 
+
+
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId "dev.hypersense.software.hss_okta_flutter_example"
@@ -49,7 +54,16 @@ android {
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
+
+        buildConfigField "String", 'ISSUER', "\"${oktaProperties.getProperty('issuer')}\""
+        buildConfigField "String", 'CLIENT_ID', "\"${oktaProperties.getProperty('clientId')}\""
+        buildConfigField "String", 'SIGN_IN_REDIRECT_URI', "\"${oktaProperties.getProperty('signInRedirectUri')}\""
+        buildConfigField "String", 'SIGN_OUT_REDIRECT_URI', "\"${oktaProperties.getProperty('signOutRedirectUri')}\""
+       manifestPlaceholders += [webAuthenticationRedirectScheme: oktaProperties.getProperty('signInRedirectUri'),]
+        
     }
+
+
 
     buildTypes {
         release {
@@ -60,8 +74,20 @@ android {
     }
 }
 
+
+dependencies {
+
+}
+
 flutter {
     source '../..'
 }
 
-dependencies {}
+
+static def parseScheme(String uri) {
+    def index = uri.indexOf(':/')
+    if (index == -1) {
+        throw new IllegalStateException("Scheme is not in a valid format.")
+    }
+    return uri.substring(0, index)
+}
