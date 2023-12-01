@@ -24,7 +24,7 @@ class HssOktaFlutterWeb extends HssOktaFlutterWebPlatformInterface {
   ///  The authorization code, access, or ID Tokens will be available as parameters appended to this URL.
   ///  Values will be returned in either the search query or hash fragment portion of the URL depending on the responseMode
   ///
-  /// To process the result of the redirect, use the parseFromUrl method.
+  /// To process the result of the redirect, use the [parseFromUrl] method.
   Future<void> startRedirectAuthentication({AuthorizeOptions? options}) async {
     await promiseToFuture<void>(_auth.token.getWithRedirect(options));
   }
@@ -52,7 +52,6 @@ class HssOktaFlutterWeb extends HssOktaFlutterWebPlatformInterface {
   }
 
   /// Create token with a popup.
-
   Future<TokenResponse> startPopUpAuthentication(
       {AuthorizeOptions? options}) async {
     final res =
