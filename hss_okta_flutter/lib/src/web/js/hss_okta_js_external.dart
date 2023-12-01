@@ -151,6 +151,8 @@ class TokenManager {
   external void setTokens(Tokens tokens);
   external void remove(String key);
   external void clear();
+
+  /// Manually renew a token before it expires and update the stored value.
   external Future<void> renew(String key);
 
   /// A synchronous method which returns true if the token has expired.
