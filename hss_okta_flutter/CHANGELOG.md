@@ -44,3 +44,6 @@
 * Updated getToken to return Abstract token
 * Added Userclaims 
 * Added Userclaims to AbstractToken
+
+# 1.3.1
+* removed acces to OktaAuth JS Object

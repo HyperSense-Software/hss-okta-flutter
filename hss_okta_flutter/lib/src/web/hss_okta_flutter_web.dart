@@ -4,6 +4,9 @@ import 'package:hss_okta_flutter/src/web/hss_okta_flutter_web_platform_interface
 import 'package:hss_okta_flutter/src/web/js/hss_okta_js_external.dart';
 import 'package:js/js_util.dart';
 
+/// Wrapper for Okta Auth JS for Flutter/Dart Web
+///
+/// Intialize using [initializeClient] method with [OktaConfig] object before using other methods.
 class HssOktaFlutterWeb extends HssOktaFlutterWebPlatformInterface {
   static void registerWith(Registrar registrar) {
     HssOktaFlutterWebPlatformInterface.instance = HssOktaFlutterWeb();
@@ -11,13 +14,7 @@ class HssOktaFlutterWeb extends HssOktaFlutterWebPlatformInterface {
 
   late OktaAuth _auth;
 
-  /// Getter for the OktaAuth JS Object
-  ///
-  /// For general use, You should use the methods provided by this class instead of accessing the JS object directly.
-  OktaAuth? get oktaAuth => _auth;
-
   /// Initialize the Okta client with the provided configuration.
-
   Future<void> initializeClient({required OktaConfig oktaConfig}) async {
     _auth = OktaAuth(oktaConfig);
   }
