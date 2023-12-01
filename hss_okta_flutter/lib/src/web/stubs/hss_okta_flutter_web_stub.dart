@@ -21,7 +21,7 @@ class HssOktaFlutterWeb {
     throw UnimplementedError();
   }
 
-  Future<Map> getUserInfo({
+  Future<UserClaims> getUserInfo({
     AccessToken? accessTokenObject,
     IDToken? idTokenObject,
   }) =>

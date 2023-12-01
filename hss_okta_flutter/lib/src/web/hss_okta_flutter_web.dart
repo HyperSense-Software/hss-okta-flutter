@@ -145,15 +145,14 @@ class HssOktaFlutterWeb extends HssOktaFlutterWebPlatformInterface {
   ///  It is assumed that the access token is stored using the key "accessToken" and the ID token is stored under the key "idToken".
   ///  If you have stored either token in a non-standard location, this logic can be skipped by passing the access and ID token objects directly.
 
-  Future<Map> getUserInfo(
+  Future<UserClaims> getUserInfo(
       {AccessToken? accessTokenObject, IDToken? idTokenObject}) async {
     final res = await promiseToFuture(_auth.token.getUserInfo(
       accessTokenObject,
       idTokenObject,
     ));
-    final jsObject = dartify(res);
 
-    return jsObject as Map;
+    return res;
   }
 
   Future<TokenResponse> renewToken({required String refreshToken}) {
