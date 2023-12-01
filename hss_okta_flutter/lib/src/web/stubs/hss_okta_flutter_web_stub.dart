@@ -21,9 +21,11 @@ class HssOktaFlutterWeb {
     throw UnimplementedError();
   }
 
-  Future<TokenResponse> getUserInfo({required String accessToken}) {
-    throw UnimplementedError();
-  }
+  Future<Map> getUserInfo({
+    AccessToken? accessTokenObject,
+    IDToken? idTokenObject,
+  }) =>
+      throw UnimplementedError();
 
   Future<void> initializeClient({required OktaConfig oktaConfig}) {
     throw UnimplementedError();
@@ -39,7 +41,7 @@ class HssOktaFlutterWeb {
 
   void removeToken(String key) => throw UnimplementedError();
 
-  Future<TokenResponse> renew(String tokenToRenew) {
+  Future<TokenResponse> renew(AbstractToken tokenToRenew) {
     throw UnimplementedError();
   }
 
@@ -54,4 +56,11 @@ class HssOktaFlutterWeb {
   Future<void> startRedirectAuthentication({AuthorizeOptions? options}) {
     throw UnimplementedError();
   }
+
+  void setTokens(Tokens tokens) => throw UnimplementedError();
+
+  Future<Tokens> getTokens(Tokens tokens) => throw UnimplementedError();
+
+  Future<bool> hasTokenExpired(AbstractToken token) async =>
+      throw UnimplementedError();
 }
