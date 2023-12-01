@@ -45,6 +45,8 @@ class OktaAuth {
   /// Revokes the refresh token (if any) for this application so it can no longer be used to mint new tokens. The [refreshToken] parameter is optional. By default, revokeRefreshToken will look for a token object named refreshToken within the TokenManager. If you have stored the refresh token object in a different location, you should retrieve it first and then pass it here. Returns a promise that resolves when the operation has completed. This method will succeed even if the refresh token has already been revoked or removed.
   Future revokeRefreshToken(RefreshToken refreshToken) =>
       throw UnimplementedError();
+
+  Future getUser() => throw UnimplementedError();
 }
 
 class OktaConfig {

@@ -171,4 +171,9 @@ class HssOktaFlutterWeb extends HssOktaFlutterWebPlatformInterface {
   Future<void> revokeRefreshToken(RefreshToken refreshToken) async {
     await promiseToFuture(_auth.revokeRefreshToken(refreshToken));
   }
+
+  Future<UserClaims> getUser() async {
+    final res = await promiseToFuture(_auth.getUser());
+    return res;
+  }
 }

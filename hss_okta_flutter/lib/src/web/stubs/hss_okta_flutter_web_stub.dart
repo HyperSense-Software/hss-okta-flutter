@@ -63,4 +63,6 @@ class HssOktaFlutterWeb {
 
   Future<bool> hasTokenExpired(AbstractToken token) async =>
       throw UnimplementedError();
+
+  Future<UserClaims> getUser() => throw UnimplementedError();
 }

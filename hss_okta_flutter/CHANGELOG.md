@@ -50,3 +50,4 @@
 * Changed return type of getUserInfo to UserClaims
 * Added revoke AccessToken
 * Added revoke RefreshToken
+* Added Alias of getUserInfo
