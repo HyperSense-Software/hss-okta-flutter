@@ -31,6 +31,12 @@ class OktaAuth {
 
   ///Returns the id token string retrieved from [AuthState] if it exists.
   external String getIdToken();
+
+  /// Revokes the access token for this application so it can no longer be used to authenticate API requests. The [accessToken] parameter is optional. By default, revokeAccessToken will look for a token object named accessToken within the TokenManager. If you have stored the access token object in a different location, you should retrieve it first and then pass it here. Returns a promise that resolves when the operation has completed. This method will succeed even if the access token has already been revoked or removed.
+  external Future revokeAccessToken(AccessToken accessToken);
+
+  /// Revokes the refresh token (if any) for this application so it can no longer be used to mint new tokens. The [refreshToken] parameter is optional. By default, revokeRefreshToken will look for a token object named refreshToken within the TokenManager. If you have stored the refresh token object in a different location, you should retrieve it first and then pass it here. Returns a promise that resolves when the operation has completed. This method will succeed even if the refresh token has already been revoked or removed.
+  external Future revokeRefreshToken(RefreshToken refreshToken);
 }
 
 /// Used With [OktaAuth]'s Initializer

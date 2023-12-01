@@ -48,3 +48,5 @@
 # 1.3.1
 * removed acces to OktaAuth JS Object
 * Changed return type of getUserInfo to UserClaims
+* Added revoke AccessToken
+* Added revoke RefreshToken
