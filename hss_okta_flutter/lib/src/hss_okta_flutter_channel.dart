@@ -1,6 +1,9 @@
 import 'package:hss_okta_flutter/src/generated/hss_okta_flutter.g.dart';
 import 'package:hss_okta_flutter/src/hss_okta_platform_interface.dart';
 
+/// {@template hss_okta_flutter_channel}
+/// A Flutter channel for calling methods by their platform name
+/// {@endtemplate}
 class HssOktaFlutterChannel extends HssOktaFlutterPlatformInterface {
   final _api = HssOktaFlutterPluginApi();
 
