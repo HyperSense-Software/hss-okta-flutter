@@ -98,15 +98,17 @@ class Token {
 }
 
 class AuthorizeOptions {
-  AuthorizeOptions({
-    List<String>? responseType,
-    String? sessionToken,
-    List<String>? scopes,
-  });
-
-  List<String>? responseType;
-  String? sessionToken;
-  List<String>? scopes;
+  external factory AuthorizeOptions(
+      {List<String>? responseType,
+      String? sessionToken,
+      List<String>? scopes,
+      String? nonce,
+      String? state,
+      String? idp,
+      String? prompt,
+      int? maxAge,
+      String? loginHint,
+      String? display});
 }
 
 class Tokens {

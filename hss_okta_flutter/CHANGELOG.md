@@ -54,3 +54,4 @@
 * Added removeOriginalUri,getOriginalUri, and setOriginalUri to OktaAuth
 * Added handleRedirect for OktaAuth
 * Added setHeaders to OktaAuth
+* Added other AuthorizeOptions arguments

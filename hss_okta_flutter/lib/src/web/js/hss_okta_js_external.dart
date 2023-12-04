@@ -3,6 +3,9 @@
 library hss_okta_js;
 
 // import 'package:js/js.dart';
+import 'dart:js';
+import 'dart:js_interop';
+
 import 'package:js/js.dart';
 
 /// The Http Client used for all the Okta API calls
@@ -175,15 +178,50 @@ class TokenManager {
 }
 
 /// Options used in getWithPopup and getWithRedirect
+///
+/// [responseType] - Specify the response type for OIDC authentication when using the Implicit OAuth Flow.
+///  The default value is ['token', 'id_token'] which will request both an access token and ID token.
+///  If pkce is true, both the access and ID token will be requested and this option will be ignored.
+///
+/// [scopes] - Specify what information to make available in the returned id_token or access_token.
+///  For OIDC, you must include openid as one of the scopes. Defaults to ['openid', 'email'].
+///
+///[idp] - Identity provider to use if there is no Okta Session.
+///
+///[state] - A string that will be passed to /authorize endpoint and returned in the OAuth response.
+/// The value is used to validate the OAuth response and prevent cross-site request forgery (CSRF).
+///  The state value passed to getWithRedirect will be returned along with any requested tokens from parseFromUrl.
+///  Your app can use this string to perform additional validation and/or pass information from the login page. Defaults to a random string.
+///
+///[nonce] - Specify a nonce that will be validated in an id_token.
+/// This is usually only provided during redirect flows to obtain an authorization code that will be exchanged for an id_token.
+///  Defaults to a random string.
+///
+///[prompt] - Determines whether the Okta login will be displayed on failure. Use none to prevent this behavior.
+/// Valid values: none, consent, login, or consent login.
+///
+///[loginHint] - Provides a hint indicating the user's email address or username.
+/// The hint will be used to either pre-fill the email box on the login page or select the username tile on the login page.
+///
+/// [maxAge] -  	Allowable elapsed time, in seconds, since the last time the end user was actively authenticated by Okta.
+///
+/// [display] - 	The display parameter to be passed to the Social Identity Provider when performing Social Login.
+///
+/// [sessionToken] - Specify an Okta sessionToken to skip reauthentication when the user already authenticated using the Authentication Flow.
 @JS()
-@staticInterop
 @anonymous
 class AuthorizeOptions {
-  external factory AuthorizeOptions({
-    List<String>? responseType,
-    String? sessionToken,
-    List<String>? scopes,
-  });
+  external factory AuthorizeOptions(
+      {JsArray? responseType,
+      String? sessionToken,
+      JSArray? scopes,
+      String? nonce,
+      String? state,
+      String? idp,
+      String? prompt,
+      int? maxAge,
+      String? loginHint,
+      String? display});
 }
 
 /// Extension Interop for [AuthorizeOptions]
