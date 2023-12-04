@@ -65,4 +65,8 @@ class HssOktaFlutterWeb {
       throw UnimplementedError();
 
   Future<UserClaims> getUser() => throw UnimplementedError();
+
+  void removeOriginalUri() => throw UnimplementedError();
+  void setOriginalUri() => throw UnimplementedError();
+  void getOriginalUri() => throw UnimplementedError();
 }

@@ -40,6 +40,15 @@ class OktaAuth {
 
   ///Alias method of token.getUserInfo.
   external Future getUser();
+
+  ///Stores the current URL state before a redirect occurs.
+  external void setOriginalUri(String uri);
+
+  /// Removes the stored URI string stored by [setOriginalUri] from storage
+  external void removeOriginalUri();
+
+  /// Returns the stored URI string stored by [setOriginalUri].
+  external String getOriginalUri();
 }
 
 /// Used With [OktaAuth]'s Initializer

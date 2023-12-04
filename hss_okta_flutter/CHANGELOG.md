@@ -51,3 +51,4 @@
 * Added revoke AccessToken
 * Added revoke RefreshToken
 * Added Alias of getUserInfo
+* Added removeOriginalUri,getOriginalUri, and setOriginalUri to OktaAuth

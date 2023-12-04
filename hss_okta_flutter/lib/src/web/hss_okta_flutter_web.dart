@@ -176,4 +176,16 @@ class HssOktaFlutterWeb extends HssOktaFlutterWebPlatformInterface {
     final res = await promiseToFuture(_auth.getUser());
     return res;
   }
+
+  void removeOriginalUri() {
+    _auth.removeOriginalUri();
+  }
+
+  void setOriginalUri(String uri) {
+    _auth.setOriginalUri(uri);
+  }
+
+  String getOriginalUri() {
+    return _auth.getOriginalUri();
+  }
 }

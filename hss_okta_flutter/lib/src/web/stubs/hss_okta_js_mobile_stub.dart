@@ -47,6 +47,10 @@ class OktaAuth {
       throw UnimplementedError();
 
   Future getUser() => throw UnimplementedError();
+
+  void setOriginalUri(String uri) => throw UnimplementedError();
+  void removeOriginalUri() => throw UnimplementedError();
+  void getOriginalUri() => throw UnimplementedError();
 }
 
 class OktaConfig {
