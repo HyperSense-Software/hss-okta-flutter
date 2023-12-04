@@ -1,61 +1,79 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/foundation.dart';
+import 'package:hss_okta_flutter/hss_okta_flutter.dart';
 
-typedef AuthBrowserLoginBuilder = Widget Function(
-    BuildContext context, Widget child);
-
+///{@template browser_sign_in_widget}
+///
 /// Provides the native platform view for the browser signin
-/// returns a [Stream<bool>] which emits true when the user has successfully signed in,
-/// the [Credential] will be saved as teh default
+/// returns a [Stream<bool>] which emits true when the user has successfully
+/// signed in,
+/// the [AuthenticationResult] will be saved as the default.
+///{@endtemplate}
 class HssOktaBrowserSignInWidget extends StatelessWidget {
-  final AuthBrowserLoginBuilder? builder;
+  ///{@macro browser_sign_in_widget}
+  const HssOktaBrowserSignInWidget({
+    super.key,
+    this.builder,
+    this.onResult,
+    this.onError,
+  });
+
+  /// Called when the native view is created.
+  final AuthBrowserBuilder? builder;
+
+  /// Called when the user has successfully signed in or not.
   final ValueSetter<bool>? onResult;
+
+  /// Called when an error occurs.
   final ValueSetter<Object>? onError;
 
-  final channel = const EventChannel(
-      "dev.hypersense.software.hss_okta.channels.browser_signin");
-  final platformViewName =
+  final _channel = const EventChannel(
+    'dev.hypersense.software.hss_okta.channels.browser_signin',
+  );
+  final _platformViewName =
       'dev.hypersense.software.hss_okta.views.browser.signin';
-  const HssOktaBrowserSignInWidget(
-      {super.key, this.builder, this.onResult, this.onError});
 
-  Stream<bool> get browserSigninStream {
-    return channel.receiveBroadcastStream().map((event) => event);
+  Stream<bool> get _browserSigninStream {
+    return _channel
+        .receiveBroadcastStream()
+        .map<bool>((event) => event as bool);
   }
 
   Widget get _iosNativeView {
     return SizedBox.shrink(
       child: UiKitView(
-        viewType: platformViewName,
+        viewType: _platformViewName,
         layoutDirection: TextDirection.ltr,
-        creationParams: const {},
         creationParamsCodec: const StandardMessageCodec(),
         onPlatformViewCreated: (i) {
-          browserSigninStream.listen((event) async {
-            if (event) {
-              onResult?.call(true);
-            }
-          }, onError: onError ?? (e) => throw e);
+          _browserSigninStream.listen(
+            (event) async {
+              if (event) {
+                onResult?.call(true);
+              }
+            },
+            onError: onError ?? (Exception e) => throw e,
+          );
         },
       ),
     );
   }
 
   Widget get _andrdoidNativeView {
-    final Map<String, dynamic> creationParams = <String, dynamic>{};
-
     return AndroidView(
-      viewType: platformViewName,
+      viewType: _platformViewName,
       layoutDirection: TextDirection.ltr,
-      creationParams: creationParams,
       creationParamsCodec: const StandardMessageCodec(),
       onPlatformViewCreated: (id) {
-        browserSigninStream.listen((event) async {
-          if (event) {
-            onResult?.call(true);
-          }
-        }, onError: onError ?? (e) => throw e);
+        _browserSigninStream.listen(
+          (event) async {
+            if (event) {
+              onResult?.call(true);
+            }
+          },
+          onError: onError ?? (Exception e) => throw e,
+        );
       },
     );
   }
@@ -67,13 +85,18 @@ class HssOktaBrowserSignInWidget extends StatelessWidget {
       return _andrdoidNativeView;
     } else {
       throw UnsupportedError(
-          "The platform ${defaultTargetPlatform.toString()} is not supported.");
+        'The platform $defaultTargetPlatform is not supported.',
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (builder != null) return builder!(context, _nativeView);
+    /// Removed after 3.16:
+    /// current sdk version not allow condition flow for constructors
+    final builder = this.builder;
+
+    if (builder != null) return builder.call(context, _nativeView);
 
     return _nativeView;
   }
