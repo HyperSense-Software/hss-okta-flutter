@@ -69,4 +69,9 @@ class HssOktaFlutterWeb {
   void removeOriginalUri() => throw UnimplementedError();
   void setOriginalUri() => throw UnimplementedError();
   void getOriginalUri() => throw UnimplementedError();
+
+  Future<void> handleRedirect({String? originalUri}) =>
+      throw UnimplementedError();
+
+  void setHeaders(Object headers) => throw UnimplementedError();
 }

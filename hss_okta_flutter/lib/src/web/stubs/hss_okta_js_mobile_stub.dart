@@ -51,6 +51,8 @@ class OktaAuth {
   void setOriginalUri(String uri) => throw UnimplementedError();
   void removeOriginalUri() => throw UnimplementedError();
   void getOriginalUri() => throw UnimplementedError();
+
+  void setHeaders(Object headers) => throw UnimplementedError();
 }
 
 class OktaConfig {

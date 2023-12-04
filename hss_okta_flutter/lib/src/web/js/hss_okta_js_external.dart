@@ -49,6 +49,9 @@ class OktaAuth {
 
   /// Returns the stored URI string stored by [setOriginalUri].
   external String getOriginalUri();
+
+  /// Can set (or unset) request headers after construction.
+  external void setHeaders(Object headers);
 }
 
 /// Used With [OktaAuth]'s Initializer

@@ -177,15 +177,34 @@ class HssOktaFlutterWeb extends HssOktaFlutterWebPlatformInterface {
     return res;
   }
 
+  ///Removes the stored URI string stored by [setOriginalUri] from storage.
   void removeOriginalUri() {
     _auth.removeOriginalUri();
   }
 
+  /// Stores the current URL state before a redirect occurs.
   void setOriginalUri(String uri) {
     _auth.setOriginalUri(uri);
   }
 
+  /// Returns the stored URI string stored by [setOriginalUri].
+
   String getOriginalUri() {
     return _auth.getOriginalUri();
+  }
+
+  /// Handle a redirect to the configured redirectUri that happens on the end of login flow, enroll authenticator flow or on an error.
+  ///Stores tokens from redirect url into storage (for login flow), then redirect users back to the originalUri.
+  /// When using PKCE authorization code flow, this method also exchanges authorization code for tokens.
+  ///
+  ///  By default it calls window.location.replace for the redirection.
+  ///  The default behavior can be overrided by providing options.restoreOriginalUri. By default, originalUri will be retrieved from storage, but this can be overridden by specifying originalUri in the first parameter to this function.
+  Future<void> handleRedirect({String? originalUri}) async {
+    await _auth.handleRedirect(originalUri);
+  }
+
+  ///Can set (or unset) request headers after construction.
+  void setHeaders(Map<String, String> headers) {
+    _auth.setHeaders(jsify(headers));
   }
 }
