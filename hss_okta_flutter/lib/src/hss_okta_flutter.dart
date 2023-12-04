@@ -33,9 +33,9 @@ class HssOktaFlutter {
   Future<AuthenticationResult?> startDirectAuthenticationFlow({
     required String email,
     required String password,
-    required List<OktaSignInFactor> factors,
+    required List<AuthenticationFactor> factors,
   }) async {
-    final factorString = factors.map((e) => e.factor).toList();
+    final factorString = factors.map((e) => e.name).toList();
 
     final result = await _instance.startDirectAuthenticationFlow(
       DirectAuthRequest(
