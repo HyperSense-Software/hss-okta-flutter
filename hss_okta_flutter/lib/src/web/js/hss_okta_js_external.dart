@@ -3,8 +3,6 @@
 library hss_okta_js;
 
 // import 'package:js/js.dart';
-import 'dart:js';
-import 'dart:js_interop';
 
 import 'package:js/js.dart';
 
@@ -180,11 +178,11 @@ class TokenManager {
 /// Options used in getWithPopup and getWithRedirect
 ///
 /// [responseType] - Specify the response type for OIDC authentication when using the Implicit OAuth Flow.
-///  The default value is ['token', 'id_token'] which will request both an access token and ID token.
+///  The default value is 'token', 'id_token' which will request both an access token and ID token.
 ///  If pkce is true, both the access and ID token will be requested and this option will be ignored.
 ///
 /// [scopes] - Specify what information to make available in the returned id_token or access_token.
-///  For OIDC, you must include openid as one of the scopes. Defaults to ['openid', 'email'].
+///  For OIDC, you must include openid as one of the scopes. Defaults to 'openid', 'email'.
 ///
 ///[idp] - Identity provider to use if there is no Okta Session.
 ///
@@ -212,9 +210,9 @@ class TokenManager {
 @anonymous
 class AuthorizeOptions {
   external factory AuthorizeOptions(
-      {JsArray? responseType,
+      {List<String>? responseType,
       String? sessionToken,
-      JSArray? scopes,
+      List<String>? scopes,
       String? nonce,
       String? state,
       String? idp,
