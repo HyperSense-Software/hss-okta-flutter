@@ -1,5 +1,6 @@
-import 'package:flutter_web_plugins/flutter_web_plugins.dart';
+import 'dart:async';
 
+import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:hss_okta_flutter/src/web/hss_okta_flutter_web_platform_interface.dart';
 import 'package:hss_okta_flutter/src/web/js/hss_okta_js_external.dart';
 import 'package:js/js_util.dart';
@@ -59,6 +60,7 @@ class HssOktaFlutterWeb extends HssOktaFlutterWebPlatformInterface {
       {AuthorizeOptions? options}) async {
     final res =
         await promiseToFuture<TokenResponse>(_auth.token.getWithPopup(options));
+
     return res;
   }
 
@@ -165,4 +167,12 @@ class HssOktaFlutterWeb extends HssOktaFlutterWebPlatformInterface {
 
   Future<bool> hasTokenExpired(AbstractToken token) async =>
       _auth.tokenManager.hasExpired(token);
+
+  void subscribe(void Function(AuthState authState) cb) {
+    _auth.authStateManager.subscribe(allowInterop(cb));
+  }
+
+  void unsubscribe(void Function(AuthState? authState) cb) {
+    _auth.authStateManager.unsubscribe(allowInterop(cb));
+  }
 }

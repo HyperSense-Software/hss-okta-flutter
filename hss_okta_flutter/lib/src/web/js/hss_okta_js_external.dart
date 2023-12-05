@@ -3,6 +3,8 @@
 library hss_okta_js;
 
 // import 'package:js/js.dart';
+import 'dart:js';
+
 import 'package:js/js.dart';
 
 /// The Http Client used for all the Okta API calls
@@ -11,6 +13,10 @@ class OktaAuth {
   external factory OktaAuth(OktaConfig options);
   external Token get token;
   external TokenManager get tokenManager;
+
+  external AuthStateManager get authStateManager;
+
+  external ServiceManager get serviceManager;
 
   /// Parses tokens from the redirect url and stores them.
   external Future<void> storeTokensFromRedirect();
@@ -149,6 +155,34 @@ class TokenManager {
   ///  However, when the app first loads this background process may not have completed,
   ///  so there is a chance that an expired token may exist in storage. This method can be called to avoid this potential race condition.
   external bool hasExpired(AbstractToken token);
+
+  @JS('on')
+  external void onError(
+    String event,
+    void Function(TokenManagerError error) handler,
+    JsObject context,
+  );
+
+  @JS('on')
+  external void onSetStorage(
+    String event,
+    void Function(String key, AbstractToken token) handler,
+    JsObject context,
+  );
+
+  ///
+  external void on(
+    String event,
+    void Function(String key, AbstractToken token) handler,
+    JsObject context,
+  );
+
+  @JS('on')
+  external void onRenewed(
+    String event,
+    Function(String key, AbstractToken token, AbstractToken oldToken) handler,
+    JsObject context,
+  );
 }
 
 /// Options used in getWithPopup and getWithRedirect
@@ -191,17 +225,32 @@ class Tokens {
   external IDToken? idToken;
 }
 
+@JS()
+class TokenManagerError {
+  external String name;
+  external String message;
+  external String errorCode;
+  external String errorSummary;
+  external String errorLink;
+  external String errorId;
+  external String errorCauses;
+}
+
 ///AuthStateManager evaluates and emits AuthState based on the events from TokenManager for downstream clients to consume.
 @JS()
 class AuthStateManager {
   external Future<AuthState?> getAuthState();
+
+  external void subscribe(void Function(AuthState authState) callback);
+  external void unsubscribe(void Function(AuthState? authState) callback);
+  external Future<AuthState> updateAuthState();
 }
 
 @JS()
 class AuthState {
   external bool isAuthenticated;
-  external String accessToken;
-  external String idToken;
+  external AccessToken accessToken;
+  external IDToken idToken;
   external String error;
 }
 
@@ -301,4 +350,11 @@ class UserClaims {
   @JS('at_hash')
   external String atHash;
   external String acr;
+}
+
+@JS()
+class ServiceManager {
+  external void registerService(String name, dynamic service);
+  external void unregisterService(String name);
+  external dynamic getService(String name);
 }
