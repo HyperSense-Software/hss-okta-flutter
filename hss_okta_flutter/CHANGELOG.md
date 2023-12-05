@@ -44,3 +44,14 @@
 * Updated getToken to return Abstract token
 * Added Userclaims 
 * Added Userclaims to AbstractToken
+
+# 1.3.1
+* removed acces to OktaAuth JS Object
+* Changed return type of getUserInfo to UserClaims
+* Added revoke AccessToken
+* Added revoke RefreshToken
+* Added Alias of getUserInfo
+* Added removeOriginalUri,getOriginalUri, and setOriginalUri to OktaAuth
+* Added handleRedirect for OktaAuth
+* Added setHeaders to OktaAuth
+* Added other AuthorizeOptions arguments

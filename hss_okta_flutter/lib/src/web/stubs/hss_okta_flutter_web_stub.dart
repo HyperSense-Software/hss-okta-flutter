@@ -21,7 +21,7 @@ class HssOktaFlutterWeb {
     throw UnimplementedError();
   }
 
-  Future<Map> getUserInfo({
+  Future<UserClaims> getUserInfo({
     AccessToken? accessTokenObject,
     IDToken? idTokenObject,
   }) =>
@@ -63,4 +63,15 @@ class HssOktaFlutterWeb {
 
   Future<bool> hasTokenExpired(AbstractToken token) async =>
       throw UnimplementedError();
+
+  Future<UserClaims> getUser() => throw UnimplementedError();
+
+  void removeOriginalUri() => throw UnimplementedError();
+  void setOriginalUri() => throw UnimplementedError();
+  void getOriginalUri() => throw UnimplementedError();
+
+  Future<void> handleRedirect({String? originalUri}) =>
+      throw UnimplementedError();
+
+  void setHeaders(Object headers) => throw UnimplementedError();
 }

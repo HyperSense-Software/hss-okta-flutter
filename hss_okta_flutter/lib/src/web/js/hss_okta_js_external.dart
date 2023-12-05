@@ -3,6 +3,7 @@
 library hss_okta_js;
 
 // import 'package:js/js.dart';
+
 import 'package:js/js.dart';
 
 /// The Http Client used for all the Okta API calls
@@ -31,6 +32,27 @@ class OktaAuth {
 
   ///Returns the id token string retrieved from [AuthState] if it exists.
   external String getIdToken();
+
+  /// Revokes the access token for this application so it can no longer be used to authenticate API requests. The [accessToken] parameter is optional. By default, revokeAccessToken will look for a token object named accessToken within the TokenManager. If you have stored the access token object in a different location, you should retrieve it first and then pass it here. Returns a promise that resolves when the operation has completed. This method will succeed even if the access token has already been revoked or removed.
+  external Future revokeAccessToken(AccessToken accessToken);
+
+  /// Revokes the refresh token (if any) for this application so it can no longer be used to mint new tokens. The [refreshToken] parameter is optional. By default, revokeRefreshToken will look for a token object named refreshToken within the TokenManager. If you have stored the refresh token object in a different location, you should retrieve it first and then pass it here. Returns a promise that resolves when the operation has completed. This method will succeed even if the refresh token has already been revoked or removed.
+  external Future revokeRefreshToken(RefreshToken refreshToken);
+
+  ///Alias method of token.getUserInfo.
+  external Future getUser();
+
+  ///Stores the current URL state before a redirect occurs.
+  external void setOriginalUri(String uri);
+
+  /// Removes the stored URI string stored by [setOriginalUri] from storage
+  external void removeOriginalUri();
+
+  /// Returns the stored URI string stored by [setOriginalUri].
+  external String getOriginalUri();
+
+  /// Can set (or unset) request headers after construction.
+  external void setHeaders(Object headers);
 }
 
 /// Used With [OktaAuth]'s Initializer
@@ -142,6 +164,8 @@ class TokenManager {
   external void setTokens(Tokens tokens);
   external void remove(String key);
   external void clear();
+
+  /// Manually renew a token before it expires and update the stored value.
   external Future<void> renew(String key);
 
   /// A synchronous method which returns true if the token has expired.
@@ -152,15 +176,50 @@ class TokenManager {
 }
 
 /// Options used in getWithPopup and getWithRedirect
+///
+/// [responseType] - Specify the response type for OIDC authentication when using the Implicit OAuth Flow.
+///  The default value is 'token', 'id_token' which will request both an access token and ID token.
+///  If pkce is true, both the access and ID token will be requested and this option will be ignored.
+///
+/// [scopes] - Specify what information to make available in the returned id_token or access_token.
+///  For OIDC, you must include openid as one of the scopes. Defaults to 'openid', 'email'.
+///
+///[idp] - Identity provider to use if there is no Okta Session.
+///
+///[state] - A string that will be passed to /authorize endpoint and returned in the OAuth response.
+/// The value is used to validate the OAuth response and prevent cross-site request forgery (CSRF).
+///  The state value passed to getWithRedirect will be returned along with any requested tokens from parseFromUrl.
+///  Your app can use this string to perform additional validation and/or pass information from the login page. Defaults to a random string.
+///
+///[nonce] - Specify a nonce that will be validated in an id_token.
+/// This is usually only provided during redirect flows to obtain an authorization code that will be exchanged for an id_token.
+///  Defaults to a random string.
+///
+///[prompt] - Determines whether the Okta login will be displayed on failure. Use none to prevent this behavior.
+/// Valid values: none, consent, login, or consent login.
+///
+///[loginHint] - Provides a hint indicating the user's email address or username.
+/// The hint will be used to either pre-fill the email box on the login page or select the username tile on the login page.
+///
+/// [maxAge] -  	Allowable elapsed time, in seconds, since the last time the end user was actively authenticated by Okta.
+///
+/// [display] - 	The display parameter to be passed to the Social Identity Provider when performing Social Login.
+///
+/// [sessionToken] - Specify an Okta sessionToken to skip reauthentication when the user already authenticated using the Authentication Flow.
 @JS()
-@staticInterop
 @anonymous
 class AuthorizeOptions {
-  external factory AuthorizeOptions({
-    List<String>? responseType,
-    String? sessionToken,
-    List<String>? scopes,
-  });
+  external factory AuthorizeOptions(
+      {List<String>? responseType,
+      String? sessionToken,
+      List<String>? scopes,
+      String? nonce,
+      String? state,
+      String? idp,
+      String? prompt,
+      int? maxAge,
+      String? loginHint,
+      String? display});
 }
 
 /// Extension Interop for [AuthorizeOptions]
