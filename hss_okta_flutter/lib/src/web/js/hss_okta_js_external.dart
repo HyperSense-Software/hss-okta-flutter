@@ -7,6 +7,8 @@ import 'dart:js';
 
 import 'package:js/js.dart';
 
+import 'hss_okta_authn_js.dart';
+
 /// The Http Client used for all the Okta API calls
 @JS()
 class OktaAuth {
@@ -17,6 +19,20 @@ class OktaAuth {
   external AuthStateManager get authStateManager;
 
   external ServiceManager get serviceManager;
+  @Deprecated('use signInWithCredentials instead')
+  external Future<AuthnTransaction> signIn(SigninOptions opts);
+
+  external Future<AuthnTransaction> signInWithCredentials(
+    SigninWithCredentialsOptions opts,
+  );
+
+  external Future<bool?> signOut();
+
+  external Future<bool> closeSession();
+
+  external SessionAPI get session;
+
+  external Future<bool> isAuthenticated();
 
   /// Parses tokens from the redirect url and stores them.
   external Future<void> storeTokensFromRedirect();
@@ -58,18 +74,18 @@ class OktaConfig {
       String? clientSecret,
       String? responseType});
 
-  external String? issuer;
-  external String? clientId;
-  external String? redirectUri;
-  external String? scopes;
-  external String? state;
-  external bool? pkce;
-  external String? authorizeUrl;
-  external String? userinfoUrl;
-  external String? tokenUrl;
-  external String? revokeUrl;
-  external String? logoutUrl;
-  external String? responseType;
+  external String? get issuer;
+  external String? get clientId;
+  external String? get redirectUri;
+  external String? get scopes;
+  external String? get state;
+  external bool? get pkce;
+  external String? get authorizeUrl;
+  external String? get userinfoUrl;
+  external String? get tokenUrl;
+  external String? get revokeUrl;
+  external String? get logoutUrl;
+  external String? get responseType;
 
   /// For server-side web applications ONLY!
   external String? clientSecret;
@@ -80,6 +96,7 @@ class OktaConfig {
 class Token {
   /// Create token with a popup.
   external Future<TokenResponse> getWithPopup(AuthorizeOptions? options);
+  external Future<TokenResponse> getWithoutPrompt(AuthorizeOptions? options);
 
   /// Create token using a redirect.
   ///  After a successful authentication, the browser will be redirected to the configured redirectUri.
@@ -200,40 +217,40 @@ class AuthorizeOptions {
 /// Extension Interop for [AuthorizeOptions]
 extension AuthorizeOptionsExtension on AuthorizeOptions {
   /// Specify an Okta sessionToken to skip reauthentication when the user already authenticated using the Authentication Flow.
-  external List<String>? responseType;
+  external List<String>? get responseType;
 
   /// Specify the response type for OIDC authentication when using the Implicit OAuth Flow. The default value is 'token', 'id_token' which will request both an access token and ID token. If pkce is true, both the access and ID token will be requested and this option will be ignored.
-  external String? sessionToken;
+  external String? get sessionToken;
 
   ///Specify what information to make available in the returned id_token or access_token. For OIDC, you must include openid as one of the scopes. Defaults to 'openid', 'email'. For a list of available scopes, see Scopes and Claims.
-  external List<String>? scopes;
+  external List<String>? get scopes;
 }
 
 /// Web API Response from getWithPopup and getWithRedirect
 @JS()
 @anonymous
 class TokenResponse {
-  external Tokens tokens;
-  external String state;
-  external String? code;
+  external Tokens get tokens;
+  external String get state;
+  external String? get code;
 }
 
 /// Container for the two kinds of Token
 @JS()
 class Tokens {
-  external AccessToken? accessToken;
-  external IDToken? idToken;
+  external AccessToken? get accessToken;
+  external IDToken? get idToken;
 }
 
 @JS()
 class TokenManagerError {
-  external String name;
-  external String message;
-  external String errorCode;
-  external String errorSummary;
-  external String errorLink;
-  external String errorId;
-  external String errorCauses;
+  external String get name;
+  external String get message;
+  external String get errorCode;
+  external String get errorSummary;
+  external String get errorLink;
+  external String get errorId;
+  external String get errorCauses;
 }
 
 ///AuthStateManager evaluates and emits AuthState based on the events from TokenManager for downstream clients to consume.
@@ -243,24 +260,24 @@ class AuthStateManager {
 
   external void subscribe(void Function(AuthState authState) callback);
   external void unsubscribe(void Function(AuthState? authState) callback);
-  external Future<AuthState> updateAuthState();
+  external Future<AuthState?> updateAuthState();
 }
 
 @JS()
 class AuthState {
-  external bool isAuthenticated;
-  external AccessToken accessToken;
-  external IDToken idToken;
-  external String error;
+  external bool get isAuthenticated;
+  external AccessToken get accessToken;
+  external IDToken get idToken;
+  external String get error;
 }
 
 /// Superclass for [AccessToken], [IDToken], and [RefreshToken]
 @JS()
 abstract class AbstractToken {
-  external int expiresAt;
-  external String authorizeUrl;
-  external List<String> scopes;
-  external bool? pendingRemove;
+  external int get expiresAt;
+  external String get authorizeUrl;
+  external List<String> get scopes;
+  external bool? get pendingRemove;
 }
 
 /// An Access Token containing the user's Access token and UserInformation URL
@@ -277,10 +294,10 @@ class AccessToken extends AbstractToken {
     pendingRemove,
   });
 
-  external String accessToken;
-  external String tokenType;
-  external String userinfoUrl;
-  external UserClaims claims;
+  external String get accessToken;
+  external String get tokenType;
+  external String get userinfoUrl;
+  external UserClaims get claims;
 }
 
 /// An ID Token containing the user's ID token, issuer, and client ID
@@ -297,10 +314,10 @@ class IDToken extends AbstractToken {
     pendingRemove,
   });
 
-  external String idToken;
-  external String issuer;
-  external String clientId;
-  external UserClaims claims;
+  external String get idToken;
+  external String get issuer;
+  external String get clientId;
+  external UserClaims get claims;
 }
 
 @JS()
@@ -316,45 +333,64 @@ class RefreshToken extends AbstractToken {
     pendingRemove,
   });
 
-  external String refreshToken;
-  external String tokenUrl;
-  external String issuer;
+  external String get refreshToken;
+  external String get tokenUrl;
+  external String get issuer;
 }
 
 @JS()
 class UserClaims {
   @JS('auth_time')
-  external String authTtime;
-  external String aud;
-  external String email;
+  external String get authTtime;
+  external String get aud;
+  external String get email;
   @JS('email_verified')
-  external String emailVerified;
-  external String exp;
+  external String get emailVerified;
+  external String get exp;
   @JS('family_name')
-  external String familyName;
+  external String get familyName;
   @JS('given_name')
-  external String givenName;
-  external String iat;
-  external String iss;
-  external String jti;
-  external String locale;
-  external String name;
-  external String nonce;
+  external String get givenName;
+  external String get iat;
+  external String get iss;
+  external String get jti;
+  external String get locale;
+  external String get name;
+  external String get nonce;
   @JS('preferred_username')
-  external String preferredUsername;
-  external String sub;
+  external String get preferredUsername;
+  external String get sub;
   @JS('updated_at')
-  external String updatedAt;
-  external String ver;
-  external String zoneinfo;
+  external String get updatedAt;
+  external String get ver;
+  external String get zoneinfo;
   @JS('at_hash')
-  external String atHash;
-  external String acr;
+  external String get atHash;
+  external String get acr;
 }
 
 @JS()
 class ServiceManager {
-  external void registerService(String name, dynamic service);
+  external void registerService(String name, JsObject service);
   external void unregisterService(String name);
-  external dynamic getService(String name);
+  external JsObject getService(String name);
+}
+
+@JS()
+class SessionObject {
+  external String get status;
+  external Future<JsObject?> refresh();
+  external Future<JsObject?> user();
+}
+
+@JS()
+class SessionAPI {
+  external Future<JsObject?> close();
+  external Future<bool?> exists();
+  external Future<SessionObject> get();
+  external Future<JsObject?> refresh();
+  external void setCookieAndRedirect(
+    String? sessionToken,
+    String? redirectUrl,
+  );
 }

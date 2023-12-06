@@ -21,15 +21,23 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final TextEditingController _controller = TextEditingController();
+
   final TextEditingController _usernamecontroller = TextEditingController(
     text: '',
   );
-  final TextEditingController _passwordcontroller =
-      TextEditingController(text: '');
+
+  final TextEditingController _passwordcontroller = TextEditingController(
+    text: '',
+  );
+
   final PageController _pageController = PageController(initialPage: 0);
+
   AuthenticationResult? result;
+
   late final StreamController<AuthState> _authStateController;
+
   StreamSubscription<AuthState>? _streamSubscription;
+
   @override
   void initState() {
     _initStreams();
@@ -65,7 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _streamSubscription = _authStateController.stream.listen((authState) {
       final idToken = authState.idToken.idToken;
       final accessToken = authState.accessToken.accessToken;
-      Navigator.of(context).pushReplacement(
+      Navigator.of(context).push(
         MaterialPageRoute(
           builder: (c) => WebProfileScreen(
             token: idToken,
@@ -153,27 +161,36 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           OutlinedButton(
               onPressed: () async {
+                final provider = PluginProvider.of(context);
                 try {
                   if (kIsWeb) {
-                    final result = await PluginProvider.of(context)
-                        .pluginWeb
-                        .signInWithCredentials(
-                          username: _usernamecontroller.text,
-                          password: _passwordcontroller.text,
-                        );
+                    final result =
+                        await provider.pluginWeb.signInWithCredentials(
+                      username: _usernamecontroller.text,
+                      password: _passwordcontroller.text,
+                    );
 
                     if (result.status == 'SUCCESS') {
-                      PluginProvider.of(context)
-                          .pluginWeb
-                          .setCookieAndRedirect(result.sessionToken);
+                      final token = await provider.pluginWeb.getWithoutPrompt(
+                          sessionToken: result.sessionToken!,
+                          scopes: ['openid', 'email', 'profile'],
+                          responseType: ['token', 'id_token']);
+                      final idToken = token.tokens.idToken?.idToken;
+                      final accessToken = token.tokens.accessToken?.accessToken;
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (c) => WebProfileScreen(
+                            token: idToken!,
+                            accessToken: accessToken!,
+                          ),
+                        ),
+                      );
                     }
                   } else {
-                    await PluginProvider.of(context)
-                        .plugin
-                        .startDirectAuthenticationFlow(
-                            email: _usernamecontroller.text,
-                            password: _passwordcontroller.text,
-                            factors: [OktaSignInFactor.otp]).then((res) {
+                    await provider.plugin.startDirectAuthenticationFlow(
+                        email: _usernamecontroller.text,
+                        password: _passwordcontroller.text,
+                        factors: [OktaSignInFactor.otp]).then((res) {
                       _processResult(res, formContext);
 
                       setState(() {});

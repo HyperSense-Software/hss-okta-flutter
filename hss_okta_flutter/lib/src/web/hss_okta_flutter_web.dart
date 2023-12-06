@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:hss_okta_flutter/src/web/hss_okta_flutter_web_platform_interface.dart';
+import 'package:hss_okta_flutter/src/web/js/hss_okta_authn_js.dart';
 import 'package:hss_okta_flutter/src/web/js/hss_okta_js_external.dart';
 import 'package:js/js_util.dart';
 
@@ -16,6 +17,10 @@ class HssOktaFlutterWeb extends HssOktaFlutterWebPlatformInterface {
   ///
   /// For general use, You should use the methods provided by this class instead of accessing the JS object directly.
   OktaAuth? get oktaAuth => _auth;
+
+  SessionAPI? get session => _auth.session;
+
+  AuthStateManager get authStateManager => _auth.authStateManager;
 
   /// Initialize the Okta client with the provided configuration.
 
@@ -96,7 +101,7 @@ class HssOktaFlutterWeb extends HssOktaFlutterWebPlatformInterface {
   }
 
   /// Returns storage key agnostic tokens set for available tokens from storage. It returns empty object ({}) if no token is in storage.
-  Future<Tokens> getTokens(Tokens tokens) async {
+  Future<Tokens> getTokens() async {
     final res = await promiseToFuture(_auth.tokenManager.getTokens());
     return res;
   }
@@ -168,11 +173,74 @@ class HssOktaFlutterWeb extends HssOktaFlutterWebPlatformInterface {
   Future<bool> hasTokenExpired(AbstractToken token) async =>
       _auth.tokenManager.hasExpired(token);
 
+  Future<AuthState?> getAuthState() async {
+    return promiseToFuture<AuthState?>(_auth.authStateManager.getAuthState());
+  }
+
+  /// Subscribes a callback that will be called when the [AuthState]
+  /// event happens.
+
   void subscribe(void Function(AuthState authState) cb) {
     _auth.authStateManager.subscribe(allowInterop(cb));
   }
 
+  /// Unsubscribes callback for [AuthState] event. It will unregister all
+  /// handlers if no callback handler is provided.
   void unsubscribe(void Function(AuthState? authState) cb) {
     _auth.authStateManager.unsubscribe(allowInterop(cb));
+  }
+
+  void signIn({required String username, required String password}) {
+    _auth.signIn(
+      SigninOptions(
+        username: username,
+        password: password,
+      ),
+    );
+  }
+
+  Future<AuthnTransaction> signInWithCredentials(
+      {required String username, required String password}) {
+    final response =
+        promiseToFuture<AuthnTransaction>(_auth.signInWithCredentials(
+      SigninWithCredentialsOptions(
+        username: username,
+        password: password,
+      ),
+    ));
+    return response;
+  }
+
+  void setCookieAndRedirect(String? sessionToken, {String? redirectUri}) {
+    _auth.session.setCookieAndRedirect(sessionToken, redirectUri);
+  }
+
+  Future<bool> isAuthenticated() {
+    return promiseToFuture<bool>(_auth.isAuthenticated());
+  }
+
+  Future<AbstractToken> get(String token) async {
+    return promiseToFuture(_auth.tokenManager.get(token));
+  }
+
+  Future<TokenResponse> getWithoutPrompt({
+    List<String>? responseType,
+    required String sessionToken,
+    List<String>? scopes,
+  }) async {
+    return promiseToFuture<TokenResponse>(
+        _auth.token.getWithoutPrompt(AuthorizeOptions(
+      sessionToken: sessionToken,
+      scopes: scopes,
+      responseType: responseType,
+    )));
+  }
+
+  Future<bool?> signOut() async {
+    return promiseToFuture<bool?>(_auth.signOut());
+  }
+
+  Future<AuthState> updateAuthState() async {
+    return promiseToFuture(_auth.authStateManager.updateAuthState());
   }
 }
