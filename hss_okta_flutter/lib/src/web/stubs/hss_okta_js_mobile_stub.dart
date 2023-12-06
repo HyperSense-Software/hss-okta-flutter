@@ -37,6 +37,22 @@ class OktaAuth {
     IDToken? idTokenObject,
   }) =>
       throw UnimplementedError();
+
+  /// Revokes the access token for this application so it can no longer be used to authenticate API requests. The [accessToken] parameter is optional. By default, revokeAccessToken will look for a token object named accessToken within the TokenManager. If you have stored the access token object in a different location, you should retrieve it first and then pass it here. Returns a promise that resolves when the operation has completed. This method will succeed even if the access token has already been revoked or removed.
+  Future revokeAccessToken(AccessToken accessToken) =>
+      throw UnimplementedError();
+
+  /// Revokes the refresh token (if any) for this application so it can no longer be used to mint new tokens. The [refreshToken] parameter is optional. By default, revokeRefreshToken will look for a token object named refreshToken within the TokenManager. If you have stored the refresh token object in a different location, you should retrieve it first and then pass it here. Returns a promise that resolves when the operation has completed. This method will succeed even if the refresh token has already been revoked or removed.
+  Future revokeRefreshToken(RefreshToken refreshToken) =>
+      throw UnimplementedError();
+
+  Future getUser() => throw UnimplementedError();
+
+  void setOriginalUri(String uri) => throw UnimplementedError();
+  void removeOriginalUri() => throw UnimplementedError();
+  void getOriginalUri() => throw UnimplementedError();
+
+  void setHeaders(Object headers) => throw UnimplementedError();
 }
 
 class OktaConfig {
@@ -82,15 +98,17 @@ class Token {
 }
 
 class AuthorizeOptions {
-  AuthorizeOptions({
-    List<String>? responseType,
-    String? sessionToken,
-    List<String>? scopes,
-  });
-
-  List<String>? responseType;
-  String? sessionToken;
-  List<String>? scopes;
+  external factory AuthorizeOptions(
+      {List<String>? responseType,
+      String? sessionToken,
+      List<String>? scopes,
+      String? nonce,
+      String? state,
+      String? idp,
+      String? prompt,
+      int? maxAge,
+      String? loginHint,
+      String? display});
 }
 
 class Tokens {

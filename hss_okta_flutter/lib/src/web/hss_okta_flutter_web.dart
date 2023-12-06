@@ -6,6 +6,9 @@ import 'package:hss_okta_flutter/src/web/js/hss_okta_authn_js.dart';
 import 'package:hss_okta_flutter/src/web/js/hss_okta_js_external.dart';
 import 'package:js/js_util.dart';
 
+/// Wrapper for Okta Auth JS for Flutter/Dart Web
+///
+/// Intialize using [initializeClient] method with [OktaConfig] object before using other methods.
 class HssOktaFlutterWeb extends HssOktaFlutterWebPlatformInterface {
   static void registerWith(Registrar registrar) {
     HssOktaFlutterWebPlatformInterface.instance = HssOktaFlutterWeb();
@@ -13,17 +16,7 @@ class HssOktaFlutterWeb extends HssOktaFlutterWebPlatformInterface {
 
   late OktaAuth _auth;
 
-  /// Getter for the OktaAuth JS Object
-  ///
-  /// For general use, You should use the methods provided by this class instead of accessing the JS object directly.
-  OktaAuth? get oktaAuth => _auth;
-
-  SessionAPI? get session => _auth.session;
-
-  AuthStateManager get authStateManager => _auth.authStateManager;
-
   /// Initialize the Okta client with the provided configuration.
-
   Future<void> initializeClient({required OktaConfig oktaConfig}) async {
     _auth = OktaAuth(oktaConfig);
   }
@@ -32,7 +25,8 @@ class HssOktaFlutterWeb extends HssOktaFlutterWebPlatformInterface {
   ///  After a successful authentication, the browser will be redirected to the configured redirectUri.
   ///  The authorization code, access, or ID Tokens will be available as parameters appended to this URL.
   ///  Values will be returned in either the search query or hash fragment portion of the URL depending on the responseMode
-
+  ///
+  /// To process the result of the redirect, use the [parseFromUrl] method.
   Future<void> startRedirectAuthentication({AuthorizeOptions? options}) async {
     await promiseToFuture<void>(_auth.token.getWithRedirect(options));
   }
@@ -60,7 +54,6 @@ class HssOktaFlutterWeb extends HssOktaFlutterWebPlatformInterface {
   }
 
   /// Create token with a popup.
-
   Future<TokenResponse> startPopUpAuthentication(
       {AuthorizeOptions? options}) async {
     final res =
@@ -155,15 +148,14 @@ class HssOktaFlutterWeb extends HssOktaFlutterWebPlatformInterface {
   ///  It is assumed that the access token is stored using the key "accessToken" and the ID token is stored under the key "idToken".
   ///  If you have stored either token in a non-standard location, this logic can be skipped by passing the access and ID token objects directly.
 
-  Future<Map> getUserInfo(
+  Future<UserClaims> getUserInfo(
       {AccessToken? accessTokenObject, IDToken? idTokenObject}) async {
     final res = await promiseToFuture(_auth.token.getUserInfo(
       accessTokenObject,
       idTokenObject,
     ));
-    final jsObject = dartify(res);
 
-    return jsObject as Map;
+    return res;
   }
 
   Future<TokenResponse> renewToken({required String refreshToken}) {
@@ -242,5 +234,51 @@ class HssOktaFlutterWeb extends HssOktaFlutterWebPlatformInterface {
 
   Future<AuthState> updateAuthState() async {
     return promiseToFuture(_auth.authStateManager.updateAuthState());
+  }
+
+  /// Revokes the access token for this application so it can no longer be used to authenticate API requests. The [accessToken] parameter is optional. By default, revokeAccessToken will look for a token object named accessToken within the TokenManager. If you have stored the access token object in a different location, you should retrieve it first and then pass it here. Returns a promise that resolves when the operation has completed. This method will succeed even if the access token has already been revoked or removed.
+  Future<void> revokeAccessToken(AccessToken accessToken) async {
+    await promiseToFuture(_auth.revokeAccessToken(accessToken));
+  }
+
+  /// Revokes the refresh token (if any) for this application so it can no longer be used to mint new tokens. The [refreshToken] parameter is optional. By default, revokeRefreshToken will look for a token object named refreshToken within the TokenManager. If you have stored the refresh token object in a different location, you should retrieve it first and then pass it here. Returns a promise that resolves when the operation has completed. This method will succeed even if the refresh token has already been revoked or removed.
+  Future<void> revokeRefreshToken(RefreshToken refreshToken) async {
+    await promiseToFuture(_auth.revokeRefreshToken(refreshToken));
+  }
+
+  Future<UserClaims> getUser() async {
+    final res = await promiseToFuture(_auth.getUser());
+    return res;
+  }
+
+  ///Removes the stored URI string stored by [setOriginalUri] from storage.
+  void removeOriginalUri() {
+    _auth.removeOriginalUri();
+  }
+
+  /// Stores the current URL state before a redirect occurs.
+  void setOriginalUri(String uri) {
+    _auth.setOriginalUri(uri);
+  }
+
+  /// Returns the stored URI string stored by [setOriginalUri].
+
+  String getOriginalUri() {
+    return _auth.getOriginalUri();
+  }
+
+  /// Handle a redirect to the configured redirectUri that happens on the end of login flow, enroll authenticator flow or on an error.
+  ///Stores tokens from redirect url into storage (for login flow), then redirect users back to the originalUri.
+  /// When using PKCE authorization code flow, this method also exchanges authorization code for tokens.
+  ///
+  ///  By default it calls window.location.replace for the redirection.
+  ///  The default behavior can be overrided by providing options.restoreOriginalUri. By default, originalUri will be retrieved from storage, but this can be overridden by specifying originalUri in the first parameter to this function.
+  Future<void> handleRedirect({String? originalUri}) async {
+    await _auth.handleRedirect(originalUri);
+  }
+
+  ///Can set (or unset) request headers after construction.
+  void setHeaders(Map<String, String> headers) {
+    _auth.setHeaders(jsify(headers));
   }
 }

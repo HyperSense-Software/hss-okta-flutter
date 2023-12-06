@@ -44,9 +44,9 @@ Feature | Android | IOS |
 |Authentication by Redirection|✅|
 |Authentication by Popup|✅|
 |Token Manager|✅|
-|Authentication Client Setup|🚧  Partially Implemented|
+|Authentication Client Setup|✅|
 |Authentication State Manager|🚧|
-|Fetch User info|🚧|
+|Fetch User info|✅|
 
   
 
