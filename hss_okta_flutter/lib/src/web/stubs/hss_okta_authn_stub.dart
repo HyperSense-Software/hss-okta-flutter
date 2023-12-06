@@ -1,14 +1,6 @@
-@JS()
-library hss_okta_js;
-
-import 'dart:js';
-
-import 'package:js/js.dart';
-
 typedef AuthnTransactionFunction = Future<AuthnTransaction> Function(
     dynamic obj);
 
-@JS()
 class AuthnTransactionState {
   external String get status;
   external String? get stateToken;
@@ -20,33 +12,25 @@ class AuthnTransactionState {
   external String? get recoveryType;
   external bool get autoPush;
   external bool get rememberDevice;
-  external JsObject? get profile;
+  external dynamic get profile;
 }
 
-@JS()
 class AuthnTransaction extends AuthnTransactionState {
   external String? sessionToken;
 }
 
-@JS()
 class AuthTransactionAPI {
   external bool exists();
   external Future status(dynamic args);
   external Future resume(dynamic args);
   external Future<AuthnTransaction> introspect(dynamic args);
   external AuthnTransaction createTransaction(AuthnTransactionState? res);
-  // external Future<AuthnTransaction> postToTransaction(
-  //     String url, RequestData? args, RequestOption? options);
 }
 
-@JS()
-@anonymous
 class SigninOptions {
   external factory SigninOptions({String? username, String? password});
 }
 
-@JS()
-@anonymous
 class SigninWithCredentialsOptions {
   external factory SigninWithCredentialsOptions({
     required String username,
@@ -54,7 +38,6 @@ class SigninWithCredentialsOptions {
   });
 }
 
-@JS()
 class AuthApiError {
   external String get errorSummary;
   external String get errorCode;

@@ -1,9 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
+import 'package:hss_okta_flutter/hss_okta_flutter.dart';
 import 'package:hss_okta_flutter/src/web/hss_okta_flutter_web_platform_interface.dart';
-import 'package:hss_okta_flutter/src/web/js/hss_okta_authn_js.dart';
-import 'package:hss_okta_flutter/src/web/js/hss_okta_js_external.dart';
 import 'package:js/js_util.dart';
 
 /// Wrapper for Okta Auth JS for Flutter/Dart Web

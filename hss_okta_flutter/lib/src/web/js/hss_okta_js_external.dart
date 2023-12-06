@@ -18,7 +18,6 @@ class OktaAuth {
 
   external AuthStateManager get authStateManager;
 
-  external ServiceManager get serviceManager;
   @Deprecated('use signInWithCredentials instead')
   external Future<AuthnTransaction> signIn(SigninOptions opts);
 
@@ -428,25 +427,18 @@ class UserClaims {
 }
 
 @JS()
-class ServiceManager {
-  external void registerService(String name, JsObject service);
-  external void unregisterService(String name);
-  external JsObject getService(String name);
-}
-
-@JS()
 class SessionObject {
   external String get status;
-  external Future<JsObject?> refresh();
-  external Future<JsObject?> user();
+  external Future refresh();
+  external Future user();
 }
 
 @JS()
 class SessionAPI {
-  external Future<JsObject?> close();
+  external Future close();
   external Future<bool?> exists();
   external Future<SessionObject> get();
-  external Future<JsObject?> refresh();
+  external Future refresh();
   external void setCookieAndRedirect(
     String? sessionToken,
     String? redirectUrl,
