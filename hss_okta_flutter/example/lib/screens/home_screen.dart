@@ -41,12 +41,8 @@ class _HomeScreenState extends State<HomeScreen> {
           }
         })
         ..unsubscribe((authState) {
-          if (authState != null) {
-            if (authState.isAuthenticated == false) {
-              _streamSubscription?.cancel();
-              _streamSubscription = null;
-            }
-          }
+          _streamSubscription?.cancel();
+          _streamSubscription = null;
         });
     });
 
