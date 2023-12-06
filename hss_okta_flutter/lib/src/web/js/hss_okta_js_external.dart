@@ -54,8 +54,7 @@ class OktaAuth {
   /// Can set (or unset) request headers after construction.
   external void setHeaders(Object headers);
 
-  external Future<AuthnTransaction> signInWithCredentials(
-      SigninOptions? options);
+  external Future<AuthnTransaction> signInWithCredentials(SigninOptions? opts);
 
   external Future<AuthnTransaction> signIn(SigninOptions? options);
 
@@ -64,6 +63,20 @@ class OktaAuth {
   /// When you've obtained a sessionToken from the authorization flows, or a session already exists,
   ///  you can obtain a token or tokens without prompting the user to log in.
   external Future<TokenResponse> getWithoutPrompt(AuthorizeOptions options);
+
+  ///Starts a new unlock recovery transaction for a given user and issues a recovery token that can be used to unlock a user’s account.
+  ///
+  /// factorType - Recovery factor to use for primary authentication. Supported options are SMS, EMAIL, or CALL
+  external Future<AuthnTransaction> unlockAccount(AccountUnlockOptions options);
+
+  /// Validates a recovery token that was distributed to the end-user to continue the recovery transaction.
+  external Future<AuthnTransaction> verifyRecoveryToken(String recoveryToken);
+}
+
+@JS()
+class AccountUnlockOptions {
+  external String? username;
+  external String? factorType;
 }
 
 @JS()
@@ -83,10 +96,12 @@ class SigninOptions {
       String? password});
 }
 
-@JS()
+@JS('AuthnTransactionImpl')
 class AuthnTransaction {
   external String? sessionToken;
   external String? status;
+  external String? stateToken;
+
   external JSObject user;
   external JSObject factor;
   external JSObject? factors;
@@ -94,6 +109,19 @@ class AuthnTransaction {
   external JSObject? scopes;
   external JSObject? target;
   external JSObject? authentication;
+
+  external Future cancel();
+  external Future changePassword(ChangePasswordOptions options);
+  external void skip();
+}
+
+@JS()
+@anonymous
+class ChangePasswordOptions {
+  external factory ChangePasswordOptions(
+      {String? oldPassword, String? newPassword});
+  external String? oldPassword;
+  external String? newPassword;
 }
 
 @JS()

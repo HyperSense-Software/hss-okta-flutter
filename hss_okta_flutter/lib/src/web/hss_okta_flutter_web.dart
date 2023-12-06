@@ -229,6 +229,7 @@ class AuthnTransactionResult {
 
   String? get status => _transaction.status;
   String? get sessionToken => _transaction.sessionToken;
+  String? get stateToken => _transaction.stateToken;
 
   Map get user {
     final jsobject = dartify(_transaction.user) as Map;
