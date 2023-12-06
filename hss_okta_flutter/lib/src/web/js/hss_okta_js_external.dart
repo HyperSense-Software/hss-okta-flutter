@@ -60,6 +60,10 @@ class OktaAuth {
   external Future<AuthnTransaction> signIn(SigninOptions? options);
 
   external SessionAPI get session;
+
+  /// When you've obtained a sessionToken from the authorization flows, or a session already exists,
+  ///  you can obtain a token or tokens without prompting the user to log in.
+  external Future<TokenResponse> getWithoutPrompt(AuthorizeOptions options);
 }
 
 @JS()
