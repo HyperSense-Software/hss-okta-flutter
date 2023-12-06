@@ -26,39 +26,6 @@ class AuthnTransactionState {
 @JS()
 class AuthnTransaction extends AuthnTransactionState {
   external String? sessionToken;
-  external (String, dynamic)? get user;
-  external (String, dynamic)? get factor;
-  external List<(String, dynamic)>? get factors;
-  external (String, dynamic)? get policy;
-  external List<(String, dynamic)>? get scopes;
-  external (String, dynamic)? get target;
-  external (String, dynamic)? get authentication;
-
-  external AuthnTransactionFunction? get next;
-
-  external AuthnTransactionFunction? get cancel;
-
-  external AuthnTransactionFunction? get skip;
-
-  external AuthnTransactionFunction? get unlock;
-
-  external AuthnTransactionFunction? get changePassword;
-
-  external AuthnTransactionFunction? get resetPassword;
-
-  external AuthnTransactionFunction? get answer;
-
-  external AuthnTransactionFunction? get recovery;
-
-  external AuthnTransactionFunction? get verify;
-
-  external AuthnTransactionFunction? get resend;
-
-  external AuthnTransactionFunction? get activate;
-
-  external AuthnTransactionFunction? get poll;
-
-  external AuthnTransactionFunction? get prev;
 }
 
 @JS()
