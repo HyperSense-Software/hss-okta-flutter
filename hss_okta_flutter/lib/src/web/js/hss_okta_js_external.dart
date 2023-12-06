@@ -58,6 +58,8 @@ class OktaAuth {
       SigninOptions? options);
 
   external Future<AuthnTransaction> signIn(SigninOptions? options);
+
+  external SessionAPI get session;
 }
 
 @JS()
@@ -88,6 +90,22 @@ class AuthnTransaction {
   external JSObject? scopes;
   external JSObject? target;
   external JSObject? authentication;
+}
+
+@JS()
+class SessionAPI {
+  external Future<JSObject> close();
+  external Future<bool> exists();
+  external Future<SessionObject> get();
+  external Future<JSObject> refresh();
+  external void setCookieAndRedirect(String? sessionToken, String? redirectUri);
+}
+
+@JS()
+class SessionObject {
+  external String get status;
+  external Future<JSObject> refresh();
+  external Future<JSObject> user();
 }
 
 /// Used With [OktaAuth]'s Initializer
