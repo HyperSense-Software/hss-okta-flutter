@@ -227,8 +227,41 @@ class AuthnTransactionResult {
   factory AuthnTransactionResult.fromJsObject(AuthnTransaction transaction) =>
       AuthnTransactionResult(transaction: transaction);
 
+  String? get status => _transaction.status;
+  String? get sessionToken => _transaction.sessionToken;
+
   Map get user {
     final jsobject = dartify(_transaction.user) as Map;
+    return jsobject;
+  }
+
+  Map get factor {
+    final jsobject = dartify(_transaction.factor) as Map;
+    return jsobject;
+  }
+
+  Map get factors {
+    final jsobject = dartify(_transaction.factors) as Map;
+    return jsobject;
+  }
+
+  Map get policy {
+    final jsobject = dartify(_transaction.policy) as Map;
+    return jsobject;
+  }
+
+  Map get scopes {
+    final jsobject = dartify(_transaction.scopes) as Map;
+    return jsobject;
+  }
+
+  Map get target {
+    final jsobject = dartify(_transaction.target) as Map;
+    return jsobject;
+  }
+
+  Map get authentication {
+    final jsobject = dartify(_transaction.authentication) as Map;
     return jsobject;
   }
 }
