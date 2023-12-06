@@ -9,4 +9,5 @@ export 'src/web/hss_okta_flutter_web.dart'
 
 export 'src/web/js/hss_okta_js_external.dart'
     if (dart.library.io) 'src/web/stubs/hss_okta_js_mobile_stub.dart'
-    if (dart.library.html) 'src/web/js/hss_okta_js_external.dart';
+    if (dart.library.html) 'src/web/js/hss_okta_js_external.dart'
+    hide AuthnTransaction;

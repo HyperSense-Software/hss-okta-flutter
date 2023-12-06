@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 
 import 'package:hss_okta_flutter/src/web/hss_okta_flutter_web_platform_interface.dart';
@@ -206,5 +208,27 @@ class HssOktaFlutterWeb extends HssOktaFlutterWebPlatformInterface {
   ///Can set (or unset) request headers after construction.
   void setHeaders(Map<String, String> headers) {
     _auth.setHeaders(jsify(headers));
+  }
+
+  Future<AuthnTransactionResult> signInWithCredentials(
+      {SigninOptions? options}) async {
+    final result = await promiseToFuture<AuthnTransaction>(
+        _auth.signInWithCredentials(options));
+
+    return AuthnTransactionResult.fromJsObject(result);
+  }
+}
+
+class AuthnTransactionResult {
+  final AuthnTransaction _transaction;
+
+  AuthnTransactionResult({required AuthnTransaction transaction})
+      : _transaction = transaction;
+  factory AuthnTransactionResult.fromJsObject(AuthnTransaction transaction) =>
+      AuthnTransactionResult(transaction: transaction);
+
+  Map get user {
+    final jsobject = dartify(_transaction.user) as Map;
+    return jsobject;
   }
 }

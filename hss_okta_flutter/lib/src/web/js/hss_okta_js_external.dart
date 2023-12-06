@@ -1,10 +1,10 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 @JS()
 library hss_okta_js;
 
-// import 'package:js/js.dart';
+import 'dart:js_interop';
 
 import 'package:js/js.dart';
+import 'package:js/js_util.dart';
 
 /// The Http Client used for all the Okta API calls
 @JS()
@@ -53,6 +53,41 @@ class OktaAuth {
 
   /// Can set (or unset) request headers after construction.
   external void setHeaders(Object headers);
+
+  external Future<AuthnTransaction> signInWithCredentials(
+      SigninOptions? options);
+
+  external Future<AuthnTransaction> signIn(SigninOptions? options);
+}
+
+@JS()
+@anonymous
+class SigninOptions {
+  String? relayState;
+  bool? sendFingerprint;
+  String? stateToken;
+  String? username;
+  String? password;
+
+  external factory SigninOptions(
+      {String? relayState,
+      bool? sendFingerprint,
+      String? stateToken,
+      String? username,
+      String? password});
+}
+
+@JS()
+class AuthnTransaction {
+  external String? sessionToken;
+  external String? status;
+  external JSObject user;
+  external JSObject factor;
+  external JSObject? factors;
+  external JSObject? policy;
+  external JSObject? scopes;
+  external JSObject? target;
+  external JSObject? authentication;
 }
 
 /// Used With [OktaAuth]'s Initializer
