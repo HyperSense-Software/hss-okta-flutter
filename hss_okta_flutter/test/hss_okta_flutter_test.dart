@@ -13,7 +13,8 @@
 // }
 
 // void main() {
-//   final HssOktaFlutterPlatform initialPlatform = HssOktaFlutterPlatform.instance;
+//   final HssOktaFlutterPlatform initialPlatform = 
+//            HssOktaFlutterPlatform.instance;
 
 //   test('$MethodChannelHssOktaFlutter is the default instance', () {
 //     expect(initialPlatform, isInstanceOf<MethodChannelHssOktaFlutter>());

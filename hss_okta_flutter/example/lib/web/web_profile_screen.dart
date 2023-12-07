@@ -19,7 +19,7 @@ class WebProfileScreen extends StatelessWidget {
             onPressed: () async {
               final provider = PluginProvider.of(context);
               if (kIsWeb) {
-                final isSignedOut = await provider.pluginWeb.signOut();
+                await provider.pluginWeb.signOut();
                 // if (isSignedOut) {
                 //   Navigator.of(context).pushReplacementNamed('/');
                 // }

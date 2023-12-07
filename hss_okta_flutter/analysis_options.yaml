@@ -22,7 +22,8 @@ analyzer:
     - lib/**/*.g.dart
     - lib/src/pigeons/**.dart
     #TODO: fix web linting
-    - lib/src/web/**.dart
+    - lib/src/web/js/**.dart
+    - lib/src/web/stubs/**.dart
 
 linter:
   rules:
