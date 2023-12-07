@@ -29,11 +29,8 @@ class _MyAppState extends State<MyApp> {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
       if (kIsWeb) {
         await _pluginWeb.initializeClient(
-            oktaConfig: OktaConfig(
-          issuer: '',
-          clientId: '',
-          redirectUri: '',
-        ));
+          oktaConfig: OktaConfig(),
+        );
       }
     });
   }
@@ -62,10 +59,16 @@ class _MyAppState extends State<MyApp> {
               settings: settings,
               builder: (context) {
                 if (args is Map<String, dynamic>) {
-                  return WebProfileScreen(token: args['token'] as String);
+                  return WebProfileScreen(
+                    token: args['token'] as String,
+                    accessToken: args['accessToken'] as String,
+                  );
                 }
 
-                return const WebProfileScreen(token: '');
+                return const WebProfileScreen(
+                  token: '',
+                  accessToken: '',
+                );
               },
             );
         }

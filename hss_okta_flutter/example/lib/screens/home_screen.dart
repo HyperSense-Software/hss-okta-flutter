@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hss_okta_flutter/hss_okta_flutter.dart';
@@ -5,6 +7,7 @@ import 'package:hss_okta_flutter_example/provider/plugin_provider.dart';
 import 'package:hss_okta_flutter_example/screens/device_sso_confirmation_screen.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 
+import '../web/web_profile_screen.dart';
 import '../web_auth.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -18,10 +21,41 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final TextEditingController _controller = TextEditingController();
-  final TextEditingController _usernamecontroller = TextEditingController();
-  final TextEditingController _passwordcontroller = TextEditingController();
+
+  final TextEditingController _usernamecontroller = TextEditingController(
+    text: '',
+  );
+
+  final TextEditingController _passwordcontroller = TextEditingController(
+    text: '',
+  );
+
   final PageController _pageController = PageController(initialPage: 0);
+
   AuthenticationResult? result;
+
+  late final StreamController<AuthState> _authStateController;
+
+  StreamSubscription<AuthState>? _streamSubscription;
+
+  @override
+  void initState() {
+    _initStreams();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+      PluginProvider.of(context).pluginWeb
+        ..subscribe((authState) {
+          if (authState.isAuthenticated) {
+            _authStateController.add(authState);
+          }
+        })
+        ..unsubscribe((authState) {
+          _streamSubscription?.cancel();
+          _streamSubscription = null;
+        });
+    });
+
+    super.initState();
+  }
 
   @override
   void dispose() {
@@ -29,7 +63,25 @@ class _HomeScreenState extends State<HomeScreen> {
     _usernamecontroller.dispose();
     _passwordcontroller.dispose();
     _pageController.dispose();
+    _streamSubscription?.cancel();
+    _streamSubscription = null;
     super.dispose();
+  }
+
+  void _initStreams() {
+    _authStateController = StreamController<AuthState>.broadcast();
+    _streamSubscription = _authStateController.stream.listen((authState) {
+      final idToken = authState.idToken.idToken;
+      final accessToken = authState.accessToken.accessToken;
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (c) => WebProfileScreen(
+            token: idToken,
+            accessToken: accessToken,
+          ),
+        ),
+      );
+    });
   }
 
   @override
@@ -109,17 +161,41 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           OutlinedButton(
               onPressed: () async {
+                final provider = PluginProvider.of(context);
                 try {
-                  await PluginProvider.of(context)
-                      .plugin
-                      .startDirectAuthenticationFlow(
-                          email: _usernamecontroller.text,
-                          password: _passwordcontroller.text,
-                          factors: [OktaSignInFactor.otp]).then((res) {
-                    _processResult(res, formContext);
+                  if (kIsWeb) {
+                    final result =
+                        await provider.pluginWeb.signInWithCredentials(
+                      username: _usernamecontroller.text,
+                      password: _passwordcontroller.text,
+                    );
 
-                    setState(() {});
-                  });
+                    if (result.status == 'SUCCESS') {
+                      final token = await provider.pluginWeb.getWithoutPrompt(
+                          sessionToken: result.sessionToken!,
+                          scopes: ['openid', 'email', 'profile'],
+                          responseType: ['token', 'id_token']);
+                      final idToken = token.tokens.idToken?.idToken;
+                      final accessToken = token.tokens.accessToken?.accessToken;
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (c) => WebProfileScreen(
+                            token: idToken!,
+                            accessToken: accessToken!,
+                          ),
+                        ),
+                      );
+                    }
+                  } else {
+                    await provider.plugin.startDirectAuthenticationFlow(
+                        email: _usernamecontroller.text,
+                        password: _passwordcontroller.text,
+                        factors: [OktaSignInFactor.otp]).then((res) {
+                      _processResult(res, formContext);
+
+                      setState(() {});
+                    });
+                  }
                 } catch (e, s) {
                   debugPrint(e.toString() + s.toString());
                   if (mounted) {
@@ -138,9 +214,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   final value = await PluginProvider.of(context)
                       .pluginWeb
                       .startPopUpAuthentication(
-                          options: AuthorizeOptions(
-                        responseType: ['token', 'id_token'],
-                      ));
+                        options: AuthorizeOptions(
+                          responseType: ['token', 'id_token'],
+                          scopes: ['openid', 'email', 'profile'],
+                        ),
+                      );
 
                   if (mounted) {
                     PluginProvider.of(context)
