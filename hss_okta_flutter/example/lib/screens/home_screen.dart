@@ -190,7 +190,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     await provider.plugin.startDirectAuthenticationFlow(
                         email: _usernamecontroller.text,
                         password: _passwordcontroller.text,
-                        factors: [OktaSignInFactor.otp]).then((res) {
+                        factors: [AuthenticationFactor.otp]).then((res) {
                       _processResult(res, formContext);
 
                       setState(() {});
