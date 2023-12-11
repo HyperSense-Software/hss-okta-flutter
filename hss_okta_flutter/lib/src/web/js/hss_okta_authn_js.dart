@@ -47,6 +47,18 @@ class SigninOptions {
 
 @JS()
 @anonymous
+class SignOutOptions {
+  external factory SignOutOptions({
+    bool? revokeAccessToken,
+    bool? revokeRefreshToken,
+    AccessToken? accessToken,
+    RefreshToken? refreshToken,
+    bool? clearTokensBeforeRedirect,
+  });
+}
+
+@JS()
+@anonymous
 class SigninWithCredentialsOptions {
   external factory SigninWithCredentialsOptions({
     required String username,

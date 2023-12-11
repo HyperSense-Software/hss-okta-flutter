@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:html' as html;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
@@ -6,12 +7,10 @@ import 'package:hss_okta_flutter/hss_okta_flutter.dart';
 import 'package:hss_okta_flutter/src/web/hss_okta_flutter_web_platform_interface.dart';
 import 'package:js/js_util.dart';
 
-///{@template hss_okta_flutter_web}
+/// {@template hss_okta_flutter_web}
 /// Wrapper for Okta Auth JS for Flutter/Dart Web
 ///
-/// Intialize using [initializeClient] method with [OktaConfig] object before
-/// using other methods.
-///
+///{@macro okta_web_initialize_client}
 /// {@endtemplate}
 
 class HssOktaFlutterWeb extends HssOktaFlutterWebPlatformInterface {
@@ -23,7 +22,11 @@ class HssOktaFlutterWeb extends HssOktaFlutterWebPlatformInterface {
 
   late OktaAuth _auth;
 
-  /// Initialize the Okta client with the provided configuration.
+  /// {@template okta_web_initialize_client}
+  /// Intialize using [initializeClient] method with [OktaConfig] object before
+  /// using other methods.
+  ///
+  /// {@endtemplate}
   Future<void> initializeClient({required OktaConfig oktaConfig}) async {
     _auth = OktaAuth(oktaConfig);
   }
@@ -324,8 +327,24 @@ class HssOktaFlutterWeb extends HssOktaFlutterWebPlatformInterface {
 
   /// Revokes refreshToken or accessToken, clears all local tokens,
   /// then redirects to Okta to end the SSO session.
-  Future<bool?> signOut() async {
-    return promiseToFuture<bool?>(_auth.signOut());
+  Future<bool?> signOut({
+    bool? revokeAccessToken,
+    bool? revokeRefreshToken,
+    AccessToken? accessToken,
+    RefreshToken? refreshToken,
+    bool? clearTokensBeforeRedirect,
+  }) async {
+    return promiseToFuture<bool?>(
+      _auth.signOut(
+        SignOutOptions(
+          refreshToken: refreshToken,
+          revokeAccessToken: revokeAccessToken,
+          accessToken: accessToken,
+          revokeRefreshToken: revokeRefreshToken,
+          clearTokensBeforeRedirect: clearTokensBeforeRedirect,
+        ),
+      ),
+    );
   }
 
   /// Returns newest [AuthState] after updating the state.
@@ -405,5 +424,19 @@ class HssOktaFlutterWeb extends HssOktaFlutterWebPlatformInterface {
   ///Can set (or unset) request headers after construction.
   void setHeaders(Map<String, String> headers) {
     _auth.setHeaders(jsify(headers) as Object);
+  }
+
+  /// Signs the user out of their current [Okta](https://developer.okta.com/docs/api/resources/sessions)
+  /// session and clears all tokens stored locally in the TokenManager. Returns
+  /// a promise that resolves with true if an existing Okta session have been
+  /// closed, or false if a session does not exist or has already been closed.
+  /// This method is an XHR-based alternative to [signOut](https://github.com/okta/okta-auth-js/tree/ff14212bc8e692e081621d579740eed9f50e96c5#signout), which will redirect to
+  /// Okta before returning to your application.
+  ///
+
+  Future<bool> closeSession() async {
+    html.window.location.reload();
+
+    return promiseToFuture<bool>(_auth.closeSession());
   }
 }
