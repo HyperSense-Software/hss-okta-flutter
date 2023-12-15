@@ -164,28 +164,43 @@ class _HomeScreenState extends State<HomeScreen> {
                 final provider = PluginProvider.of(context);
                 try {
                   if (kIsWeb) {
-                    final result =
-                        await provider.pluginWeb.signInWithCredentials(
+                    final result = await provider.pluginWeb
+                        .authenticate(AuthenticationOptions(
                       username: _usernamecontroller.text,
                       password: _passwordcontroller.text,
-                    );
-
-                    if (result.status == 'SUCCESS') {
-                      final token = await provider.pluginWeb.getWithoutPrompt(
-                          sessionToken: result.sessionToken!,
-                          scopes: ['openid', 'email', 'profile'],
-                          responseType: ['token', 'id_token']);
-                      final idToken = token.tokens.idToken?.idToken;
-                      final accessToken = token.tokens.accessToken?.accessToken;
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (c) => WebProfileScreen(
-                            token: idToken!,
-                            accessToken: accessToken!,
-                          ),
-                        ),
-                      );
+                    ));
+                    if (result.status == IdxStatus.success.name) {
+                      //   final token = await provider.pluginWeb.getWithoutPrompt(
+                      //       sessionToken: re sult.sessionToken!,
+                      //       scopes: ['openid', 'email', 'profile'],
+                      //       responseType: ['token', 'id_token']);
+                      //   final idToken = token.tokens.idToken?.idToken;
+                      //   final accessToken = token.tokens.accessToken?.accessToken;
+                      //   Navigator.of(context).push(
+                      //     MaterialPageRoute(
+                      //       builder: (c) => WebProfileScreen(
+                      //         token: idToken!,
+                      //         accessToken: accessToken!,
+                      //       ),
+                      //     ),
+                      //   );
                     }
+                    // if (result.status == 'SUCCESS') {
+                    //   final token = await provider.pluginWeb.getWithoutPrompt(
+                    //       sessionToken: result.sessionToken!,
+                    //       scopes: ['openid', 'email', 'profile'],
+                    //       responseType: ['token', 'id_token']);
+                    //   final idToken = token.tokens.idToken?.idToken;
+                    //   final accessToken = token.tokens.accessToken?.accessToken;
+                    //   Navigator.of(context).push(
+                    //     MaterialPageRoute(
+                    //       builder: (c) => WebProfileScreen(
+                    //         token: idToken!,
+                    //         accessToken: accessToken!,
+                    //       ),
+                    //     ),
+                    //   );
+                    // }
                   } else {
                     await provider.plugin.startDirectAuthenticationFlow(
                         email: _usernamecontroller.text,

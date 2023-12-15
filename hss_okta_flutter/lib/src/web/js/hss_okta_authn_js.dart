@@ -4,6 +4,7 @@ library hss_okta_js;
 import 'dart:js';
 
 import 'package:js/js.dart';
+import 'package:hss_okta_flutter/hss_okta_flutter.dart';
 
 typedef AuthnTransactionFunction = Future<AuthnTransaction> Function(
     dynamic obj);

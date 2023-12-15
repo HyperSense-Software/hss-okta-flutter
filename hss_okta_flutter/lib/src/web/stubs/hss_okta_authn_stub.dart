@@ -1,48 +1,50 @@
 typedef AuthnTransactionFunction = Future<AuthnTransaction> Function(
-    dynamic obj);
+    dynamic obj)=> throw UnimplementedError();
 
 class AuthnTransactionState {
-  external String get status;
-  external String? get stateToken;
-  external String? get type;
-  external String? get expiresAt;
-  external String? get relayState;
-  external String? get factoryResult;
-  external String? get recoveryToken;
-  external String? get recoveryType;
-  external bool get autoPush;
-  external bool get rememberDevice;
-  external dynamic get profile;
+   String get status=> throw UnimplementedError();
+   String? get stateToken=> throw UnimplementedError();
+   String? get type=> throw UnimplementedError();
+   String? get expiresAt=> throw UnimplementedError();
+   String? get relayState=> throw UnimplementedError();
+   String? get factoryResult=> throw UnimplementedError();
+   String? get recoveryToken=> throw UnimplementedError();
+   String? get recoveryType=> throw UnimplementedError();
+   bool get autoPush=> throw UnimplementedError();
+   bool get rememberDevice=> throw UnimplementedError();
+   dynamic get profile=> throw UnimplementedError();
 }
 
 class AuthnTransaction extends AuthnTransactionState {
-  external String? sessionToken;
+   String? sessionToken=> throw UnimplementedError();
 }
 
 class AuthTransactionAPI {
-  external bool exists();
-  external Future status(dynamic args);
-  external Future resume(dynamic args);
-  external Future<AuthnTransaction> introspect(dynamic args);
-  external AuthnTransaction createTransaction(AuthnTransactionState? res);
+  bool exists() => throw UnimplementedError();
+  Future status(dynamic args) => throw UnimplementedError();
+  Future resume(dynamic args) => throw UnimplementedError();
+  Future<AuthnTransaction> introspect(dynamic args) =>
+      throw UnimplementedError();
+  AuthnTransaction createTransaction(AuthnTransactionState? res) =>
+      throw UnimplementedError();
 }
 
 class SigninOptions {
-  external factory SigninOptions({String? username, String? password});
+   factory SigninOptions({String? username, String? password})=> throw UnimplementedError();
 }
 
 class SigninWithCredentialsOptions {
-  external factory SigninWithCredentialsOptions({
+   factory SigninWithCredentialsOptions({
     required String username,
     required String password,
-  });
+  })=> throw UnimplementedError();
 }
 
 class AuthApiError {
-  external String get errorSummary;
-  external String get errorCode;
-  external String get errorLink;
-  external String get errorId;
-  external String get errorCauses;
-  external String get message;
+   String get errorSummary=> throw UnimplementedError();
+   String get errorCode=> throw UnimplementedError();
+   String get errorLink=> throw UnimplementedError();
+   String get errorId=> throw UnimplementedError();
+   String get errorCauses=> throw UnimplementedError();
+   String get message=> throw UnimplementedError();
 }

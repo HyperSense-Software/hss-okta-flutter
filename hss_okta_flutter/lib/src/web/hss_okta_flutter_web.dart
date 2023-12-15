@@ -439,4 +439,26 @@ class HssOktaFlutterWeb extends HssOktaFlutterWebPlatformInterface {
 
     return promiseToFuture<bool>(_auth.closeSession());
   }
+
+  Future<IdxTransaction> start([StartOptions? options]) async {
+    return promiseToFuture(_auth.idx.start(options));
+  }
+
+  Future<IdxTransaction> authenticate([AuthenticationOptions? options]) async {
+    final res = await promiseToFuture<IdxTransaction>(
+      _auth.idx.authenticate(options),
+    );
+    return res;
+    // final idx = _auth.idx;
+
+    // return promiseToFuture<IdxTransaction>(idx.authenticate(options));
+  }
+
+  // Future<IdxTransaction> proceed([ProceedOptions? options]) async {
+  //   return promiseToFuture(_auth.idx.proceed(options));
+  // }
+
+  // Future<IdxTransaction> cancel([IdxOption? options]) async {
+  //   return promiseToFuture(_auth.idx.cancel(options));
+  // }
 }
