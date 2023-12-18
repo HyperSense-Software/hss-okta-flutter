@@ -4,7 +4,6 @@ library hss_okta_js;
 import 'dart:js_interop';
 
 import 'package:js/js.dart';
-import 'package:js/js_util.dart';
 
 /// The Http Client used for all the Okta API calls
 @JS()
@@ -71,12 +70,40 @@ class OktaAuth {
 
   /// Validates a recovery token that was distributed to the end-user to continue the recovery transaction.
   external Future<AuthnTransaction> verifyRecoveryToken(String recoveryToken);
+
+  external forgotPassword(ForgotPasswordOptions options);
+}
+
+@JS()
+class ForgotPasswordOptions {
+  external String username;
+  external String factorType;
+  external String? relayState;
+
+  /// [factorType] - can be 'SMS' | 'EMAIL' | 'CALL'
+  external factory ForgotPasswordOptions({
+    required String username,
+    required String factorType,
+    String? relayState,
+  });
+}
+
+@JS()
+class ChangePasswordOptions {
+  external String oldPassword;
+  external String newPassword;
+
+  external factory ChangePasswordOptions({
+    required String username,
+    required String factorType,
+  });
 }
 
 @JS()
 class AccountUnlockOptions {
   external String? username;
   external String? factorType;
+  external String? relayState;
 }
 
 @JS()
@@ -99,9 +126,7 @@ class SigninOptions {
 @JS('AuthnTransactionImpl')
 class AuthnTransaction {
   external String? sessionToken;
-  external String? status;
   external String? stateToken;
-
   external JSObject user;
   external JSObject factor;
   external JSObject? factors;
@@ -113,15 +138,59 @@ class AuthnTransaction {
   external Future cancel();
   external Future changePassword(ChangePasswordOptions options);
   external void skip();
+
+  external String? status;
+
+  ///LOCKED_OUT
+  external void unlock(AccountUnlockOptions options);
+
+  ///PASSWORD_EXPIRED
+
+  ///PASSWORD_RESET
+
+  ///PASSWORD_WARN
+
+  ///RECOVERY
+  external void answer(AnswerAuthnOptions options);
+  external void recovery(RecoveryAuthnOptions options);
+
+  ///RECOVERY_CHALLENGE
+  external void verify();
+
+  ///MFA_ENROLL
+
+  ///MFA_ENROLL_ACTIVATE
+
+  ///MFA_REQUIRED
+
+  ///MFA_CHALLENGE
 }
 
 @JS()
-@anonymous
-class ChangePasswordOptions {
-  external factory ChangePasswordOptions(
-      {String? oldPassword, String? newPassword});
-  external String? oldPassword;
-  external String? newPassword;
+class AnswerAuthnOptions {
+  external factory AnswerAuthnOptions({String answer, String stateToken});
+}
+
+@JS()
+class RecoveryAuthnOptions {
+  external factory RecoveryAuthnOptions(
+      {String recoveryToken, Options options});
+}
+
+@JS()
+class VerifyOptions {
+  external factory VerifyOptions({
+    String passCode,
+    String stateToken,
+  });
+}
+
+@JS()
+class Options {
+  external factory Options({
+    bool multiOptionalFactorEnroll,
+    bool warnBeforePasswordExpired,
+  });
 }
 
 @JS()
