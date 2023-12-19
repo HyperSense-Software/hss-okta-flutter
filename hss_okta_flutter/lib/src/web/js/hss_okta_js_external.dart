@@ -155,7 +155,8 @@ class AuthnTransaction {
   external void recovery(RecoveryAuthnOptions options);
 
   ///RECOVERY_CHALLENGE
-  external void verify();
+  external void verify(VerifyOptions options);
+  external void resend();
 
   ///MFA_ENROLL
 
