@@ -217,6 +217,21 @@ class HssOktaFlutterWeb extends HssOktaFlutterWebPlatformInterface {
 
     return AuthnTransactionResult.fromJsObject(result);
   }
+
+  /// Returns a promise that resolves with true if there is an existing Okta session, or false if not.
+  Future<bool> sessionExists() async {
+    return await promiseToFuture(_auth.session.exists());
+  }
+
+  ///Gets the active session.
+  Future<SessionObject> getSession() async {
+    return await promiseToFuture(_auth.session.get());
+  }
+
+  ///Refresh the current session by extending its lifetime. This can be used as a keep-alive operation.
+  Future refreshSession() async {
+    return await promiseToFuture(_auth.session.refresh());
+  }
 }
 
 class AuthnTransactionResult {
