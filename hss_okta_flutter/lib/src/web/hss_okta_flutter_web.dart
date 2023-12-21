@@ -13,11 +13,11 @@ class HssOktaFlutterWeb extends HssOktaFlutterWebPlatformInterface {
     HssOktaFlutterWebPlatformInterface.instance = HssOktaFlutterWeb();
   }
 
-  late OktaAuth auth;
+  late OktaAuth _auth;
 
   /// Initialize the Okta client with the provided configuration.
   Future<void> initializeClient({required OktaConfig oktaConfig}) async {
-    auth = OktaAuth(oktaConfig);
+    _auth = OktaAuth(oktaConfig);
   }
 
   /// Create token using a redirect.
@@ -27,7 +27,7 @@ class HssOktaFlutterWeb extends HssOktaFlutterWebPlatformInterface {
   ///
   /// To process the result of the redirect, use the [parseFromUrl] method.
   Future<void> startRedirectAuthentication({AuthorizeOptions? options}) async {
-    await promiseToFuture<void>(auth.token.getWithRedirect(options));
+    await promiseToFuture<void>(_auth.token.getWithRedirect(options));
   }
 
   ///Parses the authorization code, access, or ID Tokens from the URL after a successful authentication redirect.
@@ -46,7 +46,8 @@ class HssOktaFlutterWeb extends HssOktaFlutterWebPlatformInterface {
   ///The state string which was passed to getWithRedirect will be also be available on the response.
 
   Future<TokenResponse> parseFromUrl() async {
-    final res = await promiseToFuture<TokenResponse>(auth.token.parseFromUrl());
+    final res =
+        await promiseToFuture<TokenResponse>(_auth.token.parseFromUrl());
 
     return res;
   }
@@ -55,7 +56,7 @@ class HssOktaFlutterWeb extends HssOktaFlutterWebPlatformInterface {
   Future<TokenResponse> startPopUpAuthentication(
       {AuthorizeOptions? options}) async {
     final res =
-        await promiseToFuture<TokenResponse>(auth.token.getWithPopup(options));
+        await promiseToFuture<TokenResponse>(_auth.token.getWithPopup(options));
 
     return res;
   }
@@ -65,14 +66,14 @@ class HssOktaFlutterWeb extends HssOktaFlutterWebPlatformInterface {
   ///
   ///[key] - Key for the token you want to renew
   Future<TokenResponse> renew(String key) async {
-    final res = await promiseToFuture(auth.token.renew(key));
+    final res = await promiseToFuture(_auth.token.renew(key));
     return res;
   }
 
   /// Decode a token.
 
   Future<TokenResponse> decode(String idTokenString) async {
-    final res = await promiseToFuture(auth.token.decode(idTokenString));
+    final res = await promiseToFuture(_auth.token.decode(idTokenString));
     return res;
   }
 
@@ -83,17 +84,17 @@ class HssOktaFlutterWeb extends HssOktaFlutterWebPlatformInterface {
   /// [token] - Token object that will be added
 
   void addToken(String key, AbstractToken token) async {
-    await promiseToFuture(auth.tokenManager.add(key, token));
+    await promiseToFuture(_auth.tokenManager.add(key, token));
   }
 
   ///Adds storage key agnostic tokens to storage. It uses default token storage keys (idToken, accessToken) in storage.
   void setTokens(Tokens tokens) async {
-    auth.tokenManager.setTokens(tokens);
+    _auth.tokenManager.setTokens(tokens);
   }
 
   /// Returns storage key agnostic tokens set for available tokens from storage. It returns empty object ({}) if no token is in storage.
   Future<Tokens> getTokens() async {
-    final res = await promiseToFuture(auth.tokenManager.getTokens());
+    final res = await promiseToFuture(_auth.tokenManager.getTokens());
     return res;
   }
 
@@ -102,7 +103,7 @@ class HssOktaFlutterWeb extends HssOktaFlutterWebPlatformInterface {
   /// The [TokenManager] will emit a removed event when tokens are removed.
 
   Future<AbstractToken> getToken(String key) async {
-    final res = await promiseToFuture(auth.tokenManager.get(key));
+    final res = await promiseToFuture(_auth.tokenManager.get(key));
     return res;
   }
 
@@ -110,31 +111,31 @@ class HssOktaFlutterWeb extends HssOktaFlutterWebPlatformInterface {
   ///[key] - Key for the token you want to remove
 
   void removeToken(String key) async {
-    auth.tokenManager.remove(key);
+    _auth.tokenManager.remove(key);
   }
 
   ///Remove all tokens from the tokenManager.
 
   void clearTokens() async {
-    auth.tokenManager.clear();
+    _auth.tokenManager.clear();
   }
 
   /// Returns true if the current page is a redirect from the authorization server.
 
   bool isRedirect() {
-    return auth.isRedirect();
+    return _auth.isRedirect();
   }
 
   /// Check window.location to verify if the app is in OAuth callback state or not. This function is synchronous and returns true or false.
 
   String getAccessToken() {
-    return auth.getAccessToken();
+    return _auth.getAccessToken();
   }
 
   /// Returns the id token string retrieved if it exists.
 
   String getIdToken() {
-    return auth.getIdToken();
+    return _auth.getIdToken();
   }
 
   /// Retrieve the details about a user.
@@ -148,7 +149,7 @@ class HssOktaFlutterWeb extends HssOktaFlutterWebPlatformInterface {
 
   Future<UserClaims> getUserInfo(
       {AccessToken? accessTokenObject, IDToken? idTokenObject}) async {
-    final res = await promiseToFuture(auth.token.getUserInfo(
+    final res = await promiseToFuture(_auth.token.getUserInfo(
       accessTokenObject,
       idTokenObject,
     ));
@@ -161,23 +162,23 @@ class HssOktaFlutterWeb extends HssOktaFlutterWebPlatformInterface {
   }
 
   Future<bool> hasTokenExpired(AbstractToken token) async =>
-      auth.tokenManager.hasExpired(token);
+      _auth.tokenManager.hasExpired(token);
 
   Future<AuthState?> getAuthState() async {
-    return promiseToFuture<AuthState?>(auth.authStateManager.getAuthState());
+    return promiseToFuture<AuthState?>(_auth.authStateManager.getAuthState());
   }
 
   /// Subscribes a callback that will be called when the [AuthState]
   /// event happens.
 
   void subscribe(void Function(AuthState authState) cb) {
-    auth.authStateManager.subscribe(allowInterop(cb));
+    _auth.authStateManager.subscribe(allowInterop(cb));
   }
 
   /// Unsubscribes callback for [AuthState] event. It will unregister all
   /// handlers if no callback handler is provided.
   void unsubscribe(void Function(AuthState? authState) cb) {
-    auth.authStateManager.unsubscribe(allowInterop(cb));
+    _auth.authStateManager.unsubscribe(allowInterop(cb));
   }
 
   /// The goal of this authentication flow is to set an
@@ -194,7 +195,7 @@ class HssOktaFlutterWeb extends HssOktaFlutterWebPlatformInterface {
     required String password,
   }) {
     final response =
-        promiseToFuture<AuthnTransaction>(auth.signInWithCredentials(
+        promiseToFuture<AuthnTransaction>(_auth.signInWithCredentials(
       SigninWithCredentialsOptions(
         username: username,
         password: password,
@@ -211,15 +212,15 @@ class HssOktaFlutterWeb extends HssOktaFlutterWebPlatformInterface {
   /// [redirectUri] - After setting a cookie, Okta redirects to the specified
   ///  URI. The default is the current URI.
   void setCookieAndRedirect(String? sessionToken, {String? redirectUri}) {
-    auth.session.setCookieAndRedirect(sessionToken, redirectUri);
+    _auth.session.setCookieAndRedirect(sessionToken, redirectUri);
   }
 
   Future<bool> isAuthenticated() {
-    return promiseToFuture<bool>(auth.isAuthenticated());
+    return promiseToFuture<bool>(_auth.isAuthenticated());
   }
 
   Future<AbstractToken> get(String token) async {
-    return promiseToFuture(auth.tokenManager.get(token));
+    return promiseToFuture(_auth.tokenManager.get(token));
   }
 
   /// When you've obtained a sessionToken from the authorization flows,
@@ -259,7 +260,7 @@ class HssOktaFlutterWeb extends HssOktaFlutterWebPlatformInterface {
     List<String>? scopes,
   }) async {
     return promiseToFuture<TokenResponse>(
-        auth.token.getWithoutPrompt(AuthorizeOptions(
+        _auth.token.getWithoutPrompt(AuthorizeOptions(
       sessionToken: sessionToken,
       scopes: scopes,
       responseType: responseType,
@@ -269,42 +270,42 @@ class HssOktaFlutterWeb extends HssOktaFlutterWebPlatformInterface {
   /// Revokes refreshToken or accessToken, clears all local tokens,
   /// then redirects to Okta to end the SSO session.
   Future<bool?> signOut() async {
-    return promiseToFuture<bool?>(auth.signOut());
+    return promiseToFuture<bool?>(_auth.signOut());
   }
 
   Future<AuthState> updateAuthState() async {
-    return promiseToFuture(auth.authStateManager.updateAuthState());
+    return promiseToFuture(_auth.authStateManager.updateAuthState());
   }
 
   /// Revokes the access token for this application so it can no longer be used to authenticate API requests. The [accessToken] parameter is optional. By default, revokeAccessToken will look for a token object named accessToken within the TokenManager. If you have stored the access token object in a different location, you should retrieve it first and then pass it here. Returns a promise that resolves when the operation has completed. This method will succeed even if the access token has already been revoked or removed.
   Future<void> revokeAccessToken(AccessToken accessToken) async {
-    await promiseToFuture(auth.revokeAccessToken(accessToken));
+    await promiseToFuture(_auth.revokeAccessToken(accessToken));
   }
 
   /// Revokes the refresh token (if any) for this application so it can no longer be used to mint new tokens. The [refreshToken] parameter is optional. By default, revokeRefreshToken will look for a token object named refreshToken within the TokenManager. If you have stored the refresh token object in a different location, you should retrieve it first and then pass it here. Returns a promise that resolves when the operation has completed. This method will succeed even if the refresh token has already been revoked or removed.
   Future<void> revokeRefreshToken(RefreshToken refreshToken) async {
-    await promiseToFuture(auth.revokeRefreshToken(refreshToken));
+    await promiseToFuture(_auth.revokeRefreshToken(refreshToken));
   }
 
   Future<UserClaims> getUser() async {
-    final res = await promiseToFuture(auth.getUser());
+    final res = await promiseToFuture(_auth.getUser());
     return res;
   }
 
   ///Removes the stored URI string stored by [setOriginalUri] from storage.
   void removeOriginalUri() {
-    auth.removeOriginalUri();
+    _auth.removeOriginalUri();
   }
 
   /// Stores the current URL state before a redirect occurs.
   void setOriginalUri(String uri) {
-    auth.setOriginalUri(uri);
+    _auth.setOriginalUri(uri);
   }
 
   /// Returns the stored URI string stored by [setOriginalUri].
 
   String getOriginalUri() {
-    return auth.getOriginalUri();
+    return _auth.getOriginalUri();
   }
 
   /// Handle a redirect to the configured redirectUri that happens on the end of login flow, enroll authenticator flow or on an error.
@@ -314,23 +315,23 @@ class HssOktaFlutterWeb extends HssOktaFlutterWebPlatformInterface {
   ///  By default it calls window.location.replace for the redirection.
   ///  The default behavior can be overrided by providing options.restoreOriginalUri. By default, originalUri will be retrieved from storage, but this can be overridden by specifying originalUri in the first parameter to this function.
   Future<void> handleRedirect({String? originalUri}) async {
-    await auth.handleRedirect(originalUri);
+    await _auth.handleRedirect(originalUri);
   }
 
   ///Can set (or unset) request headers after construction.
   void setHeaders(Map<String, String> headers) {
-    auth.setHeaders(jsify(headers));
+    _auth.setHeaders(jsify(headers));
   }
 
   Future<bool> isSessionExists() async {
-    return await promiseToFuture(auth.session.exists());
+    return await promiseToFuture(_auth.session.exists());
   }
 
   Future<SessionObject> getActiveSession() async {
-    return await promiseToFuture(auth.session.get());
+    return await promiseToFuture(_auth.session.get());
   }
 
   Future<SessionObject> refreshSession() async {
-    return await promiseToFuture(auth.session.refresh());
+    return await promiseToFuture(_auth.session.refresh());
   }
 }
