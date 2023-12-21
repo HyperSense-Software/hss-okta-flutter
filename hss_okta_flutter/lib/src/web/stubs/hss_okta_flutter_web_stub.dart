@@ -156,4 +156,9 @@ class HssOktaFlutterWeb {
   Future<bool?> signOut() => throw UnimplementedError();
 
   Future<AuthState> updateAuthState() => throw UnimplementedError();
+
+  Future<bool> isSessionExists() => throw UnimplementedError();
+
+  Future<SessionObject> getActiveSession() => throw UnimplementedError();
+  Future<SessionObject> refreshSession() => throw UnimplementedError();
 }

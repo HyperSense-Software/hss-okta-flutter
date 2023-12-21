@@ -322,4 +322,16 @@ class HssOktaFlutterWeb extends HssOktaFlutterWebPlatformInterface {
   void setHeaders(Map<String, String> headers) {
     _auth.setHeaders(jsify(headers));
   }
+
+  Future<bool> isSessionExists() async {
+    return await promiseToFuture(_auth.session.exists());
+  }
+
+  Future<SessionObject> getActiveSession() async {
+    return await promiseToFuture(_auth.session.get());
+  }
+
+  Future<SessionObject> refreshSession() async {
+    return await promiseToFuture(_auth.session.refresh());
+  }
 }
