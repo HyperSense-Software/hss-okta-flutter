@@ -55,3 +55,12 @@
 * Added handleRedirect for OktaAuth
 * Added setHeaders to OktaAuth
 * Added other AuthorizeOptions arguments
+
+# 1.3.2
+* Added Authn API
+* Added AuthStateManager
+* Addded subscribe to authentication changes
+* Added unsubscribe to authentication changes
+* Added User claims
+* Added Session API
+* unprivate oktaAuth for web users that want finer control

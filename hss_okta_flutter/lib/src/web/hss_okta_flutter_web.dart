@@ -1,7 +1,8 @@
-import 'package:flutter_web_plugins/flutter_web_plugins.dart';
+import 'dart:async';
 
+import 'package:flutter_web_plugins/flutter_web_plugins.dart';
+import 'package:hss_okta_flutter/hss_okta_flutter.dart';
 import 'package:hss_okta_flutter/src/web/hss_okta_flutter_web_platform_interface.dart';
-import 'package:hss_okta_flutter/src/web/js/hss_okta_js_external.dart';
 import 'package:js/js_util.dart';
 
 /// Wrapper for Okta Auth JS for Flutter/Dart Web
@@ -56,6 +57,7 @@ class HssOktaFlutterWeb extends HssOktaFlutterWebPlatformInterface {
       {AuthorizeOptions? options}) async {
     final res =
         await promiseToFuture<TokenResponse>(_auth.token.getWithPopup(options));
+
     return res;
   }
 
@@ -91,7 +93,7 @@ class HssOktaFlutterWeb extends HssOktaFlutterWebPlatformInterface {
   }
 
   /// Returns storage key agnostic tokens set for available tokens from storage. It returns empty object ({}) if no token is in storage.
-  Future<Tokens> getTokens(Tokens tokens) async {
+  Future<Tokens> getTokens() async {
     final res = await promiseToFuture(_auth.tokenManager.getTokens());
     return res;
   }
@@ -162,6 +164,119 @@ class HssOktaFlutterWeb extends HssOktaFlutterWebPlatformInterface {
   Future<bool> hasTokenExpired(AbstractToken token) async =>
       _auth.tokenManager.hasExpired(token);
 
+  Future<AuthState?> getAuthState() async {
+    return promiseToFuture<AuthState?>(_auth.authStateManager.getAuthState());
+  }
+
+  /// Subscribes a callback that will be called when the [AuthState]
+  /// event happens.
+
+  void subscribe(void Function(AuthState authState) cb) {
+    _auth.authStateManager.subscribe(allowInterop(cb));
+  }
+
+  /// Unsubscribes callback for [AuthState] event. It will unregister all
+  /// handlers if no callback handler is provided.
+  void unsubscribe(void Function(AuthState? authState) cb) {
+    _auth.authStateManager.unsubscribe(allowInterop(cb));
+  }
+
+  /// The goal of this authentication flow is to set an
+  /// Okta [session cookie on the user's browser](https://developer.okta.com/use_cases/authentication/session_cookie#retrieving-a-session-cookie-by-visiting-a-session-redirect-link) or retrieve
+  /// an [IDToken] or [AccessToken]. The flow is started
+  /// using [signInWithCredentials].
+  ///
+  /// [username] - User’s non-qualified short-name (e.g. dade.murphy)
+  /// or unique fully-qualified login
+  ///
+  /// [password] - User’s password
+  Future<AuthnTransaction> signInWithCredentials({
+    required String username,
+    required String password,
+  }) {
+    final response =
+        promiseToFuture<AuthnTransaction>(_auth.signInWithCredentials(
+      SigninWithCredentialsOptions(
+        username: username,
+        password: password,
+      ),
+    ));
+    return response;
+  }
+
+  /// This allows you to create a session using a sessionToken.
+  ///
+  /// [sessionToken] - Ephemeral one-time token used to
+  /// bootstrap an Okta session.
+  ///
+  /// [redirectUri] - After setting a cookie, Okta redirects to the specified
+  ///  URI. The default is the current URI.
+  void setCookieAndRedirect(String? sessionToken, {String? redirectUri}) {
+    _auth.session.setCookieAndRedirect(sessionToken, redirectUri);
+  }
+
+  Future<bool> isAuthenticated() {
+    return promiseToFuture<bool>(_auth.isAuthenticated());
+  }
+
+  Future<AbstractToken> get(String token) async {
+    return promiseToFuture(_auth.tokenManager.get(token));
+  }
+
+  /// When you've obtained a sessionToken from the authorization flows,
+  /// or a session already exists, you can obtain a token or tokens without
+  /// prompting the user to log in.
+  ///
+  ///
+  /// Example:
+  ///
+  /// ```dart
+  ///    final result =
+  ///      await provider.pluginWeb.signInWithCredentials(
+  ///    username: _usernamecontroller.text,
+  ///    password: _passwordcontroller.text,
+  ///  );
+
+  ///  if (result.status == 'SUCCESS') {
+  ///    final token = await provider.pluginWeb.getWithoutPrompt(
+  ///        sessionToken: result.sessionToken!,
+  ///        scopes: ['openid', 'email', 'profile'],
+  ///        responseType: ['token', 'id_token']);
+  ///    final idToken = token.tokens.idToken?.idToken;
+  ///    final accessToken = token.tokens.accessToken?.accessToken;
+  ///    Navigator.of(context).push(
+  ///      MaterialPageRoute(
+  ///        builder: (c) => WebProfileScreen(
+  ///          token: idToken!,
+  ///          accessToken: accessToken!,
+  ///        ),
+  ///      ),
+  ///    );
+  ///  }
+  /// ```
+  Future<TokenResponse> getWithoutPrompt({
+    List<String>? responseType,
+    required String sessionToken,
+    List<String>? scopes,
+  }) async {
+    return promiseToFuture<TokenResponse>(
+        _auth.token.getWithoutPrompt(AuthorizeOptions(
+      sessionToken: sessionToken,
+      scopes: scopes,
+      responseType: responseType,
+    )));
+  }
+
+  /// Revokes refreshToken or accessToken, clears all local tokens,
+  /// then redirects to Okta to end the SSO session.
+  Future<bool?> signOut() async {
+    return promiseToFuture<bool?>(_auth.signOut());
+  }
+
+  Future<AuthState> updateAuthState() async {
+    return promiseToFuture(_auth.authStateManager.updateAuthState());
+  }
+
   /// Revokes the access token for this application so it can no longer be used to authenticate API requests. The [accessToken] parameter is optional. By default, revokeAccessToken will look for a token object named accessToken within the TokenManager. If you have stored the access token object in a different location, you should retrieve it first and then pass it here. Returns a promise that resolves when the operation has completed. This method will succeed even if the access token has already been revoked or removed.
   Future<void> revokeAccessToken(AccessToken accessToken) async {
     await promiseToFuture(_auth.revokeAccessToken(accessToken));
@@ -206,5 +321,17 @@ class HssOktaFlutterWeb extends HssOktaFlutterWebPlatformInterface {
   ///Can set (or unset) request headers after construction.
   void setHeaders(Map<String, String> headers) {
     _auth.setHeaders(jsify(headers));
+  }
+
+  Future<bool> isSessionExists() async {
+    return await promiseToFuture(_auth.session.exists());
+  }
+
+  Future<SessionObject> getActiveSession() async {
+    return await promiseToFuture(_auth.session.get());
+  }
+
+  Future<SessionObject> refreshSession() async {
+    return await promiseToFuture(_auth.session.refresh());
   }
 }

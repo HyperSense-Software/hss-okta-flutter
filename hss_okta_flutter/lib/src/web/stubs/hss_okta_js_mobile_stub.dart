@@ -1,3 +1,5 @@
+import 'hss_okta_authn_stub.dart';
+
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 class OktaAuth {
   Token get token => throw UnimplementedError();
@@ -53,6 +55,88 @@ class OktaAuth {
   void getOriginalUri() => throw UnimplementedError();
 
   void setHeaders(Object headers) => throw UnimplementedError();
+
+  /// Subscribes a callback that will be called when the [AuthState]
+  /// event happens.
+
+  void subscribe(void Function(AuthState authState) cb) =>
+      throw UnimplementedError();
+
+  /// Unsubscribes callback for [AuthState] event. It will unregister all
+  /// handlers if no callback handler is provided.
+  void unsubscribe(void Function(AuthState? authState) cb) =>
+      throw UnimplementedError();
+
+  /// The goal of this authentication flow is to set an
+  /// Okta [session cookie on the user's browser](https://developer.okta.com/use_cases/authentication/session_cookie#retrieving-a-session-cookie-by-visiting-a-session-redirect-link) or retrieve
+  /// an [IDToken] or [AccessToken]. The flow is started
+  /// using [signInWithCredentials].
+  ///
+  /// [username] - User’s non-qualified short-name (e.g. dade.murphy)
+  /// or unique fully-qualified login
+  ///
+  /// [password] - User’s password
+  Future<AuthnTransaction> signInWithCredentials({
+    required String username,
+    required String password,
+  }) =>
+      throw UnimplementedError();
+
+  /// This allows you to create a session using a sessionToken.
+  ///
+  /// [sessionToken] - Ephemeral one-time token used to
+  /// bootstrap an Okta session.
+  ///
+  /// [redirectUri] - After setting a cookie, Okta redirects to the specified
+  ///  URI. The default is the current URI.
+  void setCookieAndRedirect(String? sessionToken, {String? redirectUri}) =>
+      throw UnimplementedError();
+
+  Future<bool> isAuthenticated() => throw UnimplementedError();
+
+  /// When you've obtained a sessionToken from the authorization flows,
+  /// or a session already exists, you can obtain a token or tokens without
+  /// prompting the user to log in.
+  ///
+  ///
+  /// Example:
+  ///
+  /// ```dart
+  ///    final result =
+  ///      await provider.pluginWeb.signInWithCredentials(
+  ///    username: _usernamecontroller.text,
+  ///    password: _passwordcontroller.text,
+  ///  );
+
+  ///  if (result.status == 'SUCCESS') {
+  ///    final token = await provider.pluginWeb.getWithoutPrompt(
+  ///        sessionToken: result.sessionToken!,
+  ///        scopes: ['openid', 'email', 'profile'],
+  ///        responseType: ['token', 'id_token']);
+  ///    final idToken = token.tokens.idToken?.idToken;
+  ///    final accessToken = token.tokens.accessToken?.accessToken;
+  ///    Navigator.of(context).push(
+  ///      MaterialPageRoute(
+  ///        builder: (c) => WebProfileScreen(
+  ///          token: idToken!,
+  ///          accessToken: accessToken!,
+  ///        ),
+  ///      ),
+  ///    );
+  ///  }
+  /// ```
+  Future<TokenResponse> getWithoutPrompt({
+    List<String>? responseType,
+    required String sessionToken,
+    List<String>? scopes,
+  }) =>
+      throw UnimplementedError();
+
+  /// Revokes refreshToken or accessToken, clears all local tokens,
+  /// then redirects to Okta to end the SSO session.
+  Future<bool?> signOut() => throw UnimplementedError();
+
+  Future<AuthState> updateAuthState() => throw UnimplementedError();
 }
 
 class OktaConfig {
@@ -263,4 +347,28 @@ class UserClaims {
     required this.atHash,
     required this.acr,
   });
+}
+
+class AuthState {
+  external bool get isAuthenticated;
+  external AccessToken get accessToken;
+  external IDToken get idToken;
+  external String get error;
+}
+
+class SessionObject {
+  external String get status;
+  external Future refresh();
+  external Future user();
+}
+
+class SessionAPI {
+  external Future close();
+  external Future<bool?> exists();
+  external Future<SessionObject> get();
+  external Future refresh();
+  external void setCookieAndRedirect(
+    String? sessionToken,
+    String? redirectUrl,
+  );
 }
