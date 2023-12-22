@@ -61,5 +61,6 @@
 * Added AuthStateManager
 * Addded subscribe to authentication changes
 * Added unsubscribe to authentication changes
-* Added User claims
+* Added User claims class
 * Added Session API
+* exposed AuthClient for web users
