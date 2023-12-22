@@ -31,9 +31,13 @@ class AuthnTransaction extends AuthnTransactionState {
 @JS()
 class AuthTransactionAPI {
   external bool exists();
+  // TODO : turn into explicit arguments, they should work with js interop @vinceramcesoliveros-hypersensesoftware
   external Future status(dynamic args);
+  // TODO : turn into explicit arguments, they should work with js interop @vinceramcesoliveros-hypersensesoftware
   external Future resume(dynamic args);
+  // TODO : turn into explicit arguments, they should work with js interop @vinceramcesoliveros-hypersensesoftware
   external Future<AuthnTransaction> introspect(dynamic args);
+
   external AuthnTransaction createTransaction(AuthnTransactionState? res);
   // external Future<AuthnTransaction> postToTransaction(
   //     String url, RequestData? args, RequestOption? options);
