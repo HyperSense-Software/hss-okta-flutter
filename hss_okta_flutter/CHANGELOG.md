@@ -63,4 +63,3 @@
 * Added unsubscribe to authentication changes
 * Added User claims
 * Added Session API
-* unprivate oktaAuth for web users that want finer control
