@@ -20,6 +20,7 @@ A new Flutter plugin project.
   s.dependency 'OktaJWT'
   s.dependency 'OktaDirectAuth'
   s.dependency 'OktaWebAuthenticationUI'
+  s.dependency 'OktaIdx'
   # s.dependency 'OktaAuthNative'
   s.platform = :ios, '13.0'
 
