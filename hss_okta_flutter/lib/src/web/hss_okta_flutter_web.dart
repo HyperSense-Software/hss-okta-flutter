@@ -28,7 +28,11 @@ class HssOktaFlutterWeb extends HssOktaFlutterWebPlatformInterface {
   ///
   /// {@endtemplate}
   Future<void> initializeClient({required OktaConfig oktaConfig}) async {
-    _auth = OktaAuth(oktaConfig);
+    try {
+      _auth = OktaAuth(oktaConfig);
+    } catch (e) {
+      debugPrint('$e');
+    }
   }
 
   /// Create token using a redirect.
@@ -336,7 +340,7 @@ class HssOktaFlutterWeb extends HssOktaFlutterWebPlatformInterface {
   }) async {
     return promiseToFuture<bool?>(
       _auth.signOut(
-        SignOutOptions(
+        SignoutOptions(
           refreshToken: refreshToken,
           revokeAccessToken: revokeAccessToken,
           accessToken: accessToken,

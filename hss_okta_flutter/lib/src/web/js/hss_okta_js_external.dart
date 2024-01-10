@@ -25,7 +25,7 @@ class OktaAuth {
     SigninWithCredentialsOptions opts,
   );
 
-  external Future<bool?> signOut(SignoutOptions opts);
+  external Future<bool> signOut(SignoutOptions? options);
 
   external Future<bool> closeSession();
 
@@ -83,7 +83,7 @@ class OktaConfig {
     String? issuer,
     String? clientId,
     String? redirectUri,
-    String? scopes,
+    List<String>? scopes,
     String? state,
     bool? pkce,
     String? authorizeUrl,

@@ -47,15 +47,24 @@ class SigninOptions {
 
 @JS()
 @anonymous
-class SignOutOptions {
-  external factory SignOutOptions({
+class SignoutOptions {
+  external factory SignoutOptions({
+    dynamic? accessToken,
+    dynamic? refreshToken,
     bool? revokeAccessToken,
     bool? revokeRefreshToken,
-    AccessToken? accessToken,
-    RefreshToken? refreshToken,
     bool? clearTokensBeforeRedirect,
+    String? postLogoutRedirectUri,
+    String? state,
   });
 }
+
+///
+// revokeAccessToken?: boolean;
+// revokeRefreshToken?: boolean;
+// accessToken?: AccessToken;
+// refreshToken?: RefreshToken;
+// clearTokensBeforeRedirect?: boolean;
 
 @JS()
 @anonymous
