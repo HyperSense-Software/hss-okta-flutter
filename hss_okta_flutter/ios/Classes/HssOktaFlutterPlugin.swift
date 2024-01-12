@@ -63,7 +63,8 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
                             
                         case .mfaRequired(_):
                             completion(.success(AuthenticationResult(result: DirectAuthenticationResult.mfaRequired)))
-                        case .bindingUpdate(_): break
+                        default:
+                            break
                             
                         }
                     }else{
