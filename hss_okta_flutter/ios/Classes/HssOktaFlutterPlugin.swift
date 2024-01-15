@@ -233,9 +233,7 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
                                 resultEnum: nil,
                                 token: result.token, userInfo: userInfo)))
                         
-                        Credential.credentialDataSource.
                         
-                        Credential.tokenStorage.set
                         
                     }
                     
