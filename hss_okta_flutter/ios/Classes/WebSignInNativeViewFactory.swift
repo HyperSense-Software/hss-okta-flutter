@@ -74,7 +74,9 @@ class WebSignInNativeViewFactory: NSObject, FlutterPlatformViewFactory {
                     do{
                         
                         if(auth == nil){
-                            return FlutterError(code: "ConfigError", message: "Missing or bad Okta.plist", details: "")
+                           
+                            
+                            eventSink(FlutterError(code: "ConfigError", message: "Missing or bad Okta.plist", details: ""))
                         }
 
                         if let token = try await self.auth?.signIn(from: self.view.window){
@@ -86,10 +88,10 @@ class WebSignInNativeViewFactory: NSObject, FlutterPlatformViewFactory {
                         
                         
                     }catch let e{
-                            return FlutterError(code: "Browser Authentication Failed", message: e.localizedDescription.stringValue, details: "Failed to start Flow")
+                            eventSink(FlutterError(code: "Browser Authentication Failed", message: e.localizedDescription.stringValue, details: "Failed to start Flow"))
                         }
                     
-                    return FlutterError(code: "Browser Authentication Failed", message: "Something went wrong", details: "Failed to start Flow")
+                  eventSink(FlutterError(code: "Browser Authentication Failed", message: "Something went wrong", details: "Failed to start Flow"))
                 }
                 return nil
             }
