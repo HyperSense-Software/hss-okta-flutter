@@ -75,6 +75,7 @@ class WebSignOutNativeViewFactory: NSObject, FlutterPlatformViewFactory {
                         
                         if(auth == nil){
                             eventSink(FlutterError(code: "ConfigError", message: "Missing or bad Okta.plist", details: ""))
+                            return;
                         }
                         
                         if let webAuth = WebAuthentication.shared{

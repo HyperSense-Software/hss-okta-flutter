@@ -74,9 +74,9 @@ class WebSignInNativeViewFactory: NSObject, FlutterPlatformViewFactory {
                     do{
                         
                         if(auth == nil){
-                           
-                            
                             eventSink(FlutterError(code: "ConfigError", message: "Missing or bad Okta.plist", details: ""))
+                            
+                            return;
                         }
 
                         if let token = try await self.auth?.signIn(from: self.view.window){
