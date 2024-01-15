@@ -55,13 +55,6 @@ enum AuthenticationFactor: Int {
   case oob = 1
 }
 
-/// [AuthenticationResult] is used to determine the result of the authentication for all authentication flows
-/// return [AuthenticationResult.success] if the authentication was successful
-/// return [AuthenticationResult.mfaRequired] if the authentication requires MFA, Only for IOS does nothing for Android
-/// [error] returns the error message
-/// [OktaToken] contains the Credential from retrieved from okta
-/// [UserInfo] contains the user information retrieved from okta
-///
 /// Generated class from Pigeon that represents data sent in messages.
 struct AuthenticationResult {
   var result: DirectAuthenticationResult? = nil
@@ -102,8 +95,6 @@ struct AuthenticationResult {
   }
 }
 
-/// Class for the credential retrieved information retrieved in okta
-///
 /// Generated class from Pigeon that represents data sent in messages.
 struct OktaToken {
   var id: String? = nil
@@ -146,8 +137,6 @@ struct OktaToken {
   }
 }
 
-/// Class for the user information retrieved in okta
-///
 /// Generated class from Pigeon that represents data sent in messages.
 struct UserInfo {
   var userId: String
@@ -194,10 +183,6 @@ struct UserInfo {
   }
 }
 
-/// Authentication request for ResourceOwnerFlow
-/// [Factors] should contain [AuthenticationFactor.otp] or [AuthenticationFactor.oob] this is not available for iOS
-/// [username] and [password] are Okta Credentials
-///
 /// Generated class from Pigeon that represents data sent in messages.
 struct DirectAuthRequest {
   var username: String
@@ -224,10 +209,6 @@ struct DirectAuthRequest {
   }
 }
 
-/// Class for the device authorization flow containing the retrived session information
-/// [userCode] is the code that the user should enter in the browser
-/// [verificationUri] is the Url the user needs to navigate and insert the [userCode] to verify the login
-///
 /// Generated class from Pigeon that represents data sent in messages.
 struct DeviceAuthorizationSession {
   var userCode: String? = nil
@@ -316,6 +297,11 @@ protocol HssOktaFlutterPluginApi {
   func startDeviceAuthorizationFlow(completion: @escaping (Result<DeviceAuthorizationSession?, Error>) -> Void)
   func resumeDeviceAuthorizationFlow(completion: @escaping (Result<AuthenticationResult?, Error>) -> Void)
   func startTokenExchangeFlow(deviceSecret: String, idToken: String, completion: @escaping (Result<AuthenticationResult?, Error>) -> Void)
+  func getAllUserIds(completion: @escaping (Result<[String], Error>) -> Void)
+  func getToken(tokenId: String, completion: @escaping (Result<OktaToken?, Error>) -> Void)
+  func removeToken(tokenId: String, completion: @escaping (Result<Bool, Error>) -> Void)
+  func removeCredential(tokenId: String, completion: @escaping (Result<Bool, Error>) -> Void)
+  func setDefaultToken(tokenId: String, completion: @escaping (Result<Bool, Error>) -> Void)
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -450,6 +436,89 @@ class HssOktaFlutterPluginApiSetup {
       }
     } else {
       startTokenExchangeFlowChannel.setMessageHandler(nil)
+    }
+    let getAllUserIdsChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.getAllUserIds", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      getAllUserIdsChannel.setMessageHandler { _, reply in
+        api.getAllUserIds() { result in
+          switch result {
+            case .success(let res):
+              reply(wrapResult(res))
+            case .failure(let error):
+              reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      getAllUserIdsChannel.setMessageHandler(nil)
+    }
+    let getTokenChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.getToken", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      getTokenChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let tokenIdArg = args[0] as! String
+        api.getToken(tokenId: tokenIdArg) { result in
+          switch result {
+            case .success(let res):
+              reply(wrapResult(res))
+            case .failure(let error):
+              reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      getTokenChannel.setMessageHandler(nil)
+    }
+    let removeTokenChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.removeToken", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      removeTokenChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let tokenIdArg = args[0] as! String
+        api.removeToken(tokenId: tokenIdArg) { result in
+          switch result {
+            case .success(let res):
+              reply(wrapResult(res))
+            case .failure(let error):
+              reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      removeTokenChannel.setMessageHandler(nil)
+    }
+    let removeCredentialChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.removeCredential", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      removeCredentialChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let tokenIdArg = args[0] as! String
+        api.removeCredential(tokenId: tokenIdArg) { result in
+          switch result {
+            case .success(let res):
+              reply(wrapResult(res))
+            case .failure(let error):
+              reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      removeCredentialChannel.setMessageHandler(nil)
+    }
+    let setDefaultTokenChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.setDefaultToken", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      setDefaultTokenChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let tokenIdArg = args[0] as! String
+        api.setDefaultToken(tokenId: tokenIdArg) { result in
+          switch result {
+            case .success(let res):
+              reply(wrapResult(res))
+            case .failure(let error):
+              reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      setDefaultTokenChannel.setMessageHandler(nil)
     }
   }
 }
