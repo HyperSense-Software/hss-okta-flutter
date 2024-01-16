@@ -298,8 +298,7 @@ protocol HssOktaFlutterPluginApi {
   func resumeDeviceAuthorizationFlow(completion: @escaping (Result<AuthenticationResult?, Error>) -> Void)
   func startTokenExchangeFlow(deviceSecret: String, idToken: String, completion: @escaping (Result<AuthenticationResult?, Error>) -> Void)
   func getAllUserIds(completion: @escaping (Result<[String], Error>) -> Void)
-  func getToken(tokenId: String, completion: @escaping (Result<OktaToken?, Error>) -> Void)
-  func removeToken(tokenId: String, completion: @escaping (Result<Bool, Error>) -> Void)
+  func getToken(tokenId: String, completion: @escaping (Result<AuthenticationResult?, Error>) -> Void)
   func removeCredential(tokenId: String, completion: @escaping (Result<Bool, Error>) -> Void)
   func setDefaultToken(tokenId: String, completion: @escaping (Result<Bool, Error>) -> Void)
 }
@@ -468,23 +467,6 @@ class HssOktaFlutterPluginApiSetup {
       }
     } else {
       getTokenChannel.setMessageHandler(nil)
-    }
-    let removeTokenChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.removeToken", binaryMessenger: binaryMessenger, codec: codec)
-    if let api = api {
-      removeTokenChannel.setMessageHandler { message, reply in
-        let args = message as! [Any?]
-        let tokenIdArg = args[0] as! String
-        api.removeToken(tokenId: tokenIdArg) { result in
-          switch result {
-            case .success(let res):
-              reply(wrapResult(res))
-            case .failure(let error):
-              reply(wrapError(error))
-          }
-        }
-      }
-    } else {
-      removeTokenChannel.setMessageHandler(nil)
     }
     let removeCredentialChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.removeCredential", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {

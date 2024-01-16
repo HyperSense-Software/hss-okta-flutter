@@ -15,7 +15,7 @@ case generalError(String)
 
 
 public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginApi {
-  
+   
     
 
     let browserAuth = WebAuthentication.shared
@@ -245,6 +245,58 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
             
         }
     }
+    
+    func getAllUserIds(completion: @escaping (Result<[String], Error>) -> Void) {
+        Task{
+            let ids = Credential.allIDs
+            completion(.success(ids))
+        }
+    }
+    
+    func getToken(tokenId: String, completion: @escaping (Result<AuthenticationResult?, Error>) -> Void) {
+        Task{
+            do{
+                if let fetchedCredential = try Credential.with(id: tokenId){
+                    completion(.success(constructAuthenticationResult(
+                        resultEnum: nil, token: fetchedCredential.token, userInfo: fetchedCredential.userInfo)))
+                }
+               
+            }catch let error{
+                completion(.failure(error))
+            }
+        }
+    }
+    
+   
+    
+    func removeCredential(tokenId: String, completion: @escaping (Result<Bool, Error>) -> Void) {
+        Task{
+            Task{
+                do{
+                    
+                    try Credential.with(id:tokenId)?.remove()
+                    completion(.success(true))
+                    
+                }catch let error{
+                    completion(.failure(error))
+                }
+            }
+        }
+    }
+    
+    func setDefaultToken(tokenId: String, completion: @escaping (Result<Bool, Error>) -> Void) {
+        Task{
+            do{
+               
+                try Credential.tokenStorage.setDefaultTokenID(tokenId)
+                completion(.success(true))
+                
+            }catch let error{
+                completion(.failure(error))
+            }
+        }}
+    
+  
     
     
     

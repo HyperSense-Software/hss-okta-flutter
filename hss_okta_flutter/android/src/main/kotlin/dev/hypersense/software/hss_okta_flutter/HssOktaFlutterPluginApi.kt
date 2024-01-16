@@ -306,8 +306,7 @@ interface HssOktaFlutterPluginApi {
   fun resumeDeviceAuthorizationFlow(callback: (Result<AuthenticationResult?>) -> Unit)
   fun startTokenExchangeFlow(deviceSecret: String, idToken: String, callback: (Result<AuthenticationResult?>) -> Unit)
   fun getAllUserIds(callback: (Result<List<String>>) -> Unit)
-  fun getToken(tokenId: String, callback: (Result<OktaToken?>) -> Unit)
-  fun removeToken(tokenId: String, callback: (Result<Boolean>) -> Unit)
+  fun getToken(tokenId: String, callback: (Result<AuthenticationResult?>) -> Unit)
   fun removeCredential(tokenId: String, callback: (Result<Boolean>) -> Unit)
   fun setDefaultToken(tokenId: String, callback: (Result<Boolean>) -> Unit)
 
@@ -494,27 +493,7 @@ interface HssOktaFlutterPluginApi {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
             val tokenIdArg = args[0] as String
-            api.getToken(tokenIdArg) { result: Result<OktaToken?> ->
-              val error = result.exceptionOrNull()
-              if (error != null) {
-                reply.reply(wrapError(error))
-              } else {
-                val data = result.getOrNull()
-                reply.reply(wrapResult(data))
-              }
-            }
-          }
-        } else {
-          channel.setMessageHandler(null)
-        }
-      }
-      run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.removeToken", codec)
-        if (api != null) {
-          channel.setMessageHandler { message, reply ->
-            val args = message as List<Any?>
-            val tokenIdArg = args[0] as String
-            api.removeToken(tokenIdArg) { result: Result<Boolean> ->
+            api.getToken(tokenIdArg) { result: Result<AuthenticationResult?> ->
               val error = result.exceptionOrNull()
               if (error != null) {
                 reply.reply(wrapError(error))

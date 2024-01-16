@@ -130,10 +130,7 @@ abstract class HssOktaFlutterPluginApi {
   List<String> getAllUserIds();
 
   @async
-  OktaToken? getToken(String tokenId);
-
-  @async
-  bool removeToken(String tokenId);
+  AuthenticationResult? getToken(String tokenId);
 
   @async
   bool removeCredential(String tokenId);
