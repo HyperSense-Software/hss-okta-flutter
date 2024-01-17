@@ -307,8 +307,8 @@ interface HssOktaFlutterPluginApi {
   fun startTokenExchangeFlow(deviceSecret: String, idToken: String, callback: (Result<AuthenticationResult?>) -> Unit)
   fun getAllUserIds(callback: (Result<List<String>>) -> Unit)
   fun getToken(tokenId: String, callback: (Result<AuthenticationResult?>) -> Unit)
-  fun removeCredential(tokenId: String, callback: (Result<Boolean>) -> Unit)
-  fun setDefaultToken(tokenId: String, callback: (Result<Boolean>) -> Unit)
+  fun removeCredential(tokenId: String): Boolean
+  fun setDefaultToken(tokenId: String): Boolean
 
   companion object {
     /** The codec used by HssOktaFlutterPluginApi. */
@@ -513,15 +513,13 @@ interface HssOktaFlutterPluginApi {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
             val tokenIdArg = args[0] as String
-            api.removeCredential(tokenIdArg) { result: Result<Boolean> ->
-              val error = result.exceptionOrNull()
-              if (error != null) {
-                reply.reply(wrapError(error))
-              } else {
-                val data = result.getOrNull()
-                reply.reply(wrapResult(data))
-              }
+            var wrapped: List<Any?>
+            try {
+              wrapped = listOf<Any?>(api.removeCredential(tokenIdArg))
+            } catch (exception: Throwable) {
+              wrapped = wrapError(exception)
             }
+            reply.reply(wrapped)
           }
         } else {
           channel.setMessageHandler(null)
@@ -533,15 +531,13 @@ interface HssOktaFlutterPluginApi {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
             val tokenIdArg = args[0] as String
-            api.setDefaultToken(tokenIdArg) { result: Result<Boolean> ->
-              val error = result.exceptionOrNull()
-              if (error != null) {
-                reply.reply(wrapError(error))
-              } else {
-                val data = result.getOrNull()
-                reply.reply(wrapResult(data))
-              }
+            var wrapped: List<Any?>
+            try {
+              wrapped = listOf<Any?>(api.setDefaultToken(tokenIdArg))
+            } catch (exception: Throwable) {
+              wrapped = wrapError(exception)
             }
+            reply.reply(wrapped)
           }
         } else {
           channel.setMessageHandler(null)

@@ -299,8 +299,8 @@ protocol HssOktaFlutterPluginApi {
   func startTokenExchangeFlow(deviceSecret: String, idToken: String, completion: @escaping (Result<AuthenticationResult?, Error>) -> Void)
   func getAllUserIds(completion: @escaping (Result<[String], Error>) -> Void)
   func getToken(tokenId: String, completion: @escaping (Result<AuthenticationResult?, Error>) -> Void)
-  func removeCredential(tokenId: String, completion: @escaping (Result<Bool, Error>) -> Void)
-  func setDefaultToken(tokenId: String, completion: @escaping (Result<Bool, Error>) -> Void)
+  func removeCredential(tokenId: String) throws -> Bool
+  func setDefaultToken(tokenId: String) throws -> Bool
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -473,13 +473,11 @@ class HssOktaFlutterPluginApiSetup {
       removeCredentialChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
         let tokenIdArg = args[0] as! String
-        api.removeCredential(tokenId: tokenIdArg) { result in
-          switch result {
-            case .success(let res):
-              reply(wrapResult(res))
-            case .failure(let error):
-              reply(wrapError(error))
-          }
+        do {
+          let result = try api.removeCredential(tokenId: tokenIdArg)
+          reply(wrapResult(result))
+        } catch {
+          reply(wrapError(error))
         }
       }
     } else {
@@ -490,13 +488,11 @@ class HssOktaFlutterPluginApiSetup {
       setDefaultTokenChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
         let tokenIdArg = args[0] as! String
-        api.setDefaultToken(tokenId: tokenIdArg) { result in
-          switch result {
-            case .success(let res):
-              reply(wrapResult(res))
-            case .failure(let error):
-              reply(wrapError(error))
-          }
+        do {
+          let result = try api.setDefaultToken(tokenId: tokenIdArg)
+          reply(wrapResult(result))
+        } catch {
+          reply(wrapError(error))
         }
       }
     } else {
