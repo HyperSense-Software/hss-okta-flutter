@@ -267,6 +267,63 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
         }
     }
 
+    override fun getAllUserIds(callback: (Result<List<String>>) -> Unit) {
+       CoroutineScope(Dispatchers.IO).launch {
+           try{
+               val credentialList = CredentialBootstrap.credentialDataSource.listCredentials()
+               val ids = credentialList.mapNotNull { credential -> credential.token?.idToken }
+
+               callback.invoke(Result.success(ids))
+           }catch (exception : Exception){
+               callback.invoke(Result.failure(exception))
+           }
+
+       }
+    }
+
+    override fun getToken(tokenId: String, callback: (Result<AuthenticationResult?>) -> Unit) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try{
+                val credentialList = CredentialBootstrap.credentialDataSource.listCredentials()
+                val selectedCredential = credentialList.firstOrNull { credential ->  credential.token?.idToken == tokenId}
+
+               if(selectedCredential != null){
+                   callback.invoke(Result.success(selectedCredential.token?.let {
+                       composeOktaResult(
+                           res = it,
+                           userInfoResult = selectedCredential.getUserInfo().getOrThrow(),
+                       )
+                   }))
+               }
+            }catch (exception : Exception){
+                callback.invoke(Result.failure(exception))
+            }
+
+        }
+    }
+
+    override fun removeCredential(tokenId: String, callback: (Result<Boolean>) -> Unit) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try{
+                val credentialList = CredentialBootstrap.credentialDataSource.listCredentials()
+                val selectedCredential = credentialList.firstOrNull { credential ->  credential.token?.idToken == tokenId}
+
+                selectedCredential?.delete()
+
+                callback.invoke(Result.success(true))
+
+            }catch (exception : Exception){
+                callback.invoke(Result.failure(exception))
+            }
+
+        }
+    }
+
+    /// NOT AVAILABLE FOR ANDROID
+    override fun setDefaultToken(tokenId: String, callback: (Result<Boolean>) -> Unit) {
+       throw NotImplementedError()
+    }
+
 
     private fun composeOktaResult(res : Token, userInfoResult : OidcUserInfo) : AuthenticationResult{
         return AuthenticationResult(

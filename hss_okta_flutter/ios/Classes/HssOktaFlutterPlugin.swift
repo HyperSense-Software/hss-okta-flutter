@@ -295,11 +295,7 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
                 completion(.failure(error))
             }
         }}
-    
-  
-    
-    
-    
+
     
     //    Helper methods
         
