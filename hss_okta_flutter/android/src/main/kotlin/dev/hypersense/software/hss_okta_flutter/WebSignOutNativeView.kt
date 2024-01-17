@@ -62,7 +62,7 @@ internal class WebSignOutNativeView(private val context: Context,
                 CredentialBootstrap.oidcClient.createWebAuthenticationClient()
             when(val result = webAuthenticationClient.logoutOfBrowser(context,BuildConfig.SIGN_OUT_REDIRECT_URI,"${credential.token?.idToken}")){
                 is OidcClientResult.Error -> {
-                    eventSink?.success(false)
+                    eventSink?.success(result.exception)
                 }
                 is OidcClientResult.Success -> {
                     eventSink?.success(true)

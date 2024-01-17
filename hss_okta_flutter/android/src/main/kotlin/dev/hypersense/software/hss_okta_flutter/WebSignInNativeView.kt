@@ -63,7 +63,8 @@ internal class WebSignInNativeView(private val context: Context,
             when (val result =
                 webAuthenticationClient.login(context, "${BuildConfig.SIGN_IN_REDIRECT_URI}")) {
                 is OidcClientResult.Error -> {
-                    eventSink?.success(false)
+                    
+                    eventSink?.success(result.exception)
                 }
 
                 is OidcClientResult.Success -> {
