@@ -63,7 +63,12 @@ internal class WebSignInNativeView(private val context: Context,
             when (val result =
                 webAuthenticationClient.login(context, "${BuildConfig.SIGN_IN_REDIRECT_URI}")) {
                 is OidcClientResult.Error -> {
-                    eventSink?.success(false)
+                    
+                    eventSink?.error(
+                        "Browser Sign in Exception",
+                        result.exception.localizedMessage,
+                        ""
+                    )
                 }
 
                 is OidcClientResult.Success -> {
@@ -75,6 +80,10 @@ internal class WebSignInNativeView(private val context: Context,
     }
 
     override fun onCancel(arguments: Any?) {
+        eventSink?.error(
+            "User Cancel",
+            "Flow canceled",
+            "")
         eventSink = null
     }
 

@@ -67,3 +67,11 @@
 
 # 1.3.3
 * Added Fix for a problem in iOS which causes non-exhaustive error, making some users unable to build
+
+# 1.3.4
+* Added getAllIds for iOS and Android
+* Added removeCredential for iOS and Android
+* Added setDefaultCredential for iOS
+* Added getToken for Android and iOS
+* Fixed Missing error return for native Browser SignIn and Signout streams
+* Fixed Crash on android when okta.properties has bad values

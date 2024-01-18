@@ -62,7 +62,11 @@ internal class WebSignOutNativeView(private val context: Context,
                 CredentialBootstrap.oidcClient.createWebAuthenticationClient()
             when(val result = webAuthenticationClient.logoutOfBrowser(context,BuildConfig.SIGN_OUT_REDIRECT_URI,"${credential.token?.idToken}")){
                 is OidcClientResult.Error -> {
-                    eventSink?.success(false)
+                    eventSink?.error(
+                        "Browser Sign out Exception",
+                        result.exception.localizedMessage,
+                     ""
+                    )
                 }
                 is OidcClientResult.Success -> {
                     eventSink?.success(true)
@@ -72,6 +76,10 @@ internal class WebSignOutNativeView(private val context: Context,
     }
 
     override fun onCancel(arguments: Any?) {
+        eventSink?.error(
+            "User Cancel",
+            "Flow canceled",
+            "")
         eventSink = null
     }
 

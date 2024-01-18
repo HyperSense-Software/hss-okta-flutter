@@ -93,4 +93,36 @@ class HssOktaFlutter {
     );
     return result;
   }
+
+  /// Gets all the UserIds stored on the device
+  Future<List<String?>> getAllUserIds() async {
+    var result = await HssOktaFlutterPlatformInterface.instance.getAllUserIds();
+    return result;
+  }
+
+  /// Gets the Credential stored on the device
+  Future<AuthenticationResult?> getToken(String tokenId) async {
+    var result =
+        await HssOktaFlutterPlatformInterface.instance.getToken(tokenId);
+    return result;
+  }
+
+  /// Removes the Credential stored on the device
+  Future<bool> removeCredential(String tokenId) async {
+    var result =
+        await HssOktaFlutterPlatformInterface.instance.removeCredential(
+      tokenId,
+    );
+    return result;
+  }
+
+  /// Sets the default Credential stored on the device
+  /// This is used to set the default Credential when using multiple Credentials
+  /// This is only available on iOS
+  Future<bool> setDefaultToken(String tokenId) async {
+    var result = await HssOktaFlutterPlatformInterface.instance.setDefaultToken(
+      tokenId,
+    );
+    return result;
+  }
 }

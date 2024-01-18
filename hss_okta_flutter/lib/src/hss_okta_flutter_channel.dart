@@ -69,4 +69,24 @@ class HssOktaFlutterChannel extends HssOktaFlutterPlatformInterface {
 
     return res;
   }
+
+  @override
+  Future<List<String?>> getAllUserIds() async {
+    return await _api.getAllUserIds();
+  }
+
+  @override
+  Future<AuthenticationResult?> getToken(String tokenId) async {
+    return await _api.getToken(tokenId);
+  }
+
+  @override
+  Future<bool> removeCredential(String tokenId) async {
+    return await _api.removeCredential(tokenId);
+  }
+
+  @override
+  Future<bool> setDefaultToken(String tokenId) async {
+    return await _api.setDefaultToken(tokenId);
+  }
 }

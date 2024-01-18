@@ -71,17 +71,28 @@ class WebSignOutNativeViewFactory: NSObject, FlutterPlatformViewFactory {
                 self.sink = eventSink
                 Task{@MainActor in
                     
-                    do{
-                        if let webAuth = WebAuthentication.shared{
-                        try await webAuth.signOut(from: self.view.window)
-                        eventSink(true)
-                        }
-                    }catch let e{
-                        return FlutterError(code: "Browser Authentication Failed", message: e.localizedDescription.stringValue, details: "Failed to start Flow")
+                    if(auth == nil){
+                        eventSink(FlutterError(code: "ConfigError", message: "Missing or bad Okta.plist", details: ""))
+                        return;
                     }
                     
-                    return FlutterError(code: "Browser Sign out Failed", message:"Failed to Process Signout", details: "")
+                    self.auth?.signOut(from:self.view.window,completion:{
+                        result in
+                        switch result{
+                        case .success():
+                            eventSink(true)
+                            
+                        case .failure(let error):
+                            eventSink(FlutterError(code: "Browser Sign out Failed", message: error.localizedDescription.stringValue, details: ""))
+                            break;
+                            
+                        default :
+                            break;
+                        }
+                    })
+                    
                 }
+                
                 return nil
                 
             }
