@@ -310,9 +310,12 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
                 val credentialList = CredentialBootstrap.credentialDataSource.listCredentials()
                 val selectedCredential = credentialList.firstOrNull { credential ->  credential.token?.idToken == tokenId}
 
-                selectedCredential?.delete()
+                if(selectedCredential != null){
+                    selectedCredential.delete()
+                    callback.invoke(Result.success(true))
+                }
 
-                callback.invoke(Result.success(true))
+                callback.invoke(Result.failure(Exception("Failed to delete credential, Token not found")))
 
             }catch (exception : Exception){
                 callback.invoke(Result.failure(exception))
