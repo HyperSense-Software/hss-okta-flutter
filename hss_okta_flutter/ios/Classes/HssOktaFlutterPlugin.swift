@@ -15,8 +15,6 @@ case generalError(String)
 
 
 public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginApi {
-   
-    
 
     let browserAuth = WebAuthentication.shared
     var flow : (any AuthenticationFlow)?

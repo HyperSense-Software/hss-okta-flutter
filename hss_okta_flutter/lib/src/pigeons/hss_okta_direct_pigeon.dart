@@ -132,7 +132,8 @@ abstract class HssOktaFlutterPluginApi {
   @async
   AuthenticationResult? getToken(String tokenId);
 
+  @async
   bool removeCredential(String tokenId);
-
+  @async
   bool setDefaultToken(String tokenId);
 }
