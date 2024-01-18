@@ -296,7 +296,7 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
                    }))
                }
             }catch (exception : Exception){
-                callback.invoke(Result.failure(exception))
+                  callback.invoke(Result.failure(exception))
             }
 
         }
