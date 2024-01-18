@@ -55,52 +55,60 @@ class WebSignInNativeViewFactory: NSObject, FlutterPlatformViewFactory {
             func createNativeView(view _view: UIView){}
         }
         
-        class BrowserAuthenticationHandler : NSObject, FlutterStreamHandler{
-            private var sink: FlutterEventSink?
-            lazy var auth = WebAuthentication.shared
-            private var view : UIView
-            
-            init(view : UIView){
-                self.view = view
-                super.init()
+class BrowserAuthenticationHandler : NSObject, FlutterStreamHandler{
+    private var sink: FlutterEventSink?
+    lazy var auth = WebAuthentication.shared
+    private var view : UIView
+    
+    init(view : UIView){
+        self.view = view
+        super.init()
+        
+    }
+    
+    func onListen(withArguments arguments: Any?, eventSink: @escaping FlutterEventSink) -> FlutterError? {
+        
+        self.sink = eventSink
+        
+        Task{@MainActor in
+            if(auth == nil){
+                eventSink(FlutterError(code: "ConfigError", message: "Missing or bad Okta.plist", details: ""))
                 
+                return;
             }
             
-            func onListen(withArguments arguments: Any?, eventSink: @escaping FlutterEventSink) -> FlutterError? {
-                
-                self.sink = eventSink
-
-                Task{@MainActor in
-                    do{
-                        
-                        if(auth == nil){
-                            eventSink(FlutterError(code: "ConfigError", message: "Missing or bad Okta.plist", details: ""))
-                            
-                            return;
-                        }
-
-                        if let token = try await self.auth?.signIn(from: self.view.window){
-                            Credential.default = try Credential.store(token)
-                            
-                            eventSink(true)
-                        }
-                        
-                        
-                        
-                    }catch let e{
-                            eventSink(FlutterError(code: "Browser Authentication Failed", message: e.localizedDescription.stringValue, details: "Failed to start Flow"))
-                        }
+            
+            self.auth?.signIn(from:self.view.window,completion:{
+                result in
+                do{
                     
-                  eventSink(FlutterError(code: "Browser Authentication Failed", message: "Something went wrong", details: "Failed to start Flow"))
+                    switch result{
+                    case .success(let token):
+                        Credential.default = try Credential.store(token)
+                        eventSink(true)
+                        
+                    case .failure(let error):
+                        eventSink(FlutterError(code: "Browser Authentication Failed", message: error.localizedDescription.stringValue, details: "Failed to start Flow"))
+                        break;
+                        
+                    default :
+                        break;
+                    }
+                }catch let error{
+                    eventSink(FlutterError(code: "Browser Authentication Failed", message: error.localizedDescription.stringValue, details: "Failed to start Flow"))
                 }
-                return nil
-            }
-            
-            func onCancel(withArguments arguments: Any?) -> FlutterError? {
-                sink = nil
-                return nil
-            }
-            
+            })
             
         }
+        return nil;
+    }
+        
+        func onCancel(withArguments arguments: Any?) -> FlutterError? {
+            sink = nil
+            return FlutterError(code: "0", message: "User Cancel", details: "User Canceled the operation")
+        }
+        
+        
+    }
     
+
