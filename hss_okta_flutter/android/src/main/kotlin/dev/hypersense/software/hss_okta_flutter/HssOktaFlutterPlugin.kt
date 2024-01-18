@@ -295,6 +295,8 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
                        )
                    }))
                }
+
+                callback.invoke(Result.failure(Exception("No token found")))
             }catch (exception : Exception){
                   callback.invoke(Result.failure(exception))
             }
