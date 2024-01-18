@@ -64,3 +64,6 @@
 * Added User claims class
 * Added Session API
 * exposed AuthClient for web users
+
+# 1.3.3
+* Added Fix for a problem in iOS which causes non-exhaustive error, making some users unable to build
