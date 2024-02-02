@@ -10,6 +10,7 @@ import 'package:pigeon/pigeon.dart';
     kotlinOptions: KotlinOptions(
       package: "dev.hypersense.software.hss_okta",
     ),
+    dartTestOut: 'lib/src/generated/test/hss_okta_test.g.dart',
   ),
 )
 enum AuthenticationType { browser, sso, directAuth }
@@ -95,7 +96,7 @@ class DeviceAuthorizationSession {
       {required this.userCode, required this.verificationUri});
 }
 
-@HostApi()
+@HostApi(dartHostTestHandler: 'HssOktaFlutterPluginApiTest')
 abstract class HssOktaFlutterPluginApi {
   @async
   AuthenticationResult? startDirectAuthenticationFlow(
