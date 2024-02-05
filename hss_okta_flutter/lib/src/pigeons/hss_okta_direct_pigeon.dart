@@ -11,6 +11,9 @@ import 'package:pigeon/pigeon.dart';
       package: "dev.hypersense.software.hss_okta",
     ),
     dartTestOut: 'lib/src/generated/test/hss_okta_test.g.dart',
+    dartOptions: DartOptions(
+      testOutPath: 'lib/src/generated/test/',
+    ),
   ),
 )
 enum AuthenticationType { browser, sso, directAuth }
