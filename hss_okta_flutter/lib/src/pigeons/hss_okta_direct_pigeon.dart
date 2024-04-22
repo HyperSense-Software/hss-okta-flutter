@@ -99,7 +99,7 @@ class DeviceAuthorizationSession {
       {required this.userCode, required this.verificationUri});
 }
 
-@HostApi(dartHostTestHandler: 'HssOktaFlutterPluginApiTest')
+@HostApi()
 abstract class HssOktaFlutterPluginApi {
   @async
   AuthenticationResult? startDirectAuthenticationFlow(
