@@ -161,4 +161,6 @@ class HssOktaFlutterWeb {
 
   Future<SessionObject> getActiveSession() => throw UnimplementedError();
   Future<SessionObject> refreshSession() => throw UnimplementedError();
+
+  AuthState? getPreviousAuthState() => throw UnimplementedError();
 }
