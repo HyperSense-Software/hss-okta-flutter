@@ -59,16 +59,10 @@ class _MyAppState extends State<MyApp> {
               settings: settings,
               builder: (context) {
                 if (args is Map<String, dynamic>) {
-                  return WebProfileScreen(
-                    token: args['token'] as String,
-                    accessToken: args['accessToken'] as String,
-                  );
+                  return const WebProfileScreen();
                 }
 
-                return const WebProfileScreen(
-                  token: '',
-                  accessToken: '',
-                );
+                return const WebProfileScreen();
               },
             );
         }

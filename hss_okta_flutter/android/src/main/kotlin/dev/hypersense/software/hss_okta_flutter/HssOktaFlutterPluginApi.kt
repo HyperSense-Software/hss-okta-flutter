@@ -78,16 +78,7 @@ enum class AuthenticationFactor(val raw: Int) {
   }
 }
 
-/**
- * [AuthenticationResult] is used to determine the result of the authentication for all authentication flows
- * return [AuthenticationResult.success] if the authentication was successful
- * return [AuthenticationResult.mfaRequired] if the authentication requires MFA, Only for IOS does nothing for Android
- * [error] returns the error message
- * [OktaToken] contains the Credential from retrieved from okta
- * [UserInfo] contains the user information retrieved from okta
- *
- * Generated class from Pigeon that represents data sent in messages.
- */
+/** Generated class from Pigeon that represents data sent in messages. */
 data class AuthenticationResult (
   val result: DirectAuthenticationResult? = null,
   val error: String? = null,
@@ -121,11 +112,7 @@ data class AuthenticationResult (
   }
 }
 
-/**
- * Class for the credential retrieved information retrieved in okta
- *
- * Generated class from Pigeon that represents data sent in messages.
- */
+/** Generated class from Pigeon that represents data sent in messages. */
 data class OktaToken (
   val id: String? = null,
   val token: String? = null,
@@ -162,11 +149,7 @@ data class OktaToken (
   }
 }
 
-/**
- * Class for the user information retrieved in okta
- *
- * Generated class from Pigeon that represents data sent in messages.
- */
+/** Generated class from Pigeon that represents data sent in messages. */
 data class UserInfo (
   val userId: String,
   val givenName: String,
@@ -206,13 +189,7 @@ data class UserInfo (
   }
 }
 
-/**
- * Authentication request for ResourceOwnerFlow
- * [Factors] should contain [AuthenticationFactor.otp] or [AuthenticationFactor.oob] this is not available for iOS
- * [username] and [password] are Okta Credentials
- *
- * Generated class from Pigeon that represents data sent in messages.
- */
+/** Generated class from Pigeon that represents data sent in messages. */
 data class DirectAuthRequest (
   val username: String,
   val password: String,
@@ -237,13 +214,7 @@ data class DirectAuthRequest (
   }
 }
 
-/**
- * Class for the device authorization flow containing the retrived session information
- * [userCode] is the code that the user should enter in the browser
- * [verificationUri] is the Url the user needs to navigate and insert the [userCode] to verify the login
- *
- * Generated class from Pigeon that represents data sent in messages.
- */
+/** Generated class from Pigeon that represents data sent in messages. */
 data class DeviceAuthorizationSession (
   val userCode: String? = null,
   val verificationUri: String? = null
@@ -334,6 +305,10 @@ interface HssOktaFlutterPluginApi {
   fun startDeviceAuthorizationFlow(callback: (Result<DeviceAuthorizationSession?>) -> Unit)
   fun resumeDeviceAuthorizationFlow(callback: (Result<AuthenticationResult?>) -> Unit)
   fun startTokenExchangeFlow(deviceSecret: String, idToken: String, callback: (Result<AuthenticationResult?>) -> Unit)
+  fun getAllUserIds(callback: (Result<List<String>>) -> Unit)
+  fun getToken(tokenId: String, callback: (Result<AuthenticationResult?>) -> Unit)
+  fun removeCredential(tokenId: String, callback: (Result<Boolean>) -> Unit)
+  fun setDefaultToken(tokenId: String, callback: (Result<Boolean>) -> Unit)
 
   companion object {
     /** The codec used by HssOktaFlutterPluginApi. */
@@ -481,6 +456,84 @@ interface HssOktaFlutterPluginApi {
             val deviceSecretArg = args[0] as String
             val idTokenArg = args[1] as String
             api.startTokenExchangeFlow(deviceSecretArg, idTokenArg) { result: Result<AuthenticationResult?> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(wrapResult(data))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.getAllUserIds", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            api.getAllUserIds() { result: Result<List<String>> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(wrapResult(data))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.getToken", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val tokenIdArg = args[0] as String
+            api.getToken(tokenIdArg) { result: Result<AuthenticationResult?> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(wrapResult(data))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.removeCredential", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val tokenIdArg = args[0] as String
+            api.removeCredential(tokenIdArg) { result: Result<Boolean> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(wrapResult(data))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.setDefaultToken", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val tokenIdArg = args[0] as String
+            api.setDefaultToken(tokenIdArg) { result: Result<Boolean> ->
               val error = result.exceptionOrNull()
               if (error != null) {
                 reply.reply(wrapError(error))

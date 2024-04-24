@@ -3,7 +3,7 @@ import 'package:pigeon/pigeon.dart';
 @ConfigurePigeon(
   PigeonOptions(
     input: 'pigeons/hss_okta_pigeon.dart',
-    dartOut: 'lib/generated/hss_okta_flutter.g.dart',
+    dartOut: 'lib/src/generated/hss_okta_flutter.g.dart',
     swiftOut: 'ios/Classes/HssOktaFlutterPlugin.g.swift',
     kotlinOut:
         'android/src/main/kotlin/dev/hypersense/software/hss_okta_flutter/HssOktaFlutterPluginApi.kt',
@@ -124,4 +124,16 @@ abstract class HssOktaFlutterPluginApi {
     String deviceSecret,
     String idToken,
   );
+
+  // Token and Credential Management
+  @async
+  List<String> getAllUserIds();
+
+  @async
+  AuthenticationResult? getToken(String tokenId);
+
+  @async
+  bool removeCredential(String tokenId);
+  @async
+  bool setDefaultToken(String tokenId);
 }

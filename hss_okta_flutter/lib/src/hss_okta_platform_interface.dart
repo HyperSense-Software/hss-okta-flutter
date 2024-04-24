@@ -50,4 +50,13 @@ abstract class HssOktaFlutterPlatformInterface extends PlatformInterface {
   }) {
     throw UnimplementedError();
   }
+
+  Future<List<String?>> getAllUserIds() => throw UnimplementedError();
+
+  Future<AuthenticationResult?> getToken(String tokenId) =>
+      throw UnimplementedError();
+
+  Future<bool> removeCredential(String tokenId) => throw UnimplementedError();
+
+  Future<bool> setDefaultToken(String tokenId) => throw UnimplementedError();
 }

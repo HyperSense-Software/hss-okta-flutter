@@ -3,7 +3,7 @@
 library hss_okta_js;
 
 // import 'package:js/js.dart';
-import 'dart:js';
+// import 'dart:js';
 
 import 'package:js/js.dart';
 
@@ -144,7 +144,7 @@ class Token {
   external Future decode(String idTokenString);
 
   /// Returns a new token if the Okta session is still valid.
-  external Future renew(String key);
+  external Future renew(AbstractToken key);
 
   ///Retrieve the details about a user.
   ///
@@ -199,28 +199,28 @@ class TokenManager {
   external void onError(
     String event,
     void Function(TokenManagerError error) handler,
-    JsObject context,
+    Object context,
   );
 
   @JS('on')
   external void onSetStorage(
     String event,
     void Function(String key, AbstractToken token) handler,
-    JsObject context,
+    Object context,
   );
 
   ///
   external void on(
     String event,
     void Function(String key, AbstractToken token) handler,
-    JsObject context,
+    Object context,
   );
 
   @JS('on')
   external void onRenewed(
     String event,
     Function(String key, AbstractToken token, AbstractToken oldToken) handler,
-    JsObject context,
+    Object context,
   );
 }
 
