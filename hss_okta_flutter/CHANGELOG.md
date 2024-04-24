@@ -75,3 +75,7 @@
 * Added getToken for Android and iOS
 * Fixed Missing error return for native Browser SignIn and Signout streams
 * Fixed Crash on android when okta.properties has bad values
+
+# 1.4.0
+* Fixed renew token not accepting abstract tokens
+* updated example UI

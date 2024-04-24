@@ -37,6 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
   late final StreamController<AuthState> _authStateController;
 
   StreamSubscription<AuthState>? _streamSubscription;
+  TokenResponse? tokens;
 
   @override
   void initState() {
@@ -71,13 +72,10 @@ class _HomeScreenState extends State<HomeScreen> {
   void _initStreams() {
     _authStateController = StreamController<AuthState>.broadcast();
     _streamSubscription = _authStateController.stream.listen((authState) {
-      final idToken = authState.idToken.idToken;
-      final accessToken = authState.accessToken.accessToken;
       Navigator.of(context).push(
         MaterialPageRoute(
           builder: (c) => WebProfileScreen(
-            token: idToken,
-            accessToken: accessToken,
+            tokens: tokens,
           ),
         ),
       );
@@ -107,10 +105,8 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> getCredential(BuildContext context) async {
     try {
       result = (await PluginProvider.of(context).plugin.getCredential())!;
-
-      debugPrint(result?.token?.token ?? '');
     } catch (e) {
-      if (mounted) {
+      if (context.mounted) {
         ScaffoldMessenger.maybeOf(context)
             ?.showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
       }
@@ -151,60 +147,87 @@ class _HomeScreenState extends State<HomeScreen> {
       padding: const EdgeInsets.all(8.0),
       child: Column(
         children: [
-          const Text('Username'),
-          TextField(
-            controller: _usernamecontroller,
-          ),
-          const Text('Password'),
-          TextField(
-            controller: _passwordcontroller,
-          ),
-          OutlinedButton(
-              onPressed: () async {
-                final provider = PluginProvider.of(context);
-                try {
-                  if (kIsWeb) {
-                    final result =
-                        await provider.pluginWeb.signInWithCredentials(
-                      username: _usernamecontroller.text,
-                      password: _passwordcontroller.text,
-                    );
+          Container(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              children: [
+                TextFormField(
+                  controller: _usernamecontroller,
+                  decoration: const InputDecoration(
+                    label: Text('Username'),
+                    hintText: 'Enter your username',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(
+                  height: 12,
+                ),
+                TextFormField(
+                  controller: _passwordcontroller,
+                  decoration: const InputDecoration(
+                    label: Text('Password'),
+                    hintText: 'Enter your Password',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(
+                  height: 12,
+                ),
+                OutlinedButton(
+                    onPressed: () async {
+                      final provider = PluginProvider.of(context);
+                      try {
+                        if (kIsWeb) {
+                          final result =
+                              await provider.pluginWeb.signInWithCredentials(
+                            username: _usernamecontroller.text,
+                            password: _passwordcontroller.text,
+                          );
 
-                    if (result.status == 'SUCCESS') {
-                      final token = await provider.pluginWeb.getWithoutPrompt(
-                          sessionToken: result.sessionToken!,
-                          scopes: ['openid', 'email', 'profile'],
-                          responseType: ['token', 'id_token']);
-                      final idToken = token.tokens.idToken?.idToken;
-                      final accessToken = token.tokens.accessToken?.accessToken;
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (c) => WebProfileScreen(
-                            token: idToken!,
-                            accessToken: accessToken!,
-                          ),
-                        ),
-                      );
-                    }
-                  } else {
-                    await provider.plugin.startDirectAuthenticationFlow(
-                        email: _usernamecontroller.text,
-                        password: _passwordcontroller.text,
-                        factors: [OktaSignInFactor.otp]).then((res) {
-                      _processResult(res, formContext);
+                          if (result.status == 'SUCCESS') {
+                            final token = await provider.pluginWeb
+                                .getWithoutPrompt(
+                                    sessionToken: result.sessionToken!,
+                                    scopes: ['openid', 'email', 'profile'],
+                                    responseType: ['token', 'id_token']);
 
-                      setState(() {});
-                    });
-                  }
-                } catch (e, s) {
-                  debugPrint(e.toString() + s.toString());
-                  if (mounted) {
-                    ScaffoldMessenger.of(formContext).showSnackBar(
-                        SnackBar(content: Text('Error: ${e.toString()}')));
-                  }
-                }
-              },
-              child: const Text('Submit')),
+                            if (context.mounted) {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (c) => WebProfileScreen(
+                                    tokens: token,
+                                  ),
+                                ),
+                              );
+                            }
+                          }
+                        } else {
+                          await provider.plugin.startDirectAuthenticationFlow(
+                              email: _usernamecontroller.text,
+                              password: _passwordcontroller.text,
+                              factors: [OktaSignInFactor.otp]).then((res) {
+                            _processResult(res, formContext);
+
+                            setState(() {});
+                          });
+                        }
+                      } catch (e, s) {
+                        debugPrint(e.toString() + s.toString());
+                        if (formContext.mounted) {
+                          ScaffoldMessenger.of(formContext).showSnackBar(
+                              SnackBar(
+                                  content: Text('Error: ${e.toString()}')));
+                        }
+                      }
+                    },
+                    child: const Text('Direct Authentication Login')),
+              ],
+            ),
+          ),
+          const SizedBox(
+            height: 24,
+          ),
+          const Divider(),
           const SizedBox(
             height: 24,
           ),
@@ -219,15 +242,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           scopes: ['openid', 'email', 'profile'],
                         ),
                       );
-
+                  tokens = value;
                   if (mounted) {
                     PluginProvider.of(context)
                         .pluginWeb
                         .setTokens(value.tokens);
-                    final info = await PluginProvider.of(context)
-                        .pluginWeb
-                        .getUserInfo();
-                    debugPrint('$info');
                   }
                 } else {
                   var result = await Navigator.of(formContext).push(

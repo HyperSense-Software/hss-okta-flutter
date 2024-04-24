@@ -5,11 +5,12 @@ class PluginProvider extends InheritedWidget {
   final HssOktaFlutterWeb pluginWeb;
   final HssOktaFlutter plugin;
 
-  const PluginProvider(
-      {super.key,
-      required super.child,
-      required this.plugin,
-      required this.pluginWeb});
+  const PluginProvider({
+    super.key,
+    required super.child,
+    required this.plugin,
+    required this.pluginWeb,
+  });
 
   static PluginProvider? maybeOf(BuildContext context) {
     return context.dependOnInheritedWidgetOfExactType<PluginProvider>();
