@@ -79,3 +79,6 @@
 # 1.4.0
 * Fixed renew token not accepting abstract tokens
 * updated example UI
+
+# 1.4.1
+* Added authstate methods
