@@ -54,10 +54,7 @@ class HssOktaFlutterWeb extends HssOktaFlutterWebPlatformInterface {
   /// Create token with a popup.
   Future<TokenResponse> startPopUpAuthentication(
       {AuthorizeOptions? options}) async {
-    final res =
-        await promiseToFuture<TokenResponse>(auth.token.getWithPopup(options));
-
-    return res;
+    return promiseToFuture<TokenResponse>(auth.token.getWithPopup(options));
   }
 
   /// Returns a new token if the Okta session is still valid.
@@ -276,8 +273,23 @@ class HssOktaFlutterWeb extends HssOktaFlutterWebPlatformInterface {
     return promiseToFuture<bool?>(auth.signOut());
   }
 
+  /// Produces a unique authState object and emits an authStateChange event.
+  /// The [AuthState] object contains [Tokens] from the [TokenManager] and
+  /// a calculated isAuthenticated value. By default, [AuthState.isAuthenticated]
+  /// will be true if both [AuthState.idToken] and [AuthState.accessToken] are present.
+  /// This logic can be customized by defining a custom transformAuthState
+  /// function.
   Future<AuthState> updateAuthState() async {
-    return promiseToFuture(auth.authStateManager.updateAuthState());
+    return promiseToFuture<AuthState>(auth.authStateManager.updateAuthState());
+  }
+
+  /// Gets the previous evaluated [AuthState] from the [AuthStateManager].
+  /// This state can be used to tell when the new [AuthState] is evaluated.
+  /// For example, the authState is evaluated duing app initialization if
+  /// the previousAuthState is null, and the authState is evaluated during
+  /// tokens auto renew process if the previousAuthState exists.
+  AuthState? getPreviousAuthState() {
+    return auth.authStateManager.getPreviousAuthState();
   }
 
   /// Revokes the access token for this application so it can no longer be used to authenticate API requests. The [accessToken] parameter is optional. By default, revokeAccessToken will look for a token object named accessToken within the TokenManager. If you have stored the access token object in a different location, you should retrieve it first and then pass it here. Returns a promise that resolves when the operation has completed. This method will succeed even if the access token has already been revoked or removed.

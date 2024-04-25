@@ -79,20 +79,25 @@ class OktaAuth {
 @JS()
 @anonymous
 class OktaConfig {
-  external factory OktaConfig(
-      {String? issuer,
-      String? clientId,
-      String? redirectUri,
-      String? scopes,
-      String? state,
-      bool? pkce,
-      String? authorizeUrl,
-      String? userinfoUrl,
-      String? tokenUrl,
-      String? revokeUrl,
-      String? logoutUrl,
-      String? clientSecret,
-      String? responseType});
+  external factory OktaConfig({
+    String? issuer,
+    String? clientId,
+    String? redirectUri,
+    String? scopes,
+    String? state,
+    bool? pkce,
+    String? authorizeUrl,
+    String? userinfoUrl,
+    String? tokenUrl,
+    String? revokeUrl,
+    String? logoutUrl,
+    String? clientSecret,
+    String? responseType,
+    Future<AuthState>? Function(
+      OktaAuth oktaAuth,
+      AuthState authState,
+    )? transformAuthState,
+  });
 
   external String? get issuer;
   external String? get clientId;
@@ -318,6 +323,7 @@ class AuthStateManager {
   external void subscribe(void Function(AuthState authState) callback);
   external void unsubscribe(void Function(AuthState? authState) callback);
   external Future<AuthState?> updateAuthState();
+  external AuthState? getPreviousAuthState();
 }
 
 @JS()
