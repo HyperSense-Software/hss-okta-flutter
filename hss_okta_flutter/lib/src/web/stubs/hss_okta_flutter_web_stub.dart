@@ -45,7 +45,7 @@ class HssOktaFlutterWeb {
     throw UnimplementedError();
   }
 
-  Future<TokenResponse> renewToken({required String refreshToken}) {
+  Future<TokenResponse> renewToken({required AbstractToken tokenToRefresh}) {
     throw UnimplementedError();
   }
 
