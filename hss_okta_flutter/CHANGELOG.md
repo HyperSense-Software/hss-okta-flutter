@@ -82,3 +82,6 @@
 
 # 1.4.1
 * Added authstate methods
+
+# 1.4.2
+* Fixed Outdated web stub causing example running issues
