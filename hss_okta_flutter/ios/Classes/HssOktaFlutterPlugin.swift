@@ -16,11 +16,13 @@ case generalError(String)
 
 
 public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginApi {
+    
 
     let browserAuth = WebAuthentication.shared
     var flow : (any AuthenticationFlow)?
     var status : DirectAuthenticationFlow.Status?
     var deviceAuthorizationFlowContext : DeviceAuthorizationFlow.Context?
+    var idxFlow : InteractionCodeFlow?
     
     
     public static func register(with registrar: FlutterPluginRegistrar) {
@@ -310,49 +312,73 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
         }       
 
     // IDX METHODS
-    func startInteractionCodeFlow(completion: @escaping (Result<AuthenticationResult?, Error>) -> Void) {
+    func startEmailAuthenticationFlow(username: String, completion: @escaping (Result<IdxResponse?, Error>) -> Void) {
         Task{
             do{
                 print("STARTING INTERACTION CODE FLOW")
-                let flow = try InteractionCodeFlow();
+                idxFlow = try InteractionCodeFlow();
                
                 if #available(iOS 15.0, *) {
-                     var response = try await flow.start()
+                    var response = try await idxFlow!.start()
              
                     guard let remediation = response.remediations[.identify],
                           let username = remediation["identifier"]
-//                          let password = remediation["credentials.passcode"]
                     else{
-                        return completion(.failure(HssOktaError.generalError("Failed indentifying remidiation, check available remidiatio fields")))
+                        return completion(.failure(HssOktaError.generalError("Failed indentifying remidiation, check available remidiation fields")))
                     }
                     
-                    username.value = "aldrin.francisco@designli.co"
-//                    password.value = "09158121949aA"
+                    username.value = "\(username)"
                     
-                    var nextResponse = try await remediation.proceed()
+                    response = try await remediation.proceed()
                     
-                    guard response.isLoginSuccessful
-                        else {
-                            throw HssOktaError.credentialError("Failed to login")
-                        }
+                    completion(.success(IdxResponse(expiresAt: response.expiresAt?.millisecondsSince1970, canCancel: response.canCancel,isLoginSuccessful: response.isLoginSuccessful, intent: RequestIntent(rawValue: Int(response.intent.getIndex)) ?? RequestIntent.unknown)))
                     
-                    var token = try await response.exchangeCode()
-                    print(token)
                     
+                  
                 } else {
                     completion(.failure(HssOktaError.generalError("This method is Only Avaialable to iOS 15.0 or newer")))
                 }
-                
-                
-                completion(.success(AuthenticationResult()))
-                
+
             }catch let error{
                 completion(.failure(error))
             }
         }
     }
     
+    func continueWithPassword(password: String, completion: @escaping (Result<OktaToken?, Error>) -> Void) {
+        <#code#>
+    }
     
 }
 
+// Move this somewhere else
+extension Response.Intent{
+        public var getIndex: Int64{
+        switch self{
+        case .enrollNewUser:
+            return   0
+        case .login:
+            return  1
+        case .credentialEnrollment:
+            return  2
+        case .credentialUnenrollment:
+            return 3
+        case .credentialRecovery:
+          return 4
+        case .credentialModify:
+            return  5
+        default:
+            return 6
+        }
+    }
+}
 
+extension Date {
+    var millisecondsSince1970:Int64 {
+        Int64((self.timeIntervalSince1970 * 1000.0).rounded())
+    }
+    
+    init(milliseconds:Int64) {
+        self = Date(timeIntervalSince1970: TimeInterval(milliseconds) / 1000)
+    }
+}

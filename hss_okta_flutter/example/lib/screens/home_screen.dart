@@ -314,7 +314,7 @@ class _HomeScreenState extends State<HomeScreen> {
               await PluginProvider.of(context)
                   .plugin
                   .idx
-                  .startInteractionCodeFlow();
+                  .startEmailAuthenticationFlow('aldrin.francisco@designli.co');
             },
             child: const Text(
               'Interaction Code Flow',

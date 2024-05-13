@@ -134,8 +134,13 @@ class Idx {
   final HssOktaFlutterPlatformInterface instance;
   const Idx(this.instance);
 
-  Future<AuthenticationResult?> startInteractionCodeFlow() async {
-    final result = await instance.startInteractionCodeFlow();
+  Future<IdxResponse?> startEmailAuthenticationFlow(String email) async {
+    var result = await instance.startEmailAuthenticationFlow(email);
+    return result;
+  }
+
+  Future<OktaToken?> continueWithPassword(String password) async {
+    var result = await instance.continueWithPassword(password);
     return result;
   }
 }

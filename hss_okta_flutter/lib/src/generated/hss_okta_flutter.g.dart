@@ -34,6 +34,16 @@ enum AuthenticationFactor {
   oob,
 }
 
+enum RequestIntent {
+  enrollNewUser,
+  login,
+  credentialEnrollment,
+  credentialUnenrollment,
+  credentialRecovery,
+  credentialModify,
+  unknown,
+}
+
 class AuthenticationResult {
   AuthenticationResult({
     this.result,
@@ -240,6 +250,49 @@ class DeviceAuthorizationSession {
   }
 }
 
+class IdxResponse {
+  IdxResponse({
+    this.expiresAt,
+    this.user,
+    required this.canCancel,
+    required this.isLoginSuccessful,
+    required this.intent,
+  });
+
+  int? expiresAt;
+
+  UserInfo? user;
+
+  bool canCancel;
+
+  bool isLoginSuccessful;
+
+  RequestIntent intent;
+
+  Object encode() {
+    return <Object?>[
+      expiresAt,
+      user?.encode(),
+      canCancel,
+      isLoginSuccessful,
+      intent.index,
+    ];
+  }
+
+  static IdxResponse decode(Object result) {
+    result as List<Object?>;
+    return IdxResponse(
+      expiresAt: result[0] as int?,
+      user: result[1] != null
+          ? UserInfo.decode(result[1]! as List<Object?>)
+          : null,
+      canCancel: result[2]! as bool,
+      isLoginSuccessful: result[3]! as bool,
+      intent: RequestIntent.values[result[4]! as int],
+    );
+  }
+}
+
 class _HssOktaFlutterPluginApiCodec extends StandardMessageCodec {
   const _HssOktaFlutterPluginApiCodec();
   @override
@@ -253,11 +306,14 @@ class _HssOktaFlutterPluginApiCodec extends StandardMessageCodec {
     } else if (value is DirectAuthRequest) {
       buffer.putUint8(130);
       writeValue(buffer, value.encode());
-    } else if (value is OktaToken) {
+    } else if (value is IdxResponse) {
       buffer.putUint8(131);
       writeValue(buffer, value.encode());
-    } else if (value is UserInfo) {
+    } else if (value is OktaToken) {
       buffer.putUint8(132);
+      writeValue(buffer, value.encode());
+    } else if (value is UserInfo) {
+      buffer.putUint8(133);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -274,8 +330,10 @@ class _HssOktaFlutterPluginApiCodec extends StandardMessageCodec {
       case 130: 
         return DirectAuthRequest.decode(readValue(buffer)!);
       case 131: 
-        return OktaToken.decode(readValue(buffer)!);
+        return IdxResponse.decode(readValue(buffer)!);
       case 132: 
+        return OktaToken.decode(readValue(buffer)!);
+      case 133: 
         return UserInfo.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
@@ -572,12 +630,12 @@ class HssOktaFlutterPluginApi {
     }
   }
 
-  Future<AuthenticationResult?> startInteractionCodeFlow() async {
+  Future<IdxResponse?> startEmailAuthenticationFlow(String arg_username) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
-        'dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.startInteractionCodeFlow', codec,
+        'dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.startEmailAuthenticationFlow', codec,
         binaryMessenger: _binaryMessenger);
     final List<Object?>? replyList =
-        await channel.send(null) as List<Object?>?;
+        await channel.send(<Object?>[arg_username]) as List<Object?>?;
     if (replyList == null) {
       throw PlatformException(
         code: 'channel-error',
@@ -590,7 +648,29 @@ class HssOktaFlutterPluginApi {
         details: replyList[2],
       );
     } else {
-      return (replyList[0] as AuthenticationResult?);
+      return (replyList[0] as IdxResponse?);
+    }
+  }
+
+  Future<OktaToken?> continueWithPassword(String arg_password) async {
+    final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
+        'dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.continueWithPassword', codec,
+        binaryMessenger: _binaryMessenger);
+    final List<Object?>? replyList =
+        await channel.send(<Object?>[arg_password]) as List<Object?>?;
+    if (replyList == null) {
+      throw PlatformException(
+        code: 'channel-error',
+        message: 'Unable to establish connection on channel.',
+      );
+    } else if (replyList.length > 1) {
+      throw PlatformException(
+        code: replyList[0]! as String,
+        message: replyList[1] as String?,
+        details: replyList[2],
+      );
+    } else {
+      return (replyList[0] as OktaToken?);
     }
   }
 }

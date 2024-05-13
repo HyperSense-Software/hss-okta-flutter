@@ -95,6 +95,31 @@ class DeviceAuthorizationSession {
       {required this.userCode, required this.verificationUri});
 }
 
+class IdxResponse {
+  final int? expiresAt;
+  final UserInfo? user;
+  final bool canCancel;
+  final bool isLoginSuccessful;
+  final RequestIntent intent;
+  IdxResponse({
+    required this.expiresAt,
+    required this.user,
+    required this.canCancel,
+    required this.intent,
+    required this.isLoginSuccessful,
+  });
+}
+
+enum RequestIntent {
+  enrollNewUser,
+  login,
+  credentialEnrollment,
+  credentialUnenrollment,
+  credentialRecovery,
+  credentialModify,
+  unknown,
+}
+
 @HostApi()
 abstract class HssOktaFlutterPluginApi {
   @async
@@ -139,5 +164,8 @@ abstract class HssOktaFlutterPluginApi {
 
   // IDX Section
   @async
-  AuthenticationResult? startInteractionCodeFlow();
+  IdxResponse? startEmailAuthenticationFlow(String username);
+
+  @async
+  OktaToken? continueWithPassword(String password);
 }

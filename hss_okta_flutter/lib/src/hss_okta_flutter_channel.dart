@@ -91,7 +91,12 @@ class HssOktaFlutterChannel extends HssOktaFlutterPlatformInterface {
   }
 
   @override
-  Future<AuthenticationResult?> startInteractionCodeFlow() async {
-    return await _api.startInteractionCodeFlow();
+  Future<IdxResponse?> startEmailAuthenticationFlow(String email) async {
+    return await _api.startEmailAuthenticationFlow(email);
+  }
+
+  @override
+  Future<OktaToken?> continueWithPassword(String password) async {
+    return await _api.continueWithPassword(password);
   }
 }

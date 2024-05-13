@@ -78,6 +78,22 @@ enum class AuthenticationFactor(val raw: Int) {
   }
 }
 
+enum class RequestIntent(val raw: Int) {
+  ENROLLNEWUSER(0),
+  LOGIN(1),
+  CREDENTIALENROLLMENT(2),
+  CREDENTIALUNENROLLMENT(3),
+  CREDENTIALRECOVERY(4),
+  CREDENTIALMODIFY(5),
+  UNKNOWN(6);
+
+  companion object {
+    fun ofRaw(raw: Int): RequestIntent? {
+      return values().firstOrNull { it.raw == raw }
+    }
+  }
+}
+
 /** Generated class from Pigeon that represents data sent in messages. */
 data class AuthenticationResult (
   val result: DirectAuthenticationResult? = null,
@@ -236,6 +252,39 @@ data class DeviceAuthorizationSession (
   }
 }
 
+/** Generated class from Pigeon that represents data sent in messages. */
+data class IdxResponse (
+  val expiresAt: Long? = null,
+  val user: UserInfo? = null,
+  val canCancel: Boolean,
+  val isLoginSuccessful: Boolean,
+  val intent: RequestIntent
+
+) {
+  companion object {
+    @Suppress("UNCHECKED_CAST")
+    fun fromList(list: List<Any?>): IdxResponse {
+      val expiresAt = list[0].let { if (it is Int) it.toLong() else it as Long? }
+      val user: UserInfo? = (list[1] as List<Any?>?)?.let {
+        UserInfo.fromList(it)
+      }
+      val canCancel = list[2] as Boolean
+      val isLoginSuccessful = list[3] as Boolean
+      val intent = RequestIntent.ofRaw(list[4] as Int)!!
+      return IdxResponse(expiresAt, user, canCancel, isLoginSuccessful, intent)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf<Any?>(
+      expiresAt,
+      user?.toList(),
+      canCancel,
+      isLoginSuccessful,
+      intent.raw,
+    )
+  }
+}
+
 @Suppress("UNCHECKED_CAST")
 private object HssOktaFlutterPluginApiCodec : StandardMessageCodec() {
   override fun readValueOfType(type: Byte, buffer: ByteBuffer): Any? {
@@ -257,10 +306,15 @@ private object HssOktaFlutterPluginApiCodec : StandardMessageCodec() {
       }
       131.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          OktaToken.fromList(it)
+          IdxResponse.fromList(it)
         }
       }
       132.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          OktaToken.fromList(it)
+        }
+      }
+      133.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
           UserInfo.fromList(it)
         }
@@ -282,12 +336,16 @@ private object HssOktaFlutterPluginApiCodec : StandardMessageCodec() {
         stream.write(130)
         writeValue(stream, value.toList())
       }
-      is OktaToken -> {
+      is IdxResponse -> {
         stream.write(131)
         writeValue(stream, value.toList())
       }
-      is UserInfo -> {
+      is OktaToken -> {
         stream.write(132)
+        writeValue(stream, value.toList())
+      }
+      is UserInfo -> {
+        stream.write(133)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)
@@ -309,7 +367,8 @@ interface HssOktaFlutterPluginApi {
   fun getToken(tokenId: String, callback: (Result<AuthenticationResult?>) -> Unit)
   fun removeCredential(tokenId: String, callback: (Result<Boolean>) -> Unit)
   fun setDefaultToken(tokenId: String, callback: (Result<Boolean>) -> Unit)
-  fun startInteractionCodeFlow(callback: (Result<AuthenticationResult?>) -> Unit)
+  fun startEmailAuthenticationFlow(username: String, callback: (Result<IdxResponse?>) -> Unit)
+  fun continueWithPassword(password: String, callback: (Result<OktaToken?>) -> Unit)
 
   companion object {
     /** The codec used by HssOktaFlutterPluginApi. */
@@ -549,10 +608,32 @@ interface HssOktaFlutterPluginApi {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.startInteractionCodeFlow", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.startEmailAuthenticationFlow", codec)
         if (api != null) {
-          channel.setMessageHandler { _, reply ->
-            api.startInteractionCodeFlow() { result: Result<AuthenticationResult?> ->
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val usernameArg = args[0] as String
+            api.startEmailAuthenticationFlow(usernameArg) { result: Result<IdxResponse?> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(wrapResult(data))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.continueWithPassword", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val passwordArg = args[0] as String
+            api.continueWithPassword(passwordArg) { result: Result<OktaToken?> ->
               val error = result.exceptionOrNull()
               if (error != null) {
                 reply.reply(wrapError(error))

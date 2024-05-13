@@ -55,6 +55,16 @@ enum AuthenticationFactor: Int {
   case oob = 1
 }
 
+enum RequestIntent: Int {
+  case enrollNewUser = 0
+  case login = 1
+  case credentialEnrollment = 2
+  case credentialUnenrollment = 3
+  case credentialRecovery = 4
+  case credentialModify = 5
+  case unknown = 6
+}
+
 /// Generated class from Pigeon that represents data sent in messages.
 struct AuthenticationResult {
   var result: DirectAuthenticationResult? = nil
@@ -231,6 +241,43 @@ struct DeviceAuthorizationSession {
   }
 }
 
+/// Generated class from Pigeon that represents data sent in messages.
+struct IdxResponse {
+  var expiresAt: Int64? = nil
+  var user: UserInfo? = nil
+  var canCancel: Bool
+  var isLoginSuccessful: Bool
+  var intent: RequestIntent
+
+  static func fromList(_ list: [Any?]) -> IdxResponse? {
+    let expiresAt: Int64? = isNullish(list[0]) ? nil : (list[0] is Int64? ? list[0] as! Int64? : Int64(list[0] as! Int32))
+    var user: UserInfo? = nil
+    if let userList: [Any?] = nilOrValue(list[1]) {
+      user = UserInfo.fromList(userList)
+    }
+    let canCancel = list[2] as! Bool
+    let isLoginSuccessful = list[3] as! Bool
+    let intent = RequestIntent(rawValue: list[4] as! Int)!
+
+    return IdxResponse(
+      expiresAt: expiresAt,
+      user: user,
+      canCancel: canCancel,
+      isLoginSuccessful: isLoginSuccessful,
+      intent: intent
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      expiresAt,
+      user?.toList(),
+      canCancel,
+      isLoginSuccessful,
+      intent.rawValue,
+    ]
+  }
+}
+
 private class HssOktaFlutterPluginApiCodecReader: FlutterStandardReader {
   override func readValue(ofType type: UInt8) -> Any? {
     switch type {
@@ -241,8 +288,10 @@ private class HssOktaFlutterPluginApiCodecReader: FlutterStandardReader {
       case 130:
         return DirectAuthRequest.fromList(self.readValue() as! [Any?])
       case 131:
-        return OktaToken.fromList(self.readValue() as! [Any?])
+        return IdxResponse.fromList(self.readValue() as! [Any?])
       case 132:
+        return OktaToken.fromList(self.readValue() as! [Any?])
+      case 133:
         return UserInfo.fromList(self.readValue() as! [Any?])
       default:
         return super.readValue(ofType: type)
@@ -261,11 +310,14 @@ private class HssOktaFlutterPluginApiCodecWriter: FlutterStandardWriter {
     } else if let value = value as? DirectAuthRequest {
       super.writeByte(130)
       super.writeValue(value.toList())
-    } else if let value = value as? OktaToken {
+    } else if let value = value as? IdxResponse {
       super.writeByte(131)
       super.writeValue(value.toList())
-    } else if let value = value as? UserInfo {
+    } else if let value = value as? OktaToken {
       super.writeByte(132)
+      super.writeValue(value.toList())
+    } else if let value = value as? UserInfo {
+      super.writeByte(133)
       super.writeValue(value.toList())
     } else {
       super.writeValue(value)
@@ -301,7 +353,8 @@ protocol HssOktaFlutterPluginApi {
   func getToken(tokenId: String, completion: @escaping (Result<AuthenticationResult?, Error>) -> Void)
   func removeCredential(tokenId: String, completion: @escaping (Result<Bool, Error>) -> Void)
   func setDefaultToken(tokenId: String, completion: @escaping (Result<Bool, Error>) -> Void)
-  func startInteractionCodeFlow(completion: @escaping (Result<AuthenticationResult?, Error>) -> Void)
+  func startEmailAuthenticationFlow(username: String, completion: @escaping (Result<IdxResponse?, Error>) -> Void)
+  func continueWithPassword(password: String, completion: @escaping (Result<OktaToken?, Error>) -> Void)
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -503,10 +556,12 @@ class HssOktaFlutterPluginApiSetup {
     } else {
       setDefaultTokenChannel.setMessageHandler(nil)
     }
-    let startInteractionCodeFlowChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.startInteractionCodeFlow", binaryMessenger: binaryMessenger, codec: codec)
+    let startEmailAuthenticationFlowChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.startEmailAuthenticationFlow", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
-      startInteractionCodeFlowChannel.setMessageHandler { _, reply in
-        api.startInteractionCodeFlow() { result in
+      startEmailAuthenticationFlowChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let usernameArg = args[0] as! String
+        api.startEmailAuthenticationFlow(username: usernameArg) { result in
           switch result {
             case .success(let res):
               reply(wrapResult(res))
@@ -516,7 +571,24 @@ class HssOktaFlutterPluginApiSetup {
         }
       }
     } else {
-      startInteractionCodeFlowChannel.setMessageHandler(nil)
+      startEmailAuthenticationFlowChannel.setMessageHandler(nil)
+    }
+    let continueWithPasswordChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.continueWithPassword", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      continueWithPasswordChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let passwordArg = args[0] as! String
+        api.continueWithPassword(password: passwordArg) { result in
+          switch result {
+            case .success(let res):
+              reply(wrapResult(res))
+            case .failure(let error):
+              reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      continueWithPasswordChannel.setMessageHandler(nil)
     }
   }
 }
