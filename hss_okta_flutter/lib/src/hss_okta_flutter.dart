@@ -3,6 +3,9 @@ import 'generated/hss_okta_flutter.g.dart';
 import 'hss_okta_platform_interface.dart';
 
 class HssOktaFlutter {
+  HssOktaFlutter() : idx = Idx(HssOktaFlutterPlatformInterface.instance);
+  Idx idx;
+
   /// Starts the Direct Authentication /Resource Owner Flow
   ///
   /// factors is either [AuthenticationFactor.otp] or [AuthenticationFactor.oob] or both.
@@ -123,6 +126,16 @@ class HssOktaFlutter {
     var result = await HssOktaFlutterPlatformInterface.instance.setDefaultToken(
       tokenId,
     );
+    return result;
+  }
+}
+
+class Idx {
+  final HssOktaFlutterPlatformInterface instance;
+  const Idx(this.instance);
+
+  Future<AuthenticationResult?> startInteractionCodeFlow() async {
+    final result = await instance.startInteractionCodeFlow();
     return result;
   }
 }

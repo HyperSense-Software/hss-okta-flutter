@@ -4,6 +4,7 @@ import OktaOAuth2
 import AuthFoundation
 import UIKit
 import WebAuthenticationUI
+import OktaIdx
 
 
 
@@ -265,10 +266,8 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
         }
     }
     
-   
-    
     func removeCredential(tokenId: String, completion: @escaping (Result<Bool, Error>) -> Void) {
-        Task{
+   
             Task{
                 do{
                     
@@ -279,7 +278,7 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
                     completion(.failure(error))
                 }
             }
-        }
+        
     }
     
     func setDefaultToken(tokenId: String, completion: @escaping (Result<Bool, Error>) -> Void) {
@@ -293,9 +292,6 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
                 completion(.failure(error))
             }
         }}
-
-    
-    //    Helper methods
         
         func constructAuthenticationResult(resultEnum : DirectAuthenticationResult?, token : Token,userInfo : AuthFoundation.UserInfo?) -> AuthenticationResult{
             return AuthenticationResult(
@@ -312,6 +308,34 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
                 userInfo: UserInfo(userId: "", givenName: userInfo?.givenName ?? "", middleName: userInfo?.middleName ?? "", familyName: userInfo?.familyName ?? "", gender: userInfo?.gender ?? "", email: userInfo?.email ?? "", phoneNumber: userInfo?.phoneNumber ?? "", username: userInfo?.preferredUsername  ?? "")
             )
         }       
+
+    // IDX METHODS
+    func startInteractionCodeFlow(completion: @escaping (Result<AuthenticationResult?, Error>) -> Void) {
+        Task{
+            do{
+                print("STARTING INTERACTION CODE FLOW")
+                let flow = try InteractionCodeFlow();
+                flow.start{result in
+                    switch result{
+                    case .success(let response):
+                        print("SUCCESS")
+                        print(response)
+                        completion(.success(AuthenticationResult()))
+                    case .failure(let failure):
+                        print("FAIL")
+                        print(failure.localizedDescription)
+                        completion(.failure(HssOktaError.generalError(failure.localizedDescription)))
+                    }
+                }
+                
+                
+            }catch let error{
+                completion(.failure(error))
+            }
+        }
+    }
+    
+    
 }
 
 

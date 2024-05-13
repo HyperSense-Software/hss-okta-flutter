@@ -301,6 +301,7 @@ protocol HssOktaFlutterPluginApi {
   func getToken(tokenId: String, completion: @escaping (Result<AuthenticationResult?, Error>) -> Void)
   func removeCredential(tokenId: String, completion: @escaping (Result<Bool, Error>) -> Void)
   func setDefaultToken(tokenId: String, completion: @escaping (Result<Bool, Error>) -> Void)
+  func startInteractionCodeFlow(completion: @escaping (Result<AuthenticationResult?, Error>) -> Void)
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -501,6 +502,21 @@ class HssOktaFlutterPluginApiSetup {
       }
     } else {
       setDefaultTokenChannel.setMessageHandler(nil)
+    }
+    let startInteractionCodeFlowChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.startInteractionCodeFlow", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      startInteractionCodeFlowChannel.setMessageHandler { _, reply in
+        api.startInteractionCodeFlow() { result in
+          switch result {
+            case .success(let res):
+              reply(wrapResult(res))
+            case .failure(let error):
+              reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      startInteractionCodeFlowChannel.setMessageHandler(nil)
     }
   }
 }

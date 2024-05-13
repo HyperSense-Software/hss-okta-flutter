@@ -5,9 +5,9 @@
 Pod::Spec.new do |s|
   s.name             = 'hss_okta_flutter'
   s.version          = '0.0.1'
-  s.summary          = 'A new Flutter plugin project.'
+  s.summary          = 'A Okta API Wrapper for flutter.'
   s.description      = <<-DESC
-A new Flutter plugin project.
+  A Okta API Wrapper for flutter.
                        DESC
   s.homepage         = 'http://example.com'
   s.license          = { :file => '../LICENSE' }
@@ -20,7 +20,9 @@ A new Flutter plugin project.
   s.dependency 'OktaJWT'
   s.dependency 'OktaDirectAuth'
   s.dependency 'OktaWebAuthenticationUI'
-  # s.dependency 'OktaAuthNative'
+  #IDX
+  s.dependency 'OktaIdx'
+  #END OF IDX
   s.platform = :ios, '13.0'
 
   # Flutter.framework does not contain a i386 slice.

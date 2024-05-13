@@ -136,4 +136,8 @@ abstract class HssOktaFlutterPluginApi {
   bool removeCredential(String tokenId);
   @async
   bool setDefaultToken(String tokenId);
+
+  // IDX Section
+  @async
+  AuthenticationResult? startInteractionCodeFlow();
 }

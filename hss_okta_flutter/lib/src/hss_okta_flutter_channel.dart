@@ -89,4 +89,9 @@ class HssOktaFlutterChannel extends HssOktaFlutterPlatformInterface {
   Future<bool> setDefaultToken(String tokenId) async {
     return await _api.setDefaultToken(tokenId);
   }
+
+  @override
+  Future<AuthenticationResult?> startInteractionCodeFlow() async {
+    return await _api.startInteractionCodeFlow();
+  }
 }

@@ -42,18 +42,20 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     _initStreams();
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
-      PluginProvider.of(context).pluginWeb
-        ..subscribe((authState) {
-          if (authState.isAuthenticated) {
-            _authStateController.add(authState);
-          }
-        })
-        ..unsubscribe((authState) {
-          _streamSubscription?.cancel();
-          _streamSubscription = null;
-        });
-    });
+    if (kIsWeb) {
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+        PluginProvider.of(context).pluginWeb
+          ..subscribe((authState) {
+            if (authState.isAuthenticated) {
+              _authStateController.add(authState);
+            }
+          })
+          ..unsubscribe((authState) {
+            _streamSubscription?.cancel();
+            _streamSubscription = null;
+          });
+      });
+    }
 
     super.initState();
   }
@@ -301,7 +303,23 @@ class _HomeScreenState extends State<HomeScreen> {
                       setState(() {});
                     });
                   }),
-              child: const Text('Device SSO'))
+              child: const Text('Device SSO')),
+          const Divider(),
+          Text(
+            'IDX',
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+          OutlinedButton(
+            onPressed: () async {
+              await PluginProvider.of(context)
+                  .plugin
+                  .idx
+                  .startInteractionCodeFlow();
+            },
+            child: const Text(
+              'Interaction Code Flow',
+            ),
+          )
         ],
       ),
     );
