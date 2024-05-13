@@ -72,3 +72,4 @@
 .vscode/settings.json
 .vscode/launch.json
 /pubspec.lock
+hss_okta_flutter/example/ios/Runner/Okta.plist
