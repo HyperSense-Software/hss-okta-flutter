@@ -315,19 +315,36 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
             do{
                 print("STARTING INTERACTION CODE FLOW")
                 let flow = try InteractionCodeFlow();
-                flow.start{result in
-                    switch result{
-                    case .success(let response):
-                        print("SUCCESS")
-                        print(response)
-                        completion(.success(AuthenticationResult()))
-                    case .failure(let failure):
-                        print("FAIL")
-                        print(failure.localizedDescription)
-                        completion(.failure(HssOktaError.generalError(failure.localizedDescription)))
+               
+                if #available(iOS 15.0, *) {
+                     var response = try await flow.start()
+             
+                    guard let remediation = response.remediations[.identify],
+                          let username = remediation["identifier"]
+//                          let password = remediation["credentials.passcode"]
+                    else{
+                        return completion(.failure(HssOktaError.generalError("Failed indentifying remidiation, check available remidiatio fields")))
                     }
+                    
+                    username.value = "aldrin.francisco@designli.co"
+//                    password.value = "09158121949aA"
+                    
+                    var nextResponse = try await remediation.proceed()
+                    
+                    guard response.isLoginSuccessful
+                        else {
+                            throw HssOktaError.credentialError("Failed to login")
+                        }
+                    
+                    var token = try await response.exchangeCode()
+                    print(token)
+                    
+                } else {
+                    completion(.failure(HssOktaError.generalError("This method is Only Avaialable to iOS 15.0 or newer")))
                 }
                 
+                
+                completion(.success(AuthenticationResult()))
                 
             }catch let error{
                 completion(.failure(error))
