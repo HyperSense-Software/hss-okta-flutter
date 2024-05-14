@@ -309,10 +309,10 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
                 ),
                 userInfo: UserInfo(userId: "", givenName: userInfo?.givenName ?? "", middleName: userInfo?.middleName ?? "", familyName: userInfo?.familyName ?? "", gender: userInfo?.gender ?? "", email: userInfo?.email ?? "", phoneNumber: userInfo?.phoneNumber ?? "", username: userInfo?.preferredUsername  ?? "")
             )
-        }       
+        }
 
     // IDX METHODS
-    func startEmailAuthenticationFlow(username: String, completion: @escaping (Result<IdxResponse?, Error>) -> Void) {
+    func startEmailAuthenticationFlow(email: String, completion: @escaping (Result<IdxResponse?, Error>) -> Void) {
         Task{
             do{
                 print("STARTING INTERACTION CODE FLOW")
@@ -327,14 +327,11 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
                         return completion(.failure(HssOktaError.generalError("Failed indentifying remidiation, check available remidiation fields")))
                     }
                     
-                    username.value = "\(username)"
+                    username.value = email
                     
                     response = try await remediation.proceed()
                     
-                    completion(.success(IdxResponse(expiresAt: response.expiresAt?.millisecondsSince1970, canCancel: response.canCancel,isLoginSuccessful: response.isLoginSuccessful, intent: RequestIntent(rawValue: Int(response.intent.getIndex)) ?? RequestIntent.unknown)))
-                    
-                    
-                  
+                    completion(.success(IdxResponse(expiresAt: response.expiresAt?.millisecondsSince1970, canCancel: response.canCancel,isLoginSuccessful: response.isLoginSuccessful, intent: RequestIntent(rawValue: Int(response.intent.getIndex)) ?? RequestIntent.unknown, remidiation: IdxRemidiationOption.identify)))
                 } else {
                     completion(.failure(HssOktaError.generalError("This method is Only Avaialable to iOS 15.0 or newer")))
                 }
@@ -346,7 +343,50 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
     }
     
     func continueWithPassword(password: String, completion: @escaping (Result<OktaToken?, Error>) -> Void) {
-        <#code#>
+        do{
+           
+            if idxFlow != nil {
+                idxFlow?.resume{ responseResult in
+                        Task{
+                            if #available(iOS 15.0, *) {
+                                var response = try responseResult.get()
+                                
+                                guard let remidiation = response.remediations[.challengeAuthenticator],
+                                      let passwordField = remidiation["credentials.passcode"]
+                                else{
+                                    completion(.failure(HssOktaError.generalError("Failed to satisfy remidation")))
+                                    return
+                                }
+                                
+                                passwordField.value = password
+                                response = try await remidiation.proceed()
+                                
+                                guard response.isLoginSuccessful
+                                else{
+                                    completion(.failure(HssOktaError.generalError("Login Failed, Check your Input")))
+                                    return
+                                }
+                                
+                                let tokenResult =  try await response.exchangeCode()
+                                
+                                completion(.success(OktaToken(
+                                    id: tokenResult.id,
+                                    accessToken: tokenResult.accessToken)))
+                                
+                            } else {
+                                completion(.failure(HssOktaError.generalError("Only available for iOS 15.0 or newer")))
+                            }
+                        }
+                        
+                    
+                }
+            }
+            
+            throw HssOktaError.generalError("Create a flow first")
+            
+        }catch let error{
+            completion(.failure(HssOktaError.generalError(error.localizedDescription)))
+        }
     }
     
 }

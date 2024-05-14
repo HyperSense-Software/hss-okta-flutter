@@ -1,3 +1,4 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:pigeon/pigeon.dart';
 
 @ConfigurePigeon(
@@ -101,12 +102,15 @@ class IdxResponse {
   final bool canCancel;
   final bool isLoginSuccessful;
   final RequestIntent intent;
+  final IdxRemidiationOption remidiation;
+
   IdxResponse({
     required this.expiresAt,
     required this.user,
     required this.canCancel,
     required this.intent,
     required this.isLoginSuccessful,
+    required this.remidiation,
   });
 }
 
@@ -118,6 +122,16 @@ enum RequestIntent {
   credentialRecovery,
   credentialModify,
   unknown,
+}
+
+enum IdxRemidiationOption {
+  identify,
+  enrollAuthenticator,
+  selectAuthenticatorEnroll,
+  challengeAuthenticator,
+  selectEnrollProfile,
+  identifyRecovery,
+  cancel,
 }
 
 @HostApi()
@@ -164,7 +178,7 @@ abstract class HssOktaFlutterPluginApi {
 
   // IDX Section
   @async
-  IdxResponse? startEmailAuthenticationFlow(String username);
+  IdxResponse? startEmailAuthenticationFlow(String email);
 
   @async
   OktaToken? continueWithPassword(String password);

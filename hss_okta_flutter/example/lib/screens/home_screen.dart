@@ -309,12 +309,21 @@ class _HomeScreenState extends State<HomeScreen> {
             'IDX',
             style: Theme.of(context).textTheme.titleLarge,
           ),
+          const SizedBox(
+            height: 12,
+          ),
+          const Text('Status :'),
           OutlinedButton(
             onPressed: () async {
-              await PluginProvider.of(context)
+              final response = await PluginProvider.of(context)
                   .plugin
                   .idx
                   .startEmailAuthenticationFlow('aldrin.francisco@designli.co');
+
+              await PluginProvider.of(context)
+                  .plugin
+                  .idx
+                  .continueWithPassword('09158121949aA');
             },
             child: const Text(
               'Interaction Code Flow',
