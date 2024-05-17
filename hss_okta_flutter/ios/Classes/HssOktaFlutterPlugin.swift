@@ -340,11 +340,13 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
                     
                     
                     response.remediations.forEach{ r in
-                        let remidiationFields = r.form.fields.map{ f in
-                            "\(f.name) : \(f.form?.fields.map(){$0.name})"
-                        }
+                        let remidiationFields = r.form.fields.map{ f1 in
+                            f1.form?.fields.map{ f2 in
+                                "\(f1.name ?? "").\(f2.name ?? "")"
+                            }.joined() ?? ""
+                        }.joined()
 
-                        nextRemediations[r.name] = remidiationFields.joined()
+                        nextRemediations[r.name] = remidiationFields
                     }
                     
                     dump(nextRemediations)
