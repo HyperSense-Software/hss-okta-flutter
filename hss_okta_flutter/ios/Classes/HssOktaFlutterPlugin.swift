@@ -16,7 +16,6 @@ case generalError(String)
 
 
 public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginApi {
-    
 
     let browserAuth = WebAuthentication.shared
     var flow : (any AuthenticationFlow)?
@@ -49,7 +48,7 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
             
             Task{
                 do{
-                  
+                    
                     if let authFlow = flow as? DirectAuthenticationFlow{
                         
                         let status = try await authFlow.start(request.username, with: .password(request.password))
@@ -60,7 +59,7 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
                             Credential.default = try Credential.store(token)
                             let userInfo = try await Credential.default?.userInfo()
                             completion(.success(constructAuthenticationResult(resultEnum: DirectAuthenticationResult.success, token: token, userInfo: userInfo)))
-                           
+                            
                             
                         case .mfaRequired(_):
                             completion(.success(AuthenticationResult(result: DirectAuthenticationResult.mfaRequired)))
@@ -97,7 +96,7 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
                         completion(.failure(HssOktaError.generalError("Failed to resume flow, MFA Failed")))
                     }
                 }else{
-                        completion(.failure(HssOktaError.configError("Incorrect Flow")))
+                    completion(.failure(HssOktaError.configError("Incorrect Flow")))
                 }
             }catch let error{
                 completion(.failure(HssOktaError.generalError(error.localizedDescription)))
@@ -123,51 +122,51 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
         
         
     }
-        func revokeDefaultToken(completion: @escaping (Result<Bool?, Error>) -> Void){
-            if let credential = Credential.default{
-                Task{
-                    do{
-                        try await credential.revoke()
-                        
-                    }catch let error{
-                        debugPrint(error)
-                        completion(.success(false))
-                    }
-                }
-                completion(.success(true))
-            }else{
-                completion(.success(false))
-            }
-        }
-        
-        func getCredential(completion: @escaping (Result<AuthenticationResult?, Error>) -> Void) {
+    func revokeDefaultToken(completion: @escaping (Result<Bool?, Error>) -> Void){
+        if let credential = Credential.default{
             Task{
-               
                 do{
-                    if let result = Credential.default{
-                        let userInfo = try await result.userInfo()
-                        
-                        completion(.success(
-                            constructAuthenticationResult(
-                                resultEnum: nil,
-                                token: result.token, userInfo: userInfo)))
-                        
-                    }else{
-                        
-                        completion(.failure(HssOktaError.generalError("No default credential found")))
-                    }
-                }catch let e{
-                    completion(.failure(HssOktaError.generalError(e.localizedDescription)))
-
+                    try await credential.revoke()
+                    
+                }catch let error{
+                    debugPrint(error)
+                    completion(.success(false))
                 }
             }
+            completion(.success(true))
+        }else{
+            completion(.success(false))
         }
+    }
+    
+    func getCredential(completion: @escaping (Result<AuthenticationResult?, Error>) -> Void) {
+        Task{
+            
+            do{
+                if let result = Credential.default{
+                    let userInfo = try await result.userInfo()
+                    
+                    completion(.success(
+                        constructAuthenticationResult(
+                            resultEnum: nil,
+                            token: result.token, userInfo: userInfo)))
+                    
+                }else{
+                    
+                    completion(.failure(HssOktaError.generalError("No default credential found")))
+                }
+            }catch let e{
+                completion(.failure(HssOktaError.generalError(e.localizedDescription)))
+                
+            }
+        }
+    }
     
     func startDeviceAuthorizationFlow(completion: @escaping (Result<DeviceAuthorizationSession?, Error>) -> Void) {
         do{
             if (try? OAuth2Client.PropertyListConfiguration()) != nil{
                 
-                 flow = try DeviceAuthorizationFlow()
+                flow = try DeviceAuthorizationFlow()
                 
                 Task{
                     do{
@@ -175,7 +174,7 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
                         if let authFlow = flow as? DeviceAuthorizationFlow{
                             
                             deviceAuthorizationFlowContext = try await authFlow.start()
-
+                            
                             completion(.success(DeviceAuthorizationSession(
                                 userCode: deviceAuthorizationFlowContext?.userCode,
                                 verificationUri: deviceAuthorizationFlowContext?.verificationUri.absoluteString
@@ -215,7 +214,7 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
             }
         }
     }
-   
+    
     func startTokenExchangeFlow(deviceSecret: String, idToken: String, completion: @escaping (Result<AuthenticationResult?, Error>) -> Void) {
         Task{
             do{
@@ -261,7 +260,7 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
                     completion(.success(constructAuthenticationResult(
                         resultEnum: nil, token: fetchedCredential.token, userInfo: fetchedCredential.userInfo)))
                 }
-               
+                
             }catch let error{
                 completion(.failure(error))
             }
@@ -269,24 +268,24 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
     }
     
     func removeCredential(tokenId: String, completion: @escaping (Result<Bool, Error>) -> Void) {
-   
-            Task{
-                do{
-                    
-                    try Credential.with(id:tokenId)?.remove()
-                    completion(.success(true))
-                    
-                }catch let error{
-                    completion(.failure(error))
-                }
+        
+        Task{
+            do{
+                
+                try Credential.with(id:tokenId)?.remove()
+                completion(.success(true))
+                
+            }catch let error{
+                completion(.failure(error))
             }
+        }
         
     }
     
     func setDefaultToken(tokenId: String, completion: @escaping (Result<Bool, Error>) -> Void) {
         Task{
             do{
-               
+                
                 try Credential.tokenStorage.setDefaultTokenID(tokenId)
                 completion(.success(true))
                 
@@ -294,33 +293,33 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
                 completion(.failure(error))
             }
         }}
-        
-        func constructAuthenticationResult(resultEnum : DirectAuthenticationResult?, token : Token,userInfo : AuthFoundation.UserInfo?) -> AuthenticationResult{
-            return AuthenticationResult(
-                result: resultEnum,
-                token: OktaToken(
-                    id: token.id,
-                    token: token.idToken?.rawValue ?? "",
-                    issuedAt: Int64(((token.issuedAt?.timeIntervalSince1970 ?? 0) * 1000.0).rounded()),
-                    tokenType: token.tokenType,
-                    accessToken: token.accessToken,
-                    scope: token.scope ?? "",
-                    refreshToken: token.refreshToken ?? ""
-                ),
-                userInfo: UserInfo(userId: "", givenName: userInfo?.givenName ?? "", middleName: userInfo?.middleName ?? "", familyName: userInfo?.familyName ?? "", gender: userInfo?.gender ?? "", email: userInfo?.email ?? "", phoneNumber: userInfo?.phoneNumber ?? "", username: userInfo?.preferredUsername  ?? "")
-            )
-        }
-
+    
+    func constructAuthenticationResult(resultEnum : DirectAuthenticationResult?, token : Token,userInfo : AuthFoundation.UserInfo?) -> AuthenticationResult{
+        return AuthenticationResult(
+            result: resultEnum,
+            token: OktaToken(
+                id: token.id,
+                token: token.idToken?.rawValue ?? "",
+                issuedAt: Int64(((token.issuedAt?.timeIntervalSince1970 ?? 0) * 1000.0).rounded()),
+                tokenType: token.tokenType,
+                accessToken: token.accessToken,
+                scope: token.scope ?? "",
+                refreshToken: token.refreshToken ?? ""
+            ),
+            userInfo: UserInfo(userId: "", givenName: userInfo?.givenName ?? "", middleName: userInfo?.middleName ?? "", familyName: userInfo?.familyName ?? "", gender: userInfo?.gender ?? "", email: userInfo?.email ?? "", phoneNumber: userInfo?.phoneNumber ?? "", username: userInfo?.preferredUsername  ?? "")
+        )
+    }
+    
     // IDX METHODS
     func startEmailAuthenticationFlow(email: String, completion: @escaping (Result<IdxResponse?, Error>) -> Void) {
         Task{
             do{
                 print("STARTING INTERACTION CODE FLOW")
                 idxFlow = try InteractionCodeFlow();
-               
+                
                 if #available(iOS 15.0, *) {
                     var response = try await idxFlow!.start()
-             
+                    
                     guard let remediation = response.remediations[.identify],
                           let username = remediation["identifier"]
                     else{
@@ -345,17 +344,17 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
                                 "\(f1.name ?? "").\(f2.name ?? "")"
                             }.joined() ?? ""
                         }.joined()
-
+                        
                         nextRemediations[r.name] = remidiationFields
                     }
                     
-                    dump(nextRemediations)
-           
+                    
+                    
                     completion(.success(IdxResponse(expiresAt: response.expiresAt?.millisecondsSince1970, canCancel: response.canCancel,isLoginSuccessful: response.isLoginSuccessful, intent: RequestIntent(rawValue: Int(response.intent.getIndex)) ?? RequestIntent.unknown, remidiation: IdxRemidiationOption.identify,availableRemidiations: remediations,nextRemediations: nextRemediations)))
                 } else {
                     completion(.failure(HssOktaError.generalError("This method is Only Avaialable to iOS 15.0 or newer")))
                 }
-
+                
             }catch let error{
                 completion(.failure(error))
             }
@@ -364,43 +363,43 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
     
     func continueWithPassword(password: String, completion: @escaping (Result<OktaToken?, Error>) -> Void) {
         do{
-           
+            
             if idxFlow != nil {
                 idxFlow?.resume{ responseResult in
-                        Task{
-                            if #available(iOS 15.0, *) {
-                                var response = try responseResult.get()
-                                
-                                guard let remidiation = response.remediations[.challengeAuthenticator],
-                                      let passwordField = remidiation["credentials.passcode"]
-                                else{
-                                    completion(.failure(HssOktaError.generalError("Failed to satisfy remidation")))
-                                    return
-                                }
-                                
-                                passwordField.value = password
-                                response = try await remidiation.proceed()
-                                
-                                guard response.isLoginSuccessful
-                                else{
-                                    completion(.failure(HssOktaError.generalError("Login Failed, Check your Input")))
-                                    return
-                                }
-                                
-                                let tokenResult =  try await response.exchangeCode()
-                                
-                                completion(.success(OktaToken(
-                                    id: tokenResult.id,
-                                    token: tokenResult.idToken?.rawValue, issuedAt: Int64(((tokenResult.issuedAt?.timeIntervalSince1970 ?? 0) * 1000.0).rounded()),
-                                    tokenType: tokenResult.tokenType, accessToken: tokenResult.accessToken,
-                                    scope: tokenResult.scope, refreshToken:tokenResult.refreshToken
-                                )))
-                                
-                            } else {
-                                completion(.failure(HssOktaError.generalError("Only available for iOS 15.0 or newer")))
+                    Task{
+                        if #available(iOS 15.0, *) {
+                            var response = try responseResult.get()
+                            
+                            guard let remidiation = response.remediations[.challengeAuthenticator],
+                                  let passwordField = remidiation["credentials.passcode"]
+                            else{
+                                completion(.failure(HssOktaError.generalError("Failed to satisfy remidation")))
+                                return
                             }
+                            
+                            passwordField.value = password
+                            response = try await remidiation.proceed()
+                            
+                            guard response.isLoginSuccessful
+                            else{
+                                completion(.failure(HssOktaError.generalError("Login Failed, Check your Input")))
+                                return
+                            }
+                            
+                            let tokenResult =  try await response.exchangeCode()
+                            
+                            completion(.success(OktaToken(
+                                id: tokenResult.id,
+                                token: tokenResult.idToken?.rawValue, issuedAt: Int64(((tokenResult.issuedAt?.timeIntervalSince1970 ?? 0) * 1000.0).rounded()),
+                                tokenType: tokenResult.tokenType, accessToken: tokenResult.accessToken,
+                                scope: tokenResult.scope, refreshToken:tokenResult.refreshToken
+                            )))
+                            
+                        } else {
+                            completion(.failure(HssOktaError.generalError("Only available for iOS 15.0 or newer")))
                         }
-                        
+                    }
+                    
                     
                 }
             }
@@ -412,7 +411,98 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
         }
     }
     
+    func startSMSPhoneEnrollment(phoneNumber: String, completion: @escaping (Result<Bool, Error>) -> Void) {
+        Task{
+            if(idxFlow == nil){
+                completion(.failure(HssOktaError.generalError("Start a flow first")))
+            }
+            
+               idxFlow!.resume(
+                    completion: {res in
+                        switch(res){
+                        case .success(let response):
+             
+                                
+                                guard let remediation = response.remediations[.selectAuthenticatorEnroll],
+                                      let authenticatorField = remediation["authenticator"],
+                                      let phoneOption = authenticatorField.options?.first(where: { option in
+                                          option.label == "Phone"
+                                      }),
+                                      let phoneNumberField = phoneOption["phoneNumber"],
+                                      let methodTypeField = phoneOption["methodType"],
+                                      let smsMethod = methodTypeField.options?.first(where: { option in
+                                          option.label == "SMS"
+                                      }) else
+                                {
+                                    completion(.failure(HssOktaError.generalError("Failed to enroll SMS")))
+                                    return
+                                }
+                                
+                                authenticatorField.selectedOption = phoneOption
+                                methodTypeField.selectedOption = smsMethod
+                                phoneNumberField.value = phoneNumber
+                                
+                            remediation.proceed{ proceedResults in
+                                completion(.success(true))
+                            }
+
+                            break
+                        case .failure(let error):
+                            completion(.failure(HssOktaError.generalError(error.localizedDescription)))
+                        }
+                    })
+                
+                
+               
+                
+            
+        }
+    }
+    
+    
+    
+    func continueSMSPhoneEnrollment(passcode: String, completion: @escaping (Result<Bool, Error>) -> Void) {
+        if(idxFlow == nil){
+            completion(.failure(HssOktaError.generalError("Start a flow first")))
+        }
+        idxFlow!.resume(completion: { result in
+            
+                switch(result){
+                case .success(let response):
+                    
+                    guard let remidiation = response.remediations[.challengeAuthenticator],
+                          let passcodeField = remidiation["credentials.passcode"]
+                            
+                            
+                            
+                    else {
+                        completion(.failure(HssOktaError.generalError("Failed to contunue flow")))
+                        return}
+
+                     passcodeField.value = passcode
+                    
+                    remidiation.proceed(completion: {remidiationResult in
+                        switch(remidiationResult){
+                        case .success(_):
+                            completion(.success(true))
+                            break;
+                        case .failure(let error):
+                            completion(.failure(HssOktaError.generalError(error.localizedDescription)))
+                        }
+                    })
+                    
+                    break
+                case .failure(let error):
+                    completion(.failure(HssOktaError.generalError(error.localizedDescription)))
+                }
+            }
+        )
+        
+    }
+    
 }
+ 
+
 
 // Move this somewhere else
 extension Response.Intent{
@@ -434,6 +524,7 @@ extension Response.Intent{
             return 6
         }
     }
+    
 }
 
 extension Date {

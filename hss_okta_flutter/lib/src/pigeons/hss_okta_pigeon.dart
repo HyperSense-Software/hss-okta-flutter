@@ -186,4 +186,10 @@ abstract class HssOktaFlutterPluginApi {
 
   @async
   OktaToken? continueWithPassword(String password);
+
+  @async
+  bool startSMSPhoneEnrollment(String phoneNumber);
+
+  @async
+  bool continueSMSPhoneEnrollment(String passcode);
 }

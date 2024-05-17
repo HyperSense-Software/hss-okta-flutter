@@ -99,4 +99,15 @@ class HssOktaFlutterChannel extends HssOktaFlutterPlatformInterface {
   Future<OktaToken?> continueWithPassword(String password) async {
     return await _api.continueWithPassword(password);
   }
+
+  @override
+  Future<bool> startSMSPhoneEnrollment(String phoneNumber) async {
+    return await _api.startSMSPhoneEnrollment(phoneNumber);
+  }
+
+  @override
+  Future<bool> continueSMSPhoneEnrollment(String passcode) {
+    // TODO: implement continueSMSPhoneEnrollment
+    throw UnimplementedError();
+  }
 }

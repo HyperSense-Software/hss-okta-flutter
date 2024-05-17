@@ -375,6 +375,8 @@ protocol HssOktaFlutterPluginApi {
   func setDefaultToken(tokenId: String, completion: @escaping (Result<Bool, Error>) -> Void)
   func startEmailAuthenticationFlow(email: String, completion: @escaping (Result<IdxResponse?, Error>) -> Void)
   func continueWithPassword(password: String, completion: @escaping (Result<OktaToken?, Error>) -> Void)
+  func startSMSPhoneEnrollment(phoneNumber: String, completion: @escaping (Result<Bool, Error>) -> Void)
+  func continueSMSPhoneEnrollment(passcode: String, completion: @escaping (Result<Bool, Error>) -> Void)
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -610,6 +612,40 @@ class HssOktaFlutterPluginApiSetup {
       }
     } else {
       continueWithPasswordChannel.setMessageHandler(nil)
+    }
+    let startSMSPhoneEnrollmentChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.startSMSPhoneEnrollment\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      startSMSPhoneEnrollmentChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let phoneNumberArg = args[0] as! String
+        api.startSMSPhoneEnrollment(phoneNumber: phoneNumberArg) { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      startSMSPhoneEnrollmentChannel.setMessageHandler(nil)
+    }
+    let continueSMSPhoneEnrollmentChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.continueSMSPhoneEnrollment\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      continueSMSPhoneEnrollmentChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let passcodeArg = args[0] as! String
+        api.continueSMSPhoneEnrollment(passcode: passcodeArg) { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      continueSMSPhoneEnrollmentChannel.setMessageHandler(nil)
     }
   }
 }

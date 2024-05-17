@@ -143,4 +143,14 @@ class Idx {
     var result = await instance.continueWithPassword(password);
     return result;
   }
+
+  Future<bool> startSMSPhoneEnrollment(String phoneNumber) async {
+    var result = await instance.startSMSPhoneEnrollment(phoneNumber);
+    return result;
+  }
+
+  Future<bool> continueSMSPhoneEnrollment(String passcode) async {
+    var result = await instance.continueSMSPhoneEnrollment(passcode);
+    return result;
+  }
 }

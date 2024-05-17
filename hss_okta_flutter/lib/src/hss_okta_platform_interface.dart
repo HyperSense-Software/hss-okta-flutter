@@ -66,4 +66,7 @@ abstract class HssOktaFlutterPlatformInterface extends PlatformInterface {
 
   Future<OktaToken?> continueWithPassword(String password) =>
       throw UnimplementedError();
+
+  Future<bool> startSMSPhoneEnrollment(String phoneNumber);
+  Future<bool> continueSMSPhoneEnrollment(String passcode);
 }

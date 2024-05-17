@@ -388,6 +388,8 @@ interface HssOktaFlutterPluginApi {
   fun setDefaultToken(tokenId: String, callback: (Result<Boolean>) -> Unit)
   fun startEmailAuthenticationFlow(email: String, callback: (Result<IdxResponse?>) -> Unit)
   fun continueWithPassword(password: String, callback: (Result<OktaToken?>) -> Unit)
+  fun startSMSPhoneEnrollment(phoneNumber: String, callback: (Result<Boolean>) -> Unit)
+  fun continueSMSPhoneEnrollment(passcode: String, callback: (Result<Boolean>) -> Unit)
 
   companion object {
     /** The codec used by HssOktaFlutterPluginApi. */
@@ -653,6 +655,46 @@ interface HssOktaFlutterPluginApi {
             val args = message as List<Any?>
             val passwordArg = args[0] as String
             api.continueWithPassword(passwordArg) { result: Result<OktaToken?> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(wrapResult(data))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.startSMSPhoneEnrollment$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val phoneNumberArg = args[0] as String
+            api.startSMSPhoneEnrollment(phoneNumberArg) { result: Result<Boolean> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(wrapResult(data))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.continueSMSPhoneEnrollment$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val passcodeArg = args[0] as String
+            api.continueSMSPhoneEnrollment(passcodeArg) { result: Result<Boolean> ->
               val error = result.exceptionOrNull()
               if (error != null) {
                 reply.reply(wrapError(error))
