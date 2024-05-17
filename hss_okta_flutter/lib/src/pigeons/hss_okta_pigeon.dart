@@ -103,6 +103,8 @@ class IdxResponse {
   final bool isLoginSuccessful;
   final RequestIntent intent;
   final IdxRemidiationOption remidiation;
+  final List<String?> availableRemidiations;
+  final Map<String?, String?> nextRemediations;
 
   IdxResponse({
     required this.expiresAt,
@@ -111,6 +113,8 @@ class IdxResponse {
     required this.intent,
     required this.isLoginSuccessful,
     required this.remidiation,
+    required this.availableRemidiations,
+    required this.nextRemediations,
   });
 }
 

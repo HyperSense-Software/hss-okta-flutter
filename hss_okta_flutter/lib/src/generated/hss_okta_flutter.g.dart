@@ -262,6 +262,8 @@ class IdxResponse {
     required this.isLoginSuccessful,
     required this.intent,
     required this.remidiation,
+    required this.availableRemidiations,
+    required this.nextRemediations,
   });
 
   int? expiresAt;
@@ -276,6 +278,10 @@ class IdxResponse {
 
   IdxRemidiationOption remidiation;
 
+  List<String?> availableRemidiations;
+
+  Map<String?, String?> nextRemediations;
+
   Object encode() {
     return <Object?>[
       expiresAt,
@@ -284,6 +290,8 @@ class IdxResponse {
       isLoginSuccessful,
       intent.index,
       remidiation.index,
+      availableRemidiations,
+      nextRemediations,
     ];
   }
 
@@ -296,6 +304,8 @@ class IdxResponse {
       isLoginSuccessful: result[3]! as bool,
       intent: RequestIntent.values[result[4]! as int],
       remidiation: IdxRemidiationOption.values[result[5]! as int],
+      availableRemidiations: (result[6] as List<Object?>?)!.cast<String?>(),
+      nextRemediations: (result[7] as Map<Object?, Object?>?)!.cast<String?, String?>(),
     );
   }
 }

@@ -272,7 +272,9 @@ data class IdxResponse (
   val canCancel: Boolean,
   val isLoginSuccessful: Boolean,
   val intent: RequestIntent,
-  val remidiation: IdxRemidiationOption
+  val remidiation: IdxRemidiationOption,
+  val availableRemidiations: List<String?>,
+  val nextRemediations: Map<String?, String?>
 
 ) {
   companion object {
@@ -284,7 +286,9 @@ data class IdxResponse (
       val isLoginSuccessful = __pigeon_list[3] as Boolean
       val intent = RequestIntent.ofRaw(__pigeon_list[4] as Int)!!
       val remidiation = IdxRemidiationOption.ofRaw(__pigeon_list[5] as Int)!!
-      return IdxResponse(expiresAt, user, canCancel, isLoginSuccessful, intent, remidiation)
+      val availableRemidiations = __pigeon_list[6] as List<String?>
+      val nextRemediations = __pigeon_list[7] as Map<String?, String?>
+      return IdxResponse(expiresAt, user, canCancel, isLoginSuccessful, intent, remidiation, availableRemidiations, nextRemediations)
     }
   }
   fun toList(): List<Any?> {
@@ -295,6 +299,8 @@ data class IdxResponse (
       isLoginSuccessful,
       intent.raw,
       remidiation.raw,
+      availableRemidiations,
+      nextRemediations,
     )
   }
 }

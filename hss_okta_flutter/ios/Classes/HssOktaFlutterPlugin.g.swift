@@ -259,6 +259,8 @@ struct IdxResponse {
   var isLoginSuccessful: Bool
   var intent: RequestIntent
   var remidiation: IdxRemidiationOption
+  var availableRemidiations: [String?]
+  var nextRemediations: [String?: String?]
 
   // swift-format-ignore: AlwaysUseLowerCamelCase
   static func fromList(_ __pigeon_list: [Any?]) -> IdxResponse? {
@@ -268,6 +270,8 @@ struct IdxResponse {
     let isLoginSuccessful = __pigeon_list[3] as! Bool
     let intent = RequestIntent(rawValue: __pigeon_list[4] as! Int)!
     let remidiation = IdxRemidiationOption(rawValue: __pigeon_list[5] as! Int)!
+    let availableRemidiations = __pigeon_list[6] as! [String?]
+    let nextRemediations = __pigeon_list[7] as! [String?: String?]
 
     return IdxResponse(
       expiresAt: expiresAt,
@@ -275,7 +279,9 @@ struct IdxResponse {
       canCancel: canCancel,
       isLoginSuccessful: isLoginSuccessful,
       intent: intent,
-      remidiation: remidiation
+      remidiation: remidiation,
+      availableRemidiations: availableRemidiations,
+      nextRemediations: nextRemediations
     )
   }
   func toList() -> [Any?] {
@@ -286,6 +292,8 @@ struct IdxResponse {
       isLoginSuccessful,
       intent.rawValue,
       remidiation.rawValue,
+      availableRemidiations,
+      nextRemediations,
     ]
   }
 }

@@ -327,11 +327,29 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
                         return completion(.failure(HssOktaError.generalError("Failed indentifying remidiation, check available remidiation fields")))
                     }
                     
-                    username.value = email
+                    var remediations = [String]()
                     
+                    response.remediations.forEach{ r in
+                        remediations.append(r.name)
+                    }
+                    
+                    username.value = email
                     response = try await remediation.proceed()
                     
-                    completion(.success(IdxResponse(expiresAt: response.expiresAt?.millisecondsSince1970, canCancel: response.canCancel,isLoginSuccessful: response.isLoginSuccessful, intent: RequestIntent(rawValue: Int(response.intent.getIndex)) ?? RequestIntent.unknown, remidiation: IdxRemidiationOption.identify)))
+                    var nextRemediations = [String:String]()
+                    
+                    
+                    response.remediations.forEach{ r in
+                        let remidiationFields = r.form.fields.map{ f in
+                            "\(f.name) : \(f.form?.fields.map(){$0.name})"
+                        }
+
+                        nextRemediations[r.name] = remidiationFields.joined()
+                    }
+                    
+                    dump(nextRemediations)
+           
+                    completion(.success(IdxResponse(expiresAt: response.expiresAt?.millisecondsSince1970, canCancel: response.canCancel,isLoginSuccessful: response.isLoginSuccessful, intent: RequestIntent(rawValue: Int(response.intent.getIndex)) ?? RequestIntent.unknown, remidiation: IdxRemidiationOption.identify,availableRemidiations: remediations,nextRemediations: nextRemediations)))
                 } else {
                     completion(.failure(HssOktaError.generalError("This method is Only Avaialable to iOS 15.0 or newer")))
                 }
@@ -371,7 +389,10 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
                                 
                                 completion(.success(OktaToken(
                                     id: tokenResult.id,
-                                    accessToken: tokenResult.accessToken)))
+                                    token: tokenResult.idToken?.rawValue, issuedAt: Int64(((tokenResult.issuedAt?.timeIntervalSince1970 ?? 0) * 1000.0).rounded()),
+                                    tokenType: tokenResult.tokenType, accessToken: tokenResult.accessToken,
+                                    scope: tokenResult.scope, refreshToken:tokenResult.refreshToken
+                                )))
                                 
                             } else {
                                 completion(.failure(HssOktaError.generalError("Only available for iOS 15.0 or newer")))
