@@ -153,4 +153,19 @@ class Idx {
     var result = await instance.continueSMSPhoneEnrollment(passcode);
     return result;
   }
+
+  Future<bool> startUserEnrollmentFlow({
+    required String firstName,
+    required String lastName,
+    required String email,
+  }) async {
+    var result = await instance.startUserEnrollmentFlow(
+        firstName: firstName, lastName: lastName, email: email);
+    return result;
+  }
+
+  Future<bool> recoverPassword(String identifier) async {
+    var result = await instance.recoverPassword(identifier);
+    return result;
+  }
 }

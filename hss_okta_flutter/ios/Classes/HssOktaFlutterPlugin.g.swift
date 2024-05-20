@@ -310,8 +310,10 @@ private class HssOktaFlutterPluginApiCodecReader: FlutterStandardReader {
     case 131:
       return IdxResponse.fromList(self.readValue() as! [Any?])
     case 132:
-      return OktaToken.fromList(self.readValue() as! [Any?])
+      return IdxResponse.fromList(self.readValue() as! [Any?])
     case 133:
+      return OktaToken.fromList(self.readValue() as! [Any?])
+    case 134:
       return UserInfo.fromList(self.readValue() as! [Any?])
     default:
       return super.readValue(ofType: type)
@@ -333,11 +335,14 @@ private class HssOktaFlutterPluginApiCodecWriter: FlutterStandardWriter {
     } else if let value = value as? IdxResponse {
       super.writeByte(131)
       super.writeValue(value.toList())
-    } else if let value = value as? OktaToken {
+    } else if let value = value as? IdxResponse {
       super.writeByte(132)
       super.writeValue(value.toList())
-    } else if let value = value as? UserInfo {
+    } else if let value = value as? OktaToken {
       super.writeByte(133)
+      super.writeValue(value.toList())
+    } else if let value = value as? UserInfo {
+      super.writeByte(134)
       super.writeValue(value.toList())
     } else {
       super.writeValue(value)
@@ -377,6 +382,8 @@ protocol HssOktaFlutterPluginApi {
   func continueWithPassword(password: String, completion: @escaping (Result<OktaToken?, Error>) -> Void)
   func startSMSPhoneEnrollment(phoneNumber: String, completion: @escaping (Result<Bool, Error>) -> Void)
   func continueSMSPhoneEnrollment(passcode: String, completion: @escaping (Result<Bool, Error>) -> Void)
+  func startUserEnrollmentFlow(firstName: String, lastName: String, email: String, completion: @escaping (Result<Bool, Error>) -> Void)
+  func recoverPassword(identifier: String, completion: @escaping (Result<IdxResponse, Error>) -> Void)
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -646,6 +653,42 @@ class HssOktaFlutterPluginApiSetup {
       }
     } else {
       continueSMSPhoneEnrollmentChannel.setMessageHandler(nil)
+    }
+    let startUserEnrollmentFlowChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.startUserEnrollmentFlow\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      startUserEnrollmentFlowChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let firstNameArg = args[0] as! String
+        let lastNameArg = args[1] as! String
+        let emailArg = args[2] as! String
+        api.startUserEnrollmentFlow(firstName: firstNameArg, lastName: lastNameArg, email: emailArg) { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      startUserEnrollmentFlowChannel.setMessageHandler(nil)
+    }
+    let recoverPasswordChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.recoverPassword\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      recoverPasswordChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let identifierArg = args[0] as! String
+        api.recoverPassword(identifier: identifierArg) { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      recoverPasswordChannel.setMessageHandler(nil)
     }
   }
 }

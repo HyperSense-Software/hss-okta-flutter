@@ -107,7 +107,21 @@ class HssOktaFlutterChannel extends HssOktaFlutterPlatformInterface {
 
   @override
   Future<bool> continueSMSPhoneEnrollment(String passcode) {
-    // TODO: implement continueSMSPhoneEnrollment
-    throw UnimplementedError();
+    return _api.continueSMSPhoneEnrollment(passcode);
+  }
+
+  @override
+  Future<bool> startUserEnrollmentFlow({
+    required String firstName,
+    required String lastName,
+    required String email,
+  }) {
+    return _api.startUserEnrollmentFlow(
+        firstName: firstName, lastName: lastName, email: email);
+  }
+
+  @override
+  Future<bool> recoverPassword(String identifier) {
+    return _api.recoverPassword(identifier);
   }
 }

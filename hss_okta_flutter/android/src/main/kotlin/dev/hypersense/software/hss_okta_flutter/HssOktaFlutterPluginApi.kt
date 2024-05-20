@@ -330,10 +330,15 @@ private object HssOktaFlutterPluginApiCodec : StandardMessageCodec() {
       }
       132.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          OktaToken.fromList(it)
+          IdxResponse.fromList(it)
         }
       }
       133.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          OktaToken.fromList(it)
+        }
+      }
+      134.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
           UserInfo.fromList(it)
         }
@@ -359,12 +364,16 @@ private object HssOktaFlutterPluginApiCodec : StandardMessageCodec() {
         stream.write(131)
         writeValue(stream, value.toList())
       }
-      is OktaToken -> {
+      is IdxResponse -> {
         stream.write(132)
         writeValue(stream, value.toList())
       }
-      is UserInfo -> {
+      is OktaToken -> {
         stream.write(133)
+        writeValue(stream, value.toList())
+      }
+      is UserInfo -> {
+        stream.write(134)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)
@@ -390,6 +399,8 @@ interface HssOktaFlutterPluginApi {
   fun continueWithPassword(password: String, callback: (Result<OktaToken?>) -> Unit)
   fun startSMSPhoneEnrollment(phoneNumber: String, callback: (Result<Boolean>) -> Unit)
   fun continueSMSPhoneEnrollment(passcode: String, callback: (Result<Boolean>) -> Unit)
+  fun startUserEnrollmentFlow(firstName: String, lastName: String, email: String, callback: (Result<Boolean>) -> Unit)
+  fun recoverPassword(identifier: String, callback: (Result<IdxResponse>) -> Unit)
 
   companion object {
     /** The codec used by HssOktaFlutterPluginApi. */
@@ -695,6 +706,48 @@ interface HssOktaFlutterPluginApi {
             val args = message as List<Any?>
             val passcodeArg = args[0] as String
             api.continueSMSPhoneEnrollment(passcodeArg) { result: Result<Boolean> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(wrapResult(data))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.startUserEnrollmentFlow$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val firstNameArg = args[0] as String
+            val lastNameArg = args[1] as String
+            val emailArg = args[2] as String
+            api.startUserEnrollmentFlow(firstNameArg, lastNameArg, emailArg) { result: Result<Boolean> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(wrapResult(data))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.recoverPassword$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val identifierArg = args[0] as String
+            api.recoverPassword(identifierArg) { result: Result<IdxResponse> ->
               val error = result.exceptionOrNull()
               if (error != null) {
                 reply.reply(wrapError(error))

@@ -192,4 +192,13 @@ abstract class HssOktaFlutterPluginApi {
 
   @async
   bool continueSMSPhoneEnrollment(String passcode);
+
+  @async
+  bool startUserEnrollmentFlow(
+      {required String firstName,
+      required String lastName,
+      required String email});
+
+  @async
+  IdxResponse recoverPassword(String identifier);
 }

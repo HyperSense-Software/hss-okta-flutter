@@ -16,7 +16,9 @@ case generalError(String)
 
 
 public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginApi {
-
+   
+    
+   
     let browserAuth = WebAuthentication.shared
     var flow : (any AuthenticationFlow)?
     var status : DirectAuthenticationFlow.Status?
@@ -497,6 +499,132 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
                 }
             }
         )
+        
+    }
+    
+    func startUserEnrollmentFlow(firstName: String, lastName: String, email: String, completion: @escaping (Result<Bool, Error>) -> Void) {
+        
+        do{
+            if(idxFlow == nil){
+                idxFlow = try InteractionCodeFlow()
+            }
+            
+            Task{
+                if #available(iOS 15.0, *) {
+                    var response = try await idxFlow!.start()
+                    guard let remediation = response.remediations[.selectEnrollProfile] else {
+                        completion(.failure(HssOktaError.generalError("The organization doesn't have enrollProfile enabled")))
+                        return
+                    }
+                    
+                    response = try await remediation.proceed()
+                    guard let remediation = response.remediations[.enrollProfile],
+                          let firstNameField = remediation["userProfile.firstName"],
+                          let lastNameField = remediation["userProfile.lastName"],
+                          let emailField = remediation["userProfile.email"]
+                    else {
+                        let error = response.messages.first?.message
+                        completion(.failure(HssOktaError.generalError("Failed with remidation : \(error ?? "unknown error")")))
+                        return
+                    }
+                    
+                    firstNameField.value = firstName
+                    lastNameField.value = lastName
+                    emailField.value = email
+                    
+                    let newResponse = try await remediation.proceed()
+                    completion(.success(true))
+
+                    
+                } else {
+                    completion(.failure(HssOktaError.generalError("This is only available for iOS 15.0 and above")))
+                }
+            }
+            
+        }catch let error{
+            completion(.failure(HssOktaError.generalError(error.localizedDescription)))
+        }
+    }
+    
+    func recoverPassword(identifier: String, completion: @escaping (Result<IdxResponse, Error>) -> Void) {
+
+            if(idxFlow == nil){
+                completion(.failure(HssOktaError.credentialError("Start a flow first")))
+                return
+            }
+            
+            idxFlow!.resume(completion:{ result in
+                switch(result){
+                case .success(let resultResponse):
+                    var response = resultResponse
+                    
+                    if let recoverable = response.authenticators.current?.recoverable {
+                        recoverable.recover(completion: { recoverResponse in
+                            switch(recoverResponse){
+                            case .success(let recoverResult):
+                                Task{
+                                    var response = recoverResult
+                                    var remediations = [String]()
+                                    
+                                    response.remediations.forEach{ r in
+                                        remediations.append(r.name)
+                                    }
+                                    
+                                    guard let remediation = response.remediations[.identifyRecovery],
+                                          let identifierField = remediation["identifier"]
+                                    else {
+                                        // Handle error
+                                        return
+                                    }
+
+                                    identifierField.value = identifier
+
+                                    if #available(iOS 15.0, *) {
+                                        response =  try await recoverable.recover()
+
+                                        var nextRemediations = [String:String]()
+                                        
+                                        
+                                        response.remediations.forEach{ r in
+                                            let remidiationFields = r.form.fields.map{ f1 in
+                                                f1.form?.fields.map{ f2 in
+                                                    "\(f1.name ?? "").\(f2.name ?? "")"
+                                                }.joined() ?? ""
+                                            }.joined()
+                                            
+                                            nextRemediations[r.name] = remidiationFields
+                                        }
+                                        
+                                        
+                                        
+                                        completion(.success(IdxResponse(expiresAt: response.expiresAt?.millisecondsSince1970, canCancel: response.canCancel,isLoginSuccessful: response.isLoginSuccessful, intent: RequestIntent(rawValue: Int(response.intent.getIndex)) ?? RequestIntent.unknown, remidiation: IdxRemidiationOption.identify,availableRemidiations: remediations,nextRemediations: nextRemediations)))
+                                        
+                                    } else {
+                                        // Fallback on earlier versions
+                                    }
+                                    
+                                }
+                                
+                                break
+                            case .failure:
+                                let error = response.messages.first?.message
+                                completion(.failure(HssOktaError.generalError("Failed with remidation : \(error ?? "unknown error")")))
+                            }
+                        })
+                        
+                       
+                       
+                    }else{
+                        completion(.failure(HssOktaError.generalError("Password Recovery is not enabled")))
+                    }
+                    break
+                case .failure(let error):
+                    completion(.failure(HssOktaError.generalError(error.localizedDescription)))
+                }
+            })
+            
+           
+            
         
     }
     
