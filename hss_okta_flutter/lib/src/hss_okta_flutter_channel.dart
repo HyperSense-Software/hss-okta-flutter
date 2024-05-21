@@ -121,7 +121,12 @@ class HssOktaFlutterChannel extends HssOktaFlutterPlatformInterface {
   }
 
   @override
-  Future<bool> recoverPassword(String identifier) {
+  Future<IdxResponse> recoverPassword(String identifier) {
     return _api.recoverPassword(identifier);
+  }
+
+  @override
+  Future<IdxResponse?> getIdxResponse() {
+    return _api.getIdxResponse();
   }
 }

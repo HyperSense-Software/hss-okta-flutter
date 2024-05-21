@@ -164,8 +164,13 @@ class Idx {
     return result;
   }
 
-  Future<bool> recoverPassword(String identifier) async {
+  Future<IdxResponse> recoverPassword(String identifier) async {
     var result = await instance.recoverPassword(identifier);
+    return result;
+  }
+
+  Future<IdxResponse?> getResponse() async {
+    var result = await instance.getIdxResponse();
     return result;
   }
 }

@@ -102,9 +102,8 @@ class IdxResponse {
   final bool canCancel;
   final bool isLoginSuccessful;
   final RequestIntent intent;
-  final IdxRemidiationOption remidiation;
-  final List<String?> availableRemidiations;
-  final Map<String?, String?> nextRemediations;
+  final List<String?> messages;
+  final UserInfo? userInfo;
 
   IdxResponse({
     required this.expiresAt,
@@ -112,9 +111,8 @@ class IdxResponse {
     required this.canCancel,
     required this.intent,
     required this.isLoginSuccessful,
-    required this.remidiation,
-    required this.availableRemidiations,
-    required this.nextRemediations,
+    required this.messages,
+    this.userInfo,
   });
 }
 
@@ -126,16 +124,6 @@ enum RequestIntent {
   credentialRecovery,
   credentialModify,
   unknown,
-}
-
-enum IdxRemidiationOption {
-  identify,
-  enrollAuthenticator,
-  selectAuthenticatorEnroll,
-  challengeAuthenticator,
-  selectEnrollProfile,
-  identifyRecovery,
-  cancel,
 }
 
 @HostApi()
@@ -201,4 +189,7 @@ abstract class HssOktaFlutterPluginApi {
 
   @async
   IdxResponse recoverPassword(String identifier);
+
+  @async
+  IdxResponse? getIdxResponse();
 }

@@ -66,16 +66,6 @@ enum RequestIntent: Int {
   case unknown = 6
 }
 
-enum IdxRemidiationOption: Int {
-  case identify = 0
-  case enrollAuthenticator = 1
-  case selectAuthenticatorEnroll = 2
-  case challengeAuthenticator = 3
-  case selectEnrollProfile = 4
-  case identifyRecovery = 5
-  case cancel = 6
-}
-
 /// Generated class from Pigeon that represents data sent in messages.
 struct AuthenticationResult {
   var result: DirectAuthenticationResult? = nil
@@ -258,9 +248,8 @@ struct IdxResponse {
   var canCancel: Bool
   var isLoginSuccessful: Bool
   var intent: RequestIntent
-  var remidiation: IdxRemidiationOption
-  var availableRemidiations: [String?]
-  var nextRemediations: [String?: String?]
+  var messages: [String?]
+  var userInfo: UserInfo? = nil
 
   // swift-format-ignore: AlwaysUseLowerCamelCase
   static func fromList(_ __pigeon_list: [Any?]) -> IdxResponse? {
@@ -269,9 +258,8 @@ struct IdxResponse {
     let canCancel = __pigeon_list[2] as! Bool
     let isLoginSuccessful = __pigeon_list[3] as! Bool
     let intent = RequestIntent(rawValue: __pigeon_list[4] as! Int)!
-    let remidiation = IdxRemidiationOption(rawValue: __pigeon_list[5] as! Int)!
-    let availableRemidiations = __pigeon_list[6] as! [String?]
-    let nextRemediations = __pigeon_list[7] as! [String?: String?]
+    let messages = __pigeon_list[5] as! [String?]
+    let userInfo: UserInfo? = nilOrValue(__pigeon_list[6])
 
     return IdxResponse(
       expiresAt: expiresAt,
@@ -279,9 +267,8 @@ struct IdxResponse {
       canCancel: canCancel,
       isLoginSuccessful: isLoginSuccessful,
       intent: intent,
-      remidiation: remidiation,
-      availableRemidiations: availableRemidiations,
-      nextRemediations: nextRemediations
+      messages: messages,
+      userInfo: userInfo
     )
   }
   func toList() -> [Any?] {
@@ -291,9 +278,8 @@ struct IdxResponse {
       canCancel,
       isLoginSuccessful,
       intent.rawValue,
-      remidiation.rawValue,
-      availableRemidiations,
-      nextRemediations,
+      messages,
+      userInfo,
     ]
   }
 }
@@ -384,6 +370,7 @@ protocol HssOktaFlutterPluginApi {
   func continueSMSPhoneEnrollment(passcode: String, completion: @escaping (Result<Bool, Error>) -> Void)
   func startUserEnrollmentFlow(firstName: String, lastName: String, email: String, completion: @escaping (Result<Bool, Error>) -> Void)
   func recoverPassword(identifier: String, completion: @escaping (Result<IdxResponse, Error>) -> Void)
+  func getIdxResponse(completion: @escaping (Result<IdxResponse, Error>) -> Void)
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -689,6 +676,21 @@ class HssOktaFlutterPluginApiSetup {
       }
     } else {
       recoverPasswordChannel.setMessageHandler(nil)
+    }
+    let getIdxResponseChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.getIdxResponse\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      getIdxResponseChannel.setMessageHandler { _, reply in
+        api.getIdxResponse { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      getIdxResponseChannel.setMessageHandler(nil)
     }
   }
 }

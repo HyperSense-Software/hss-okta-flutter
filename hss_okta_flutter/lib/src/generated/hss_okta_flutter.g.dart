@@ -42,16 +42,6 @@ enum RequestIntent {
   unknown,
 }
 
-enum IdxRemidiationOption {
-  identify,
-  enrollAuthenticator,
-  selectAuthenticatorEnroll,
-  challengeAuthenticator,
-  selectEnrollProfile,
-  identifyRecovery,
-  cancel,
-}
-
 class AuthenticationResult {
   AuthenticationResult({
     this.result,
@@ -261,9 +251,8 @@ class IdxResponse {
     required this.canCancel,
     required this.isLoginSuccessful,
     required this.intent,
-    required this.remidiation,
-    required this.availableRemidiations,
-    required this.nextRemediations,
+    required this.messages,
+    this.userInfo,
   });
 
   int? expiresAt;
@@ -276,11 +265,9 @@ class IdxResponse {
 
   RequestIntent intent;
 
-  IdxRemidiationOption remidiation;
+  List<String?> messages;
 
-  List<String?> availableRemidiations;
-
-  Map<String?, String?> nextRemediations;
+  UserInfo? userInfo;
 
   Object encode() {
     return <Object?>[
@@ -289,9 +276,8 @@ class IdxResponse {
       canCancel,
       isLoginSuccessful,
       intent.index,
-      remidiation.index,
-      availableRemidiations,
-      nextRemediations,
+      messages,
+      userInfo,
     ];
   }
 
@@ -303,9 +289,8 @@ class IdxResponse {
       canCancel: result[2]! as bool,
       isLoginSuccessful: result[3]! as bool,
       intent: RequestIntent.values[result[4]! as int],
-      remidiation: IdxRemidiationOption.values[result[5]! as int],
-      availableRemidiations: (result[6] as List<Object?>?)!.cast<String?>(),
-      nextRemediations: (result[7] as Map<Object?, Object?>?)!.cast<String?, String?>(),
+      messages: (result[5] as List<Object?>?)!.cast<String?>(),
+      userInfo: result[6] as UserInfo?,
     );
   }
 }
@@ -789,6 +774,33 @@ class HssOktaFlutterPluginApi {
     );
     final List<Object?>? __pigeon_replyList =
         await __pigeon_channel.send(<Object?>[identifier]) as List<Object?>?;
+    if (__pigeon_replyList == null) {
+      throw _createConnectionError(__pigeon_channelName);
+    } else if (__pigeon_replyList.length > 1) {
+      throw PlatformException(
+        code: __pigeon_replyList[0]! as String,
+        message: __pigeon_replyList[1] as String?,
+        details: __pigeon_replyList[2],
+      );
+    } else if (__pigeon_replyList[0] == null) {
+      throw PlatformException(
+        code: 'null-error',
+        message: 'Host platform returned null value for non-null return value.',
+      );
+    } else {
+      return (__pigeon_replyList[0] as IdxResponse?)!;
+    }
+  }
+
+  Future<IdxResponse> getIdxResponse() async {
+    final String __pigeon_channelName = 'dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.getIdxResponse$__pigeon_messageChannelSuffix';
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
+      __pigeon_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: __pigeon_binaryMessenger,
+    );
+    final List<Object?>? __pigeon_replyList =
+        await __pigeon_channel.send(null) as List<Object?>?;
     if (__pigeon_replyList == null) {
       throw _createConnectionError(__pigeon_channelName);
     } else if (__pigeon_replyList.length > 1) {

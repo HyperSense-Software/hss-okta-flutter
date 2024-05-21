@@ -320,10 +320,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   .idx
                   .startEmailAuthenticationFlow('aldrin.francisco@designli.co');
 
-              response?.nextRemediations.forEach((key, value) {
-                print("$key == $value");
-              });
-
               final token = await PluginProvider.of(context)
                   .plugin
                   .idx

@@ -16,6 +16,7 @@ case generalError(String)
 
 
 public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginApi {
+ 
    
     
    
@@ -349,10 +350,8 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
                         
                         nextRemediations[r.name] = remidiationFields
                     }
-                    
-                    
-                    
-                    completion(.success(IdxResponse(expiresAt: response.expiresAt?.millisecondsSince1970, canCancel: response.canCancel,isLoginSuccessful: response.isLoginSuccessful, intent: RequestIntent(rawValue: Int(response.intent.getIndex)) ?? RequestIntent.unknown, remidiation: IdxRemidiationOption.identify,availableRemidiations: remediations,nextRemediations: nextRemediations)))
+
+                    completion(.success(self.mapResponeToIdxResponse(response: response)))
                 } else {
                     completion(.failure(HssOktaError.generalError("This method is Only Avaialable to iOS 15.0 or newer")))
                 }
@@ -453,11 +452,6 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
                             completion(.failure(HssOktaError.generalError(error.localizedDescription)))
                         }
                     })
-                
-                
-               
-                
-            
         }
     }
     
@@ -581,26 +575,11 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
 
                                     if #available(iOS 15.0, *) {
                                         response =  try await recoverable.recover()
-
-                                        var nextRemediations = [String:String]()
                                         
-                                        
-                                        response.remediations.forEach{ r in
-                                            let remidiationFields = r.form.fields.map{ f1 in
-                                                f1.form?.fields.map{ f2 in
-                                                    "\(f1.name ?? "").\(f2.name ?? "")"
-                                                }.joined() ?? ""
-                                            }.joined()
-                                            
-                                            nextRemediations[r.name] = remidiationFields
-                                        }
-                                        
-                                        
-                                        
-                                        completion(.success(IdxResponse(expiresAt: response.expiresAt?.millisecondsSince1970, canCancel: response.canCancel,isLoginSuccessful: response.isLoginSuccessful, intent: RequestIntent(rawValue: Int(response.intent.getIndex)) ?? RequestIntent.unknown, remidiation: IdxRemidiationOption.identify,availableRemidiations: remediations,nextRemediations: nextRemediations)))
+                                        completion(.success(self.mapResponeToIdxResponse(response:response)))
                                         
                                     } else {
-                                        // Fallback on earlier versions
+                                        completion(.failure(HssOktaError.generalError("This methid is only available for iOS 15.0 and above")))
                                     }
                                     
                                 }
@@ -622,11 +601,43 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
                     completion(.failure(HssOktaError.generalError(error.localizedDescription)))
                 }
             })
-            
-           
-            
+
+    }
+    
+    func getIdxResponse(completion: @escaping (Result<IdxResponse, Error>) -> Void) {
+        return safeIdxResponse(completion: {res in
+            switch(res){
+            case .success(let result):
+                completion(.success(self.mapResponeToIdxResponse(response: result)))
+                break
+            case.failure(let error):
+                completion(.failure(error))
+            }
+        })
+    }
+    
+    func safeIdxResponse(completion: @escaping (Result<Response,Error>) -> Void){
+        
+        if(idxFlow == nil){
+            completion(.failure(HssOktaError.credentialError("Start a flow first")))
+        }
+        
+        idxFlow?.resume(completion: { result in
+            switch(result){
+            case .success(let resultResponse):
+                completion(.success(resultResponse))
+                break
+            case .failure(let error):
+                completion(.failure(HssOktaError.credentialError(error.localizedDescription)))
+            }
+        })
         
     }
+            
+            func mapResponeToIdxResponse(response : Response) -> IdxResponse{
+                return IdxResponse(expiresAt: response.expiresAt?.millisecondsSince1970, canCancel: response.canCancel,isLoginSuccessful: response.isLoginSuccessful, intent: RequestIntent(rawValue: Int(response.intent.getIndex)) ?? RequestIntent.unknown,messages: response.messages.allMessages.map{$0.message},userInfo: UserInfo(userId: response.user?.id ?? "", givenName: response.user?.profile?.firstName ?? "", middleName:"", familyName: response.user?.profile?.lastName ?? "", gender: "", email: "", phoneNumber: "", username: response.user?.username ?? ""))
+            }
+    
     
 }
  

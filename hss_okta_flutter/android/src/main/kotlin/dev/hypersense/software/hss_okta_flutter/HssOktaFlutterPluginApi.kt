@@ -95,22 +95,6 @@ enum class RequestIntent(val raw: Int) {
   }
 }
 
-enum class IdxRemidiationOption(val raw: Int) {
-  IDENTIFY(0),
-  ENROLL_AUTHENTICATOR(1),
-  SELECT_AUTHENTICATOR_ENROLL(2),
-  CHALLENGE_AUTHENTICATOR(3),
-  SELECT_ENROLL_PROFILE(4),
-  IDENTIFY_RECOVERY(5),
-  CANCEL(6);
-
-  companion object {
-    fun ofRaw(raw: Int): IdxRemidiationOption? {
-      return values().firstOrNull { it.raw == raw }
-    }
-  }
-}
-
 /** Generated class from Pigeon that represents data sent in messages. */
 data class AuthenticationResult (
   val result: DirectAuthenticationResult? = null,
@@ -272,9 +256,8 @@ data class IdxResponse (
   val canCancel: Boolean,
   val isLoginSuccessful: Boolean,
   val intent: RequestIntent,
-  val remidiation: IdxRemidiationOption,
-  val availableRemidiations: List<String?>,
-  val nextRemediations: Map<String?, String?>
+  val messages: List<String?>,
+  val userInfo: UserInfo? = null
 
 ) {
   companion object {
@@ -285,10 +268,9 @@ data class IdxResponse (
       val canCancel = __pigeon_list[2] as Boolean
       val isLoginSuccessful = __pigeon_list[3] as Boolean
       val intent = RequestIntent.ofRaw(__pigeon_list[4] as Int)!!
-      val remidiation = IdxRemidiationOption.ofRaw(__pigeon_list[5] as Int)!!
-      val availableRemidiations = __pigeon_list[6] as List<String?>
-      val nextRemediations = __pigeon_list[7] as Map<String?, String?>
-      return IdxResponse(expiresAt, user, canCancel, isLoginSuccessful, intent, remidiation, availableRemidiations, nextRemediations)
+      val messages = __pigeon_list[5] as List<String?>
+      val userInfo = __pigeon_list[6] as UserInfo?
+      return IdxResponse(expiresAt, user, canCancel, isLoginSuccessful, intent, messages, userInfo)
     }
   }
   fun toList(): List<Any?> {
@@ -298,9 +280,8 @@ data class IdxResponse (
       canCancel,
       isLoginSuccessful,
       intent.raw,
-      remidiation.raw,
-      availableRemidiations,
-      nextRemediations,
+      messages,
+      userInfo,
     )
   }
 }
@@ -401,6 +382,7 @@ interface HssOktaFlutterPluginApi {
   fun continueSMSPhoneEnrollment(passcode: String, callback: (Result<Boolean>) -> Unit)
   fun startUserEnrollmentFlow(firstName: String, lastName: String, email: String, callback: (Result<Boolean>) -> Unit)
   fun recoverPassword(identifier: String, callback: (Result<IdxResponse>) -> Unit)
+  fun getIdxResponse(callback: (Result<IdxResponse>) -> Unit)
 
   companion object {
     /** The codec used by HssOktaFlutterPluginApi. */
@@ -748,6 +730,24 @@ interface HssOktaFlutterPluginApi {
             val args = message as List<Any?>
             val identifierArg = args[0] as String
             api.recoverPassword(identifierArg) { result: Result<IdxResponse> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(wrapResult(data))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.getIdxResponse$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            api.getIdxResponse() { result: Result<IdxResponse> ->
               val error = result.exceptionOrNull()
               if (error != null) {
                 reply.reply(wrapError(error))

@@ -81,4 +81,6 @@ abstract class HssOktaFlutterPlatformInterface extends PlatformInterface {
 
   Future<IdxResponse> recoverPassword(String identifier) =>
       throw UnimplementedError();
+
+  Future<IdxResponse?> getIdxResponse() => throw UnimplementedError();
 }
