@@ -129,4 +129,9 @@ class HssOktaFlutterChannel extends HssOktaFlutterPlatformInterface {
   Future<IdxResponse?> getIdxResponse() {
     return _api.getIdxResponse();
   }
+
+  @override
+  Future<bool> cancelCurrentTransaction() {
+    return _api.cancelCurrentTransaction();
+  }
 }

@@ -83,4 +83,6 @@ abstract class HssOktaFlutterPlatformInterface extends PlatformInterface {
       throw UnimplementedError();
 
   Future<IdxResponse?> getIdxResponse() => throw UnimplementedError();
+
+  Future<bool> cancelCurrentTransaction() => throw UnimplementedError();
 }

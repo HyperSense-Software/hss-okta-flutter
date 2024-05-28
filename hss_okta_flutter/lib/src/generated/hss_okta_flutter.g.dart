@@ -253,6 +253,7 @@ class IdxResponse {
     required this.intent,
     required this.messages,
     this.userInfo,
+    this.authenticationFactors,
   });
 
   int? expiresAt;
@@ -269,6 +270,8 @@ class IdxResponse {
 
   UserInfo? userInfo;
 
+  List<String?>? authenticationFactors;
+
   Object encode() {
     return <Object?>[
       expiresAt,
@@ -278,6 +281,7 @@ class IdxResponse {
       intent.index,
       messages,
       userInfo,
+      authenticationFactors,
     ];
   }
 
@@ -291,6 +295,7 @@ class IdxResponse {
       intent: RequestIntent.values[result[4]! as int],
       messages: (result[5] as List<Object?>?)!.cast<String?>(),
       userInfo: result[6] as UserInfo?,
+      authenticationFactors: (result[7] as List<Object?>?)?.cast<String?>(),
     );
   }
 }
@@ -792,8 +797,30 @@ class HssOktaFlutterPluginApi {
     }
   }
 
-  Future<IdxResponse> getIdxResponse() async {
+  Future<IdxResponse?> getIdxResponse() async {
     final String __pigeon_channelName = 'dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.getIdxResponse$__pigeon_messageChannelSuffix';
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
+      __pigeon_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: __pigeon_binaryMessenger,
+    );
+    final List<Object?>? __pigeon_replyList =
+        await __pigeon_channel.send(null) as List<Object?>?;
+    if (__pigeon_replyList == null) {
+      throw _createConnectionError(__pigeon_channelName);
+    } else if (__pigeon_replyList.length > 1) {
+      throw PlatformException(
+        code: __pigeon_replyList[0]! as String,
+        message: __pigeon_replyList[1] as String?,
+        details: __pigeon_replyList[2],
+      );
+    } else {
+      return (__pigeon_replyList[0] as IdxResponse?);
+    }
+  }
+
+  Future<bool> cancelCurrentTransaction() async {
+    final String __pigeon_channelName = 'dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.cancelCurrentTransaction$__pigeon_messageChannelSuffix';
     final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
@@ -815,7 +842,34 @@ class HssOktaFlutterPluginApi {
         message: 'Host platform returned null value for non-null return value.',
       );
     } else {
-      return (__pigeon_replyList[0] as IdxResponse?)!;
+      return (__pigeon_replyList[0] as bool?)!;
+    }
+  }
+
+  Future<Map<String?, String?>> getAuthenticationFactors() async {
+    final String __pigeon_channelName = 'dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.getAuthenticationFactors$__pigeon_messageChannelSuffix';
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
+      __pigeon_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: __pigeon_binaryMessenger,
+    );
+    final List<Object?>? __pigeon_replyList =
+        await __pigeon_channel.send(null) as List<Object?>?;
+    if (__pigeon_replyList == null) {
+      throw _createConnectionError(__pigeon_channelName);
+    } else if (__pigeon_replyList.length > 1) {
+      throw PlatformException(
+        code: __pigeon_replyList[0]! as String,
+        message: __pigeon_replyList[1] as String?,
+        details: __pigeon_replyList[2],
+      );
+    } else if (__pigeon_replyList[0] == null) {
+      throw PlatformException(
+        code: 'null-error',
+        message: 'Host platform returned null value for non-null return value.',
+      );
+    } else {
+      return (__pigeon_replyList[0] as Map<Object?, Object?>?)!.cast<String?, String?>();
     }
   }
 }

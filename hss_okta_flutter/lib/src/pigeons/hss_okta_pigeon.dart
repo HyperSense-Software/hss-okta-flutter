@@ -1,4 +1,5 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+
 import 'package:pigeon/pigeon.dart';
 
 @ConfigurePigeon(
@@ -104,6 +105,7 @@ class IdxResponse {
   final RequestIntent intent;
   final List<String?> messages;
   final UserInfo? userInfo;
+  List<String?>? authenticationFactors;
 
   IdxResponse({
     required this.expiresAt,
@@ -113,6 +115,7 @@ class IdxResponse {
     required this.isLoginSuccessful,
     required this.messages,
     this.userInfo,
+    this.authenticationFactors,
   });
 }
 
@@ -192,4 +195,13 @@ abstract class HssOktaFlutterPluginApi {
 
   @async
   IdxResponse? getIdxResponse();
+
+  @async
+  bool cancelCurrentTransaction();
+
+  @async
+  Map<String?, String?> getAuthenticationFactors();
+
+  // @async
+  // IdxResponse setAuthenticationFactor(String authenticationFactor);
 }

@@ -250,6 +250,7 @@ struct IdxResponse {
   var intent: RequestIntent
   var messages: [String?]
   var userInfo: UserInfo? = nil
+  var authenticationFactors: [String?]? = nil
 
   // swift-format-ignore: AlwaysUseLowerCamelCase
   static func fromList(_ __pigeon_list: [Any?]) -> IdxResponse? {
@@ -260,6 +261,7 @@ struct IdxResponse {
     let intent = RequestIntent(rawValue: __pigeon_list[4] as! Int)!
     let messages = __pigeon_list[5] as! [String?]
     let userInfo: UserInfo? = nilOrValue(__pigeon_list[6])
+    let authenticationFactors: [String?]? = nilOrValue(__pigeon_list[7])
 
     return IdxResponse(
       expiresAt: expiresAt,
@@ -268,7 +270,8 @@ struct IdxResponse {
       isLoginSuccessful: isLoginSuccessful,
       intent: intent,
       messages: messages,
-      userInfo: userInfo
+      userInfo: userInfo,
+      authenticationFactors: authenticationFactors
     )
   }
   func toList() -> [Any?] {
@@ -280,6 +283,7 @@ struct IdxResponse {
       intent.rawValue,
       messages,
       userInfo,
+      authenticationFactors,
     ]
   }
 }
@@ -370,7 +374,9 @@ protocol HssOktaFlutterPluginApi {
   func continueSMSPhoneEnrollment(passcode: String, completion: @escaping (Result<Bool, Error>) -> Void)
   func startUserEnrollmentFlow(firstName: String, lastName: String, email: String, completion: @escaping (Result<Bool, Error>) -> Void)
   func recoverPassword(identifier: String, completion: @escaping (Result<IdxResponse, Error>) -> Void)
-  func getIdxResponse(completion: @escaping (Result<IdxResponse, Error>) -> Void)
+  func getIdxResponse(completion: @escaping (Result<IdxResponse?, Error>) -> Void)
+  func cancelCurrentTransaction(completion: @escaping (Result<Bool, Error>) -> Void)
+  func getAuthenticationFactors(completion: @escaping (Result<[String?: String?], Error>) -> Void)
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -691,6 +697,36 @@ class HssOktaFlutterPluginApiSetup {
       }
     } else {
       getIdxResponseChannel.setMessageHandler(nil)
+    }
+    let cancelCurrentTransactionChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.cancelCurrentTransaction\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      cancelCurrentTransactionChannel.setMessageHandler { _, reply in
+        api.cancelCurrentTransaction { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      cancelCurrentTransactionChannel.setMessageHandler(nil)
+    }
+    let getAuthenticationFactorsChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.getAuthenticationFactors\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      getAuthenticationFactorsChannel.setMessageHandler { _, reply in
+        api.getAuthenticationFactors { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      getAuthenticationFactorsChannel.setMessageHandler(nil)
     }
   }
 }

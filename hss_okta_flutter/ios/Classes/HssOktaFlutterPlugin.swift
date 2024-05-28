@@ -16,10 +16,9 @@ case generalError(String)
 
 
 public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginApi {
- 
    
     
-   
+    
     let browserAuth = WebAuthentication.shared
     var flow : (any AuthenticationFlow)?
     var status : DirectAuthenticationFlow.Status?
@@ -604,8 +603,35 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
 
     }
     
-    func getIdxResponse(completion: @escaping (Result<IdxResponse, Error>) -> Void) {
-        return safeIdxResponse(completion: {res in
+    func getAuthenticationFactors(completion: @escaping (Result<[String? : String?], Error>) -> Void) {
+        if(idxFlow == nil){
+            completion(.failure(HssOktaError.credentialError("Start a flow first")))
+            return
+        }
+        
+        idxFlow!.resume(completion: {resumeResult in
+            switch(resumeResult){
+            case .success(let response):
+            
+                var remidiationOptions = [String:String]()
+                
+                response.remediations.forEach{ option in
+                    option.form.fields.forEach{ field in
+                        remidiationOptions[option.name] = field.label
+                    }
+                }
+                completion(.success(remidiationOptions))
+                
+                break
+            case .failure(let error):
+                completion(.failure(HssOktaError.generalError(error.localizedDescription)))
+            }
+                
+        })
+    }
+    
+    func getIdxResponse(completion: @escaping (Result<IdxResponse?, Error>) -> Void){
+        return resumeFlow(completion: {res in
             switch(res){
             case .success(let result):
                 completion(.success(self.mapResponeToIdxResponse(response: result)))
@@ -616,7 +642,15 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
         })
     }
     
-    func safeIdxResponse(completion: @escaping (Result<Response,Error>) -> Void){
+    func cancelCurrentTransaction(completion: @escaping (Result<Bool, Error>) -> Void) {
+        if(idxFlow == nil){
+            completion(.failure(HssOktaError.credentialError("No flow to cancel")))
+        }
+        
+        idxFlow!.cancel()
+    }
+    
+    func resumeFlow(completion: @escaping (Result<Response,Error>) -> Void){
         
         if(idxFlow == nil){
             completion(.failure(HssOktaError.credentialError("Start a flow first")))
@@ -633,8 +667,8 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
         })
         
     }
-            
-            func mapResponeToIdxResponse(response : Response) -> IdxResponse{
+    
+    func mapResponeToIdxResponse(response : Response) -> IdxResponse{
                 return IdxResponse(expiresAt: response.expiresAt?.millisecondsSince1970, canCancel: response.canCancel,isLoginSuccessful: response.isLoginSuccessful, intent: RequestIntent(rawValue: Int(response.intent.getIndex)) ?? RequestIntent.unknown,messages: response.messages.allMessages.map{$0.message},userInfo: UserInfo(userId: response.user?.id ?? "", givenName: response.user?.profile?.firstName ?? "", middleName:"", familyName: response.user?.profile?.lastName ?? "", gender: "", email: "", phoneNumber: "", username: response.user?.username ?? ""))
             }
     

@@ -257,7 +257,8 @@ data class IdxResponse (
   val isLoginSuccessful: Boolean,
   val intent: RequestIntent,
   val messages: List<String?>,
-  val userInfo: UserInfo? = null
+  val userInfo: UserInfo? = null,
+  val authenticationFactors: List<String?>? = null
 
 ) {
   companion object {
@@ -270,7 +271,8 @@ data class IdxResponse (
       val intent = RequestIntent.ofRaw(__pigeon_list[4] as Int)!!
       val messages = __pigeon_list[5] as List<String?>
       val userInfo = __pigeon_list[6] as UserInfo?
-      return IdxResponse(expiresAt, user, canCancel, isLoginSuccessful, intent, messages, userInfo)
+      val authenticationFactors = __pigeon_list[7] as List<String?>?
+      return IdxResponse(expiresAt, user, canCancel, isLoginSuccessful, intent, messages, userInfo, authenticationFactors)
     }
   }
   fun toList(): List<Any?> {
@@ -282,6 +284,7 @@ data class IdxResponse (
       intent.raw,
       messages,
       userInfo,
+      authenticationFactors,
     )
   }
 }
@@ -382,7 +385,9 @@ interface HssOktaFlutterPluginApi {
   fun continueSMSPhoneEnrollment(passcode: String, callback: (Result<Boolean>) -> Unit)
   fun startUserEnrollmentFlow(firstName: String, lastName: String, email: String, callback: (Result<Boolean>) -> Unit)
   fun recoverPassword(identifier: String, callback: (Result<IdxResponse>) -> Unit)
-  fun getIdxResponse(callback: (Result<IdxResponse>) -> Unit)
+  fun getIdxResponse(callback: (Result<IdxResponse?>) -> Unit)
+  fun cancelCurrentTransaction(callback: (Result<Boolean>) -> Unit)
+  fun getAuthenticationFactors(callback: (Result<Map<String?, String?>>) -> Unit)
 
   companion object {
     /** The codec used by HssOktaFlutterPluginApi. */
@@ -747,7 +752,43 @@ interface HssOktaFlutterPluginApi {
         val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.getIdxResponse$separatedMessageChannelSuffix", codec)
         if (api != null) {
           channel.setMessageHandler { _, reply ->
-            api.getIdxResponse() { result: Result<IdxResponse> ->
+            api.getIdxResponse() { result: Result<IdxResponse?> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(wrapResult(data))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.cancelCurrentTransaction$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            api.cancelCurrentTransaction() { result: Result<Boolean> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(wrapResult(data))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.getAuthenticationFactors$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            api.getAuthenticationFactors() { result: Result<Map<String?, String?>> ->
               val error = result.exceptionOrNull()
               if (error != null) {
                 reply.reply(wrapError(error))

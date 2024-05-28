@@ -173,4 +173,9 @@ class Idx {
     var result = await instance.getIdxResponse();
     return result;
   }
+
+  Future<bool> cancelCurrentTransaction() async {
+    var result = await instance.cancelCurrentTransaction();
+    return result;
+  }
 }
