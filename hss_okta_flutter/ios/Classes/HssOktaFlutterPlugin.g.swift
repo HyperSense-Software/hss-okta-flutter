@@ -249,8 +249,8 @@ struct IdxResponse {
   var isLoginSuccessful: Bool
   var intent: RequestIntent
   var messages: [String?]
-  var userInfo: UserInfo? = nil
   var authenticationFactors: [String?]? = nil
+  var token: OktaToken? = nil
 
   // swift-format-ignore: AlwaysUseLowerCamelCase
   static func fromList(_ __pigeon_list: [Any?]) -> IdxResponse? {
@@ -260,8 +260,8 @@ struct IdxResponse {
     let isLoginSuccessful = __pigeon_list[3] as! Bool
     let intent = RequestIntent(rawValue: __pigeon_list[4] as! Int)!
     let messages = __pigeon_list[5] as! [String?]
-    let userInfo: UserInfo? = nilOrValue(__pigeon_list[6])
-    let authenticationFactors: [String?]? = nilOrValue(__pigeon_list[7])
+    let authenticationFactors: [String?]? = nilOrValue(__pigeon_list[6])
+    let token: OktaToken? = nilOrValue(__pigeon_list[7])
 
     return IdxResponse(
       expiresAt: expiresAt,
@@ -270,8 +270,8 @@ struct IdxResponse {
       isLoginSuccessful: isLoginSuccessful,
       intent: intent,
       messages: messages,
-      userInfo: userInfo,
-      authenticationFactors: authenticationFactors
+      authenticationFactors: authenticationFactors,
+      token: token
     )
   }
   func toList() -> [Any?] {
@@ -282,8 +282,8 @@ struct IdxResponse {
       isLoginSuccessful,
       intent.rawValue,
       messages,
-      userInfo,
       authenticationFactors,
+      token,
     ]
   }
 }
@@ -368,8 +368,7 @@ protocol HssOktaFlutterPluginApi {
   func getToken(tokenId: String, completion: @escaping (Result<AuthenticationResult?, Error>) -> Void)
   func removeCredential(tokenId: String, completion: @escaping (Result<Bool, Error>) -> Void)
   func setDefaultToken(tokenId: String, completion: @escaping (Result<Bool, Error>) -> Void)
-  func startEmailAuthenticationFlow(email: String, completion: @escaping (Result<IdxResponse?, Error>) -> Void)
-  func continueWithPassword(password: String, completion: @escaping (Result<OktaToken?, Error>) -> Void)
+  func authenticateWithEmailAndPassword(email: String, password: String, completion: @escaping (Result<IdxResponse?, Error>) -> Void)
   func startSMSPhoneEnrollment(phoneNumber: String, completion: @escaping (Result<Bool, Error>) -> Void)
   func continueSMSPhoneEnrollment(passcode: String, completion: @escaping (Result<Bool, Error>) -> Void)
   func startUserEnrollmentFlow(firstName: String, lastName: String, email: String, completion: @escaping (Result<Bool, Error>) -> Void)
@@ -579,12 +578,13 @@ class HssOktaFlutterPluginApiSetup {
     } else {
       setDefaultTokenChannel.setMessageHandler(nil)
     }
-    let startEmailAuthenticationFlowChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.startEmailAuthenticationFlow\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    let authenticateWithEmailAndPasswordChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.authenticateWithEmailAndPassword\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
-      startEmailAuthenticationFlowChannel.setMessageHandler { message, reply in
+      authenticateWithEmailAndPasswordChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
         let emailArg = args[0] as! String
-        api.startEmailAuthenticationFlow(email: emailArg) { result in
+        let passwordArg = args[1] as! String
+        api.authenticateWithEmailAndPassword(email: emailArg, password: passwordArg) { result in
           switch result {
           case .success(let res):
             reply(wrapResult(res))
@@ -594,24 +594,7 @@ class HssOktaFlutterPluginApiSetup {
         }
       }
     } else {
-      startEmailAuthenticationFlowChannel.setMessageHandler(nil)
-    }
-    let continueWithPasswordChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.continueWithPassword\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-    if let api = api {
-      continueWithPasswordChannel.setMessageHandler { message, reply in
-        let args = message as! [Any?]
-        let passwordArg = args[0] as! String
-        api.continueWithPassword(password: passwordArg) { result in
-          switch result {
-          case .success(let res):
-            reply(wrapResult(res))
-          case .failure(let error):
-            reply(wrapError(error))
-          }
-        }
-      }
-    } else {
-      continueWithPasswordChannel.setMessageHandler(nil)
+      authenticateWithEmailAndPasswordChannel.setMessageHandler(nil)
     }
     let startSMSPhoneEnrollmentChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.startSMSPhoneEnrollment\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {

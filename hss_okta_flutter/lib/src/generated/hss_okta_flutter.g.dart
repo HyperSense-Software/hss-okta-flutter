@@ -252,8 +252,8 @@ class IdxResponse {
     required this.isLoginSuccessful,
     required this.intent,
     required this.messages,
-    this.userInfo,
     this.authenticationFactors,
+    this.token,
   });
 
   int? expiresAt;
@@ -268,9 +268,9 @@ class IdxResponse {
 
   List<String?> messages;
 
-  UserInfo? userInfo;
-
   List<String?>? authenticationFactors;
+
+  OktaToken? token;
 
   Object encode() {
     return <Object?>[
@@ -280,8 +280,8 @@ class IdxResponse {
       isLoginSuccessful,
       intent.index,
       messages,
-      userInfo,
       authenticationFactors,
+      token,
     ];
   }
 
@@ -294,8 +294,8 @@ class IdxResponse {
       isLoginSuccessful: result[3]! as bool,
       intent: RequestIntent.values[result[4]! as int],
       messages: (result[5] as List<Object?>?)!.cast<String?>(),
-      userInfo: result[6] as UserInfo?,
-      authenticationFactors: (result[7] as List<Object?>?)?.cast<String?>(),
+      authenticationFactors: (result[6] as List<Object?>?)?.cast<String?>(),
+      token: result[7] as OktaToken?,
     );
   }
 }
@@ -645,15 +645,15 @@ class HssOktaFlutterPluginApi {
     }
   }
 
-  Future<IdxResponse?> startEmailAuthenticationFlow(String email) async {
-    final String __pigeon_channelName = 'dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.startEmailAuthenticationFlow$__pigeon_messageChannelSuffix';
+  Future<IdxResponse?> authenticateWithEmailAndPassword(String email, String password) async {
+    final String __pigeon_channelName = 'dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.authenticateWithEmailAndPassword$__pigeon_messageChannelSuffix';
     final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
     );
     final List<Object?>? __pigeon_replyList =
-        await __pigeon_channel.send(<Object?>[email]) as List<Object?>?;
+        await __pigeon_channel.send(<Object?>[email, password]) as List<Object?>?;
     if (__pigeon_replyList == null) {
       throw _createConnectionError(__pigeon_channelName);
     } else if (__pigeon_replyList.length > 1) {
@@ -664,28 +664,6 @@ class HssOktaFlutterPluginApi {
       );
     } else {
       return (__pigeon_replyList[0] as IdxResponse?);
-    }
-  }
-
-  Future<OktaToken?> continueWithPassword(String password) async {
-    final String __pigeon_channelName = 'dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.continueWithPassword$__pigeon_messageChannelSuffix';
-    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
-      __pigeon_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: __pigeon_binaryMessenger,
-    );
-    final List<Object?>? __pigeon_replyList =
-        await __pigeon_channel.send(<Object?>[password]) as List<Object?>?;
-    if (__pigeon_replyList == null) {
-      throw _createConnectionError(__pigeon_channelName);
-    } else if (__pigeon_replyList.length > 1) {
-      throw PlatformException(
-        code: __pigeon_replyList[0]! as String,
-        message: __pigeon_replyList[1] as String?,
-        details: __pigeon_replyList[2],
-      );
-    } else {
-      return (__pigeon_replyList[0] as OktaToken?);
     }
   }
 

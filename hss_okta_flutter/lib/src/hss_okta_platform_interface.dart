@@ -61,10 +61,8 @@ abstract class HssOktaFlutterPlatformInterface extends PlatformInterface {
   Future<bool> setDefaultToken(String tokenId) => throw UnimplementedError();
 
   // idx
-  Future<IdxResponse?> startEmailAuthenticationFlow(String email) =>
-      throw UnimplementedError();
-
-  Future<OktaToken?> continueWithPassword(String password) =>
+  Future<IdxResponse?> authenticateWithEmailAndPassword(
+          String email, String password) =>
       throw UnimplementedError();
 
   Future<bool> startSMSPhoneEnrollment(String phoneNumber) =>
@@ -85,4 +83,7 @@ abstract class HssOktaFlutterPlatformInterface extends PlatformInterface {
   Future<IdxResponse?> getIdxResponse() => throw UnimplementedError();
 
   Future<bool> cancelCurrentTransaction() => throw UnimplementedError();
+
+  Future<Map<String?, String?>> getAuthenticationFactors() =>
+      throw UnimplementedError();
 }

@@ -134,13 +134,10 @@ class Idx {
   final HssOktaFlutterPlatformInterface instance;
   const Idx(this.instance);
 
-  Future<IdxResponse?> startEmailAuthenticationFlow(String email) async {
-    var result = await instance.startEmailAuthenticationFlow(email);
-    return result;
-  }
-
-  Future<OktaToken?> continueWithPassword(String password) async {
-    var result = await instance.continueWithPassword(password);
+  Future<IdxResponse?> authenticateWithEmailAndPassword(
+      String email, String password) async {
+    var result =
+        await instance.authenticateWithEmailAndPassword(email, password);
     return result;
   }
 
@@ -176,6 +173,11 @@ class Idx {
 
   Future<bool> cancelCurrentTransaction() async {
     var result = await instance.cancelCurrentTransaction();
+    return result;
+  }
+
+  Future<Map<String?, String?>> getAuthenticationFactors() async {
+    var result = await instance.getAuthenticationFactors();
     return result;
   }
 }

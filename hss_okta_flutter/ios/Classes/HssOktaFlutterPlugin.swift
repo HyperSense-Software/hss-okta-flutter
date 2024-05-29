@@ -16,9 +16,7 @@ case generalError(String)
 
 
 public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginApi {
-   
-    
-    
+
     let browserAuth = WebAuthentication.shared
     var flow : (any AuthenticationFlow)?
     var status : DirectAuthenticationFlow.Status?
@@ -313,101 +311,54 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
     }
     
     // IDX METHODS
-    func startEmailAuthenticationFlow(email: String, completion: @escaping (Result<IdxResponse?, Error>) -> Void) {
+    
+    func authenticateWithEmailAndPassword(email: String, password: String, completion: @escaping (Result<IdxResponse?, Error>) -> Void) {
         Task{
             do{
-                print("STARTING INTERACTION CODE FLOW")
+                
                 idxFlow = try InteractionCodeFlow();
                 
                 if #available(iOS 15.0, *) {
                     var response = try await idxFlow!.start()
                     
                     guard let remediation = response.remediations[.identify],
-                          let username = remediation["identifier"]
+                          let usernameField = remediation["identifier"],
+                          let passwordField = remediation["credentials.passcode"]
                     else{
                         return completion(.failure(HssOktaError.generalError("Failed indentifying remidiation, check available remidiation fields")))
                     }
                     
-                    var remediations = [String]()
+                    usernameField.value = email
+                    passwordField.value = password
                     
-                    response.remediations.forEach{ r in
-                        remediations.append(r.name)
-                    }
-                    
-                    username.value = email
                     response = try await remediation.proceed()
-                    
-                    var nextRemediations = [String:String]()
-                    
-                    
-                    response.remediations.forEach{ r in
-                        let remidiationFields = r.form.fields.map{ f1 in
-                            f1.form?.fields.map{ f2 in
-                                "\(f1.name ?? "").\(f2.name ?? "")"
-                            }.joined() ?? ""
-                        }.joined()
-                        
-                        nextRemediations[r.name] = remidiationFields
+                
+                    guard response.isLoginSuccessful
+                    else{
+                        completion(.failure(HssOktaError.credentialError(response.messages.first?.message ?? "Unknown error")))
+                        return
                     }
-
-                    completion(.success(self.mapResponeToIdxResponse(response: response)))
+                    
+                    let token =  try await response.exchangeCode()
+                    
+                    completion(.success(self.mapResponeToIdxResponse(response: response,token: OktaToken(
+                        id: token.id,
+                        token: token.idToken?.rawValue ?? "",
+                        issuedAt: Int64(((token.issuedAt?.timeIntervalSince1970 ?? 0) * 1000.0).rounded()),
+                        tokenType: token.tokenType,
+                        accessToken: token.accessToken,
+                        scope: token.scope ?? "",
+                        refreshToken: token.refreshToken ?? ""
+                    ))))
+                    
+                    
                 } else {
                     completion(.failure(HssOktaError.generalError("This method is Only Avaialable to iOS 15.0 or newer")))
                 }
                 
             }catch let error{
-                completion(.failure(error))
+                completion(.failure(HssOktaError.generalError(error.localizedDescription.debugDescription)))
             }
-        }
-    }
-    
-    func continueWithPassword(password: String, completion: @escaping (Result<OktaToken?, Error>) -> Void) {
-        do{
-            
-            if idxFlow != nil {
-                idxFlow?.resume{ responseResult in
-                    Task{
-                        if #available(iOS 15.0, *) {
-                            var response = try responseResult.get()
-                            
-                            guard let remidiation = response.remediations[.challengeAuthenticator],
-                                  let passwordField = remidiation["credentials.passcode"]
-                            else{
-                                completion(.failure(HssOktaError.generalError("Failed to satisfy remidation")))
-                                return
-                            }
-                            
-                            passwordField.value = password
-                            response = try await remidiation.proceed()
-                            
-                            guard response.isLoginSuccessful
-                            else{
-                                completion(.failure(HssOktaError.generalError("Login Failed, Check your Input")))
-                                return
-                            }
-                            
-                            let tokenResult =  try await response.exchangeCode()
-                            
-                            completion(.success(OktaToken(
-                                id: tokenResult.id,
-                                token: tokenResult.idToken?.rawValue, issuedAt: Int64(((tokenResult.issuedAt?.timeIntervalSince1970 ?? 0) * 1000.0).rounded()),
-                                tokenType: tokenResult.tokenType, accessToken: tokenResult.accessToken,
-                                scope: tokenResult.scope, refreshToken:tokenResult.refreshToken
-                            )))
-                            
-                        } else {
-                            completion(.failure(HssOktaError.generalError("Only available for iOS 15.0 or newer")))
-                        }
-                    }
-                    
-                    
-                }
-            }
-            
-            throw HssOktaError.generalError("Create a flow first")
-            
-        }catch let error{
-            completion(.failure(HssOktaError.generalError(error.localizedDescription)))
         }
     }
     
@@ -575,7 +526,7 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
                                     if #available(iOS 15.0, *) {
                                         response =  try await recoverable.recover()
                                         
-                                        completion(.success(self.mapResponeToIdxResponse(response:response)))
+                                        completion(.success(self.mapResponeToIdxResponse(response:response, token: nil)))
                                         
                                     } else {
                                         completion(.failure(HssOktaError.generalError("This methid is only available for iOS 15.0 and above")))
@@ -584,7 +535,7 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
                                 }
                                 
                                 break
-                            case .failure:
+                            case .failure(let error):
                                 let error = response.messages.first?.message
                                 completion(.failure(HssOktaError.generalError("Failed with remidation : \(error ?? "unknown error")")))
                             }
@@ -616,9 +567,7 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
                 var remidiationOptions = [String:String]()
                 
                 response.remediations.forEach{ option in
-                    option.form.fields.forEach{ field in
-                        remidiationOptions[option.name] = field.label
-                    }
+                    remidiationOptions[option.name] = option.form.fields.map{($0.name ?? "")}.joined(separator:",")
                 }
                 completion(.success(remidiationOptions))
                 
@@ -634,7 +583,7 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
         return resumeFlow(completion: {res in
             switch(res){
             case .success(let result):
-                completion(.success(self.mapResponeToIdxResponse(response: result)))
+                completion(.success(self.mapResponeToIdxResponse(response: result,token: nil)))
                 break
             case.failure(let error):
                 completion(.failure(error))
@@ -668,8 +617,8 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
         
     }
     
-    func mapResponeToIdxResponse(response : Response) -> IdxResponse{
-                return IdxResponse(expiresAt: response.expiresAt?.millisecondsSince1970, canCancel: response.canCancel,isLoginSuccessful: response.isLoginSuccessful, intent: RequestIntent(rawValue: Int(response.intent.getIndex)) ?? RequestIntent.unknown,messages: response.messages.allMessages.map{$0.message},userInfo: UserInfo(userId: response.user?.id ?? "", givenName: response.user?.profile?.firstName ?? "", middleName:"", familyName: response.user?.profile?.lastName ?? "", gender: "", email: "", phoneNumber: "", username: response.user?.username ?? ""))
+    func mapResponeToIdxResponse(response : Response,token : OktaToken?) -> IdxResponse{
+        return IdxResponse(expiresAt: response.expiresAt?.millisecondsSince1970, user: UserInfo(userId: response.user?.id ?? "", givenName: response.user?.profile?.firstName ?? "", middleName:"", familyName: response.user?.profile?.lastName ?? "", gender: "", email: "", phoneNumber: "", username: response.user?.username ?? ""), canCancel: response.canCancel,isLoginSuccessful: response.isLoginSuccessful, intent: RequestIntent(rawValue: Int(response.intent.getIndex)) ?? RequestIntent.unknown,messages: response.messages.allMessages.map{$0.message},token: token)
             }
     
     

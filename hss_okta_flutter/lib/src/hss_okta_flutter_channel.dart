@@ -91,13 +91,9 @@ class HssOktaFlutterChannel extends HssOktaFlutterPlatformInterface {
   }
 
   @override
-  Future<IdxResponse?> startEmailAuthenticationFlow(String email) async {
-    return await _api.startEmailAuthenticationFlow(email);
-  }
-
-  @override
-  Future<OktaToken?> continueWithPassword(String password) async {
-    return await _api.continueWithPassword(password);
+  Future<IdxResponse?> authenticateWithEmailAndPassword(
+      String email, String password) async {
+    return await _api.authenticateWithEmailAndPassword(email, password);
   }
 
   @override
@@ -133,5 +129,10 @@ class HssOktaFlutterChannel extends HssOktaFlutterPlatformInterface {
   @override
   Future<bool> cancelCurrentTransaction() {
     return _api.cancelCurrentTransaction();
+  }
+
+  @override
+  Future<Map<String?, String?>> getAuthenticationFactors() {
+    return _api.getAuthenticationFactors();
   }
 }

@@ -257,8 +257,8 @@ data class IdxResponse (
   val isLoginSuccessful: Boolean,
   val intent: RequestIntent,
   val messages: List<String?>,
-  val userInfo: UserInfo? = null,
-  val authenticationFactors: List<String?>? = null
+  val authenticationFactors: List<String?>? = null,
+  val token: OktaToken? = null
 
 ) {
   companion object {
@@ -270,9 +270,9 @@ data class IdxResponse (
       val isLoginSuccessful = __pigeon_list[3] as Boolean
       val intent = RequestIntent.ofRaw(__pigeon_list[4] as Int)!!
       val messages = __pigeon_list[5] as List<String?>
-      val userInfo = __pigeon_list[6] as UserInfo?
-      val authenticationFactors = __pigeon_list[7] as List<String?>?
-      return IdxResponse(expiresAt, user, canCancel, isLoginSuccessful, intent, messages, userInfo, authenticationFactors)
+      val authenticationFactors = __pigeon_list[6] as List<String?>?
+      val token = __pigeon_list[7] as OktaToken?
+      return IdxResponse(expiresAt, user, canCancel, isLoginSuccessful, intent, messages, authenticationFactors, token)
     }
   }
   fun toList(): List<Any?> {
@@ -283,8 +283,8 @@ data class IdxResponse (
       isLoginSuccessful,
       intent.raw,
       messages,
-      userInfo,
       authenticationFactors,
+      token,
     )
   }
 }
@@ -379,8 +379,7 @@ interface HssOktaFlutterPluginApi {
   fun getToken(tokenId: String, callback: (Result<AuthenticationResult?>) -> Unit)
   fun removeCredential(tokenId: String, callback: (Result<Boolean>) -> Unit)
   fun setDefaultToken(tokenId: String, callback: (Result<Boolean>) -> Unit)
-  fun startEmailAuthenticationFlow(email: String, callback: (Result<IdxResponse?>) -> Unit)
-  fun continueWithPassword(password: String, callback: (Result<OktaToken?>) -> Unit)
+  fun authenticateWithEmailAndPassword(email: String, password: String, callback: (Result<IdxResponse?>) -> Unit)
   fun startSMSPhoneEnrollment(phoneNumber: String, callback: (Result<Boolean>) -> Unit)
   fun continueSMSPhoneEnrollment(passcode: String, callback: (Result<Boolean>) -> Unit)
   fun startUserEnrollmentFlow(firstName: String, lastName: String, email: String, callback: (Result<Boolean>) -> Unit)
@@ -627,32 +626,13 @@ interface HssOktaFlutterPluginApi {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.startEmailAuthenticationFlow$separatedMessageChannelSuffix", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.authenticateWithEmailAndPassword$separatedMessageChannelSuffix", codec)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
             val emailArg = args[0] as String
-            api.startEmailAuthenticationFlow(emailArg) { result: Result<IdxResponse?> ->
-              val error = result.exceptionOrNull()
-              if (error != null) {
-                reply.reply(wrapError(error))
-              } else {
-                val data = result.getOrNull()
-                reply.reply(wrapResult(data))
-              }
-            }
-          }
-        } else {
-          channel.setMessageHandler(null)
-        }
-      }
-      run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.continueWithPassword$separatedMessageChannelSuffix", codec)
-        if (api != null) {
-          channel.setMessageHandler { message, reply ->
-            val args = message as List<Any?>
-            val passwordArg = args[0] as String
-            api.continueWithPassword(passwordArg) { result: Result<OktaToken?> ->
+            val passwordArg = args[1] as String
+            api.authenticateWithEmailAndPassword(emailArg, passwordArg) { result: Result<IdxResponse?> ->
               val error = result.exceptionOrNull()
               if (error != null) {
                 reply.reply(wrapError(error))

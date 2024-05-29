@@ -315,15 +315,17 @@ class _HomeScreenState extends State<HomeScreen> {
           const Text('Status :'),
           OutlinedButton(
             onPressed: () async {
-              final response = await PluginProvider.of(context)
-                  .plugin
-                  .idx
-                  .startEmailAuthenticationFlow('aldrin.francisco@designli.co');
+              try {
+                final plugin = PluginProvider.of(context).plugin;
 
-              final token = await PluginProvider.of(context)
-                  .plugin
-                  .idx
-                  .continueWithPassword('09158121949aA');
+                final response = await plugin.idx
+                    .authenticateWithEmailAndPassword(
+                        'aldrin.francisco@designli.co', '23321122aA');
+
+                print('token: ${response!.token?.accessToken}');
+              } catch (e, s) {
+                print(e);
+              }
             },
             child: const Text(
               'Interaction Code Flow',

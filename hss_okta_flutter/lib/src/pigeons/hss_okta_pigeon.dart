@@ -104,8 +104,8 @@ class IdxResponse {
   final bool isLoginSuccessful;
   final RequestIntent intent;
   final List<String?> messages;
-  final UserInfo? userInfo;
   List<String?>? authenticationFactors;
+  OktaToken? token;
 
   IdxResponse({
     required this.expiresAt,
@@ -114,8 +114,8 @@ class IdxResponse {
     required this.intent,
     required this.isLoginSuccessful,
     required this.messages,
-    this.userInfo,
     this.authenticationFactors,
+    this.token,
   });
 }
 
@@ -173,10 +173,7 @@ abstract class HssOktaFlutterPluginApi {
 
   // IDX Section
   @async
-  IdxResponse? startEmailAuthenticationFlow(String email);
-
-  @async
-  OktaToken? continueWithPassword(String password);
+  IdxResponse? authenticateWithEmailAndPassword(String email, String password);
 
   @async
   bool startSMSPhoneEnrollment(String phoneNumber);
