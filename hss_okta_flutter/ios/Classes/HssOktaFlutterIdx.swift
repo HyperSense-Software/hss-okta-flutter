@@ -159,7 +159,7 @@ public class HSSOktaFlutterIdx{
                     lastNameField.value = lastName
                     emailField.value = email
                     
-                    let newResponse = try await remediation.proceed()
+                    _ = try await remediation.proceed()
                     completion(.success(true))
 
                     
@@ -175,7 +175,7 @@ public class HSSOktaFlutterIdx{
             idxFlow.resume(completion:{ result in
                 switch(result){
                 case .success(let resultResponse):
-                    var response = resultResponse
+                    let response = resultResponse
                     
                     if let recoverable = response.authenticators.current?.recoverable {
                         recoverable.recover(completion: { recoverResponse in
@@ -234,7 +234,7 @@ public class HSSOktaFlutterIdx{
         if(idxFlow.context == nil){
             Task{
                 if #available(iOS 15.0, *) {
-                    var response = try await idxFlow.start()
+                    let response = try await idxFlow.start()
                     var remidiationOptions = [String]()
                     
                     response.remediations.forEach{ option in
@@ -303,7 +303,7 @@ public class HSSOktaFlutterIdx{
         if(idxFlow.context == nil){
             Task{
                 if #available(iOS 15.0, *) {
-                    var response = try await idxFlow.start()
+                    let response = try await idxFlow.start()
                     var forms = [String]()
                     let remidiationForm = response.remediations[remidiation]
                     
@@ -354,7 +354,111 @@ public class HSSOktaFlutterIdx{
         
     }
     
+    func startInteractionCodeFlow(completion: @escaping (Result<IdxResponse?, Error>) -> Void) {
+        idxFlow.start(completion: { result in
+            switch(result){
+            case .success(let response):
+                completion(.success(self.mapResponeToIdxResponse(response: response, token: nil)))
+            case.failure(let error):
+                completion(.failure(HssOktaError.generalError(error.localizedDescription)))
+            }
+            
+        })
+    }
+    
+    func continueWithIdentifier(identifier: String, completion: @escaping (Result<IdxResponse?, Error>) -> Void) {
+        idxFlow.resume(completion: { resume in
+                Task{
+                    switch(resume){
+                    case .success(var result):
+                        
+                        var response = result
+                        guard let remediation = result.remediations[.identify],
+                                let identifierField = remediation["identifier"]
+                        else{
+                            completion(.failure(HssOktaError.generalError(response.messages.allMessages.first?.message ?? "Unknown error")))
+                            return
+                        }
+                        
+                        identifierField.value = identifier
+                        
+                        if #available(iOS 15.0, *) {
+                            response = try await remediation.proceed()
+                        } else {
+                            completion(.failure(HssOktaError.configError("Only available for iOS 15.0")))
+                        }
+                        
+                        completion(.success(self.mapResponeToIdxResponse(response: response, token: nil)))
+                        
+                        break
+                    case .failure(let error):
+                        completion(.failure(HssOktaError.generalError(error.localizedDescription)))
+                    }
+                }
+        })
+    }
+    
+    func continueWithPasscode(passcode: String, completion: @escaping (Result<IdxResponse?, Error>) -> Void) {
+        idxFlow.resume(completion: { resume in
+                Task{
+                    switch(resume){
+                    case .success(var result):
+                        
+                        var response = result
+                        guard let remediation = result.remediations[.identify],
+                                let passcodeField = remediation["credentials.passcode"]
+                        else{
+                            completion(.failure(HssOktaError.generalError(response.messages.allMessages.first?.message ?? "Unknown error")))
+                            return
+                        }
+                        
+                        passcodeField.value = passcode
+                        
+                        if #available(iOS 15.0, *) {
+                            response = try await remediation.proceed()
+                        } else {
+                            completion(.failure(HssOktaError.configError("Only available for iOS 15.0")))
+                        }
+                        
+                        
+                        guard response.isLoginSuccessful
+                            else{
+                            completion(.failure(HssOktaError.generalError(response.messages.allMessages.first?.message ?? "Unknown error")))
+                            return
+                        }
+                        
+                        response.exchangeCode(completion:{
+                            result in
+                            switch(result){
+                            case .success(let token):
+                                completion(.success(self.mapResponeToIdxResponse(response: response, token: self.mapToOktaToken(token: token))))
+                            case.failure(let error):
+                                completion(.failure(HssOktaError.generalError(response.messages.allMessages.first?.message ?? error.localizedDescription)))
+                            }
+
+                        })
+                        
+                        break
+                    case .failure(let error):
+                        completion(.failure(HssOktaError.generalError(error.localizedDescription)))
+                    }
+                }
+        })
+    }
+    
     func mapResponeToIdxResponse(response : Response,token : OktaToken?) -> IdxResponse{
         return IdxResponse(expiresAt: response.expiresAt?.millisecondsSince1970, user: UserInfo(userId: response.user?.id ?? "", givenName: response.user?.profile?.firstName ?? "", middleName:"", familyName: response.user?.profile?.lastName ?? "", gender: "", email: "", phoneNumber: "", username: response.user?.username ?? ""), canCancel: response.canCancel,isLoginSuccessful: response.isLoginSuccessful, intent: RequestIntent(rawValue: Int(response.intent.getIndex)) ?? RequestIntent.unknown,messages: response.messages.allMessages.map{$0.message},token: token)
             }
+    
+    func mapToOktaToken(token : Token) -> OktaToken{
+      return  OktaToken(
+            id: token.id,
+            token: token.idToken?.rawValue ?? "",
+            issuedAt: Int64(((token.issuedAt?.timeIntervalSince1970 ?? 0) * 1000.0).rounded()),
+            tokenType: token.tokenType,
+            accessToken: token.accessToken,
+            scope: token.scope ?? "",
+            refreshToken: token.refreshToken ?? ""
+        )
+    }
 }

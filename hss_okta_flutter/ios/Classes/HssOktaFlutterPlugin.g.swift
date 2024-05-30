@@ -369,13 +369,16 @@ protocol HssOktaFlutterPluginApi {
   func removeCredential(tokenId: String, completion: @escaping (Result<Bool, Error>) -> Void)
   func setDefaultToken(tokenId: String, completion: @escaping (Result<Bool, Error>) -> Void)
   func authenticateWithEmailAndPassword(email: String, password: String, completion: @escaping (Result<IdxResponse?, Error>) -> Void)
+  func startInteractionCodeFlow(completion: @escaping (Result<IdxResponse?, Error>) -> Void)
+  func continueWithIdentifier(identifier: String, completion: @escaping (Result<IdxResponse?, Error>) -> Void)
+  func continueWithPasscode(passcode: String, completion: @escaping (Result<IdxResponse?, Error>) -> Void)
   func startSMSPhoneEnrollment(phoneNumber: String, completion: @escaping (Result<Bool, Error>) -> Void)
   func continueSMSPhoneEnrollment(passcode: String, completion: @escaping (Result<Bool, Error>) -> Void)
   func startUserEnrollmentFlow(firstName: String, lastName: String, email: String, completion: @escaping (Result<Bool, Error>) -> Void)
   func recoverPassword(identifier: String, completion: @escaping (Result<IdxResponse, Error>) -> Void)
   func getIdxResponse(completion: @escaping (Result<IdxResponse?, Error>) -> Void)
   func cancelCurrentTransaction(completion: @escaping (Result<Bool, Error>) -> Void)
-  func getRemidiationsFactors(completion: @escaping (Result<[String], Error>) -> Void)
+  func getRemidiations(completion: @escaping (Result<[String], Error>) -> Void)
   func getRemidiationsFields(remidiation: String, fields: String?, completion: @escaping (Result<[String], Error>) -> Void)
 }
 
@@ -597,6 +600,55 @@ class HssOktaFlutterPluginApiSetup {
     } else {
       authenticateWithEmailAndPasswordChannel.setMessageHandler(nil)
     }
+    let startInteractionCodeFlowChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.startInteractionCodeFlow\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      startInteractionCodeFlowChannel.setMessageHandler { _, reply in
+        api.startInteractionCodeFlow { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      startInteractionCodeFlowChannel.setMessageHandler(nil)
+    }
+    let continueWithIdentifierChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.continueWithIdentifier\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      continueWithIdentifierChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let identifierArg = args[0] as! String
+        api.continueWithIdentifier(identifier: identifierArg) { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      continueWithIdentifierChannel.setMessageHandler(nil)
+    }
+    let continueWithPasscodeChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.continueWithPasscode\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      continueWithPasscodeChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let passcodeArg = args[0] as! String
+        api.continueWithPasscode(passcode: passcodeArg) { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      continueWithPasscodeChannel.setMessageHandler(nil)
+    }
     let startSMSPhoneEnrollmentChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.startSMSPhoneEnrollment\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       startSMSPhoneEnrollmentChannel.setMessageHandler { message, reply in
@@ -697,10 +749,10 @@ class HssOktaFlutterPluginApiSetup {
     } else {
       cancelCurrentTransactionChannel.setMessageHandler(nil)
     }
-    let getRemidiationsFactorsChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.getRemidiationsFactors\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    let getRemidiationsChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.getRemidiations\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
-      getRemidiationsFactorsChannel.setMessageHandler { _, reply in
-        api.getRemidiationsFactors { result in
+      getRemidiationsChannel.setMessageHandler { _, reply in
+        api.getRemidiations { result in
           switch result {
           case .success(let res):
             reply(wrapResult(res))
@@ -710,7 +762,7 @@ class HssOktaFlutterPluginApiSetup {
         }
       }
     } else {
-      getRemidiationsFactorsChannel.setMessageHandler(nil)
+      getRemidiationsChannel.setMessageHandler(nil)
     }
     let getRemidiationsFieldsChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.getRemidiationsFields\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {

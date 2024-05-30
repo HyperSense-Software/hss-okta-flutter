@@ -380,13 +380,16 @@ interface HssOktaFlutterPluginApi {
   fun removeCredential(tokenId: String, callback: (Result<Boolean>) -> Unit)
   fun setDefaultToken(tokenId: String, callback: (Result<Boolean>) -> Unit)
   fun authenticateWithEmailAndPassword(email: String, password: String, callback: (Result<IdxResponse?>) -> Unit)
+  fun startInteractionCodeFlow(callback: (Result<IdxResponse?>) -> Unit)
+  fun continueWithIdentifier(identifier: String, callback: (Result<IdxResponse?>) -> Unit)
+  fun continueWithPasscode(passcode: String, callback: (Result<IdxResponse?>) -> Unit)
   fun startSMSPhoneEnrollment(phoneNumber: String, callback: (Result<Boolean>) -> Unit)
   fun continueSMSPhoneEnrollment(passcode: String, callback: (Result<Boolean>) -> Unit)
   fun startUserEnrollmentFlow(firstName: String, lastName: String, email: String, callback: (Result<Boolean>) -> Unit)
   fun recoverPassword(identifier: String, callback: (Result<IdxResponse>) -> Unit)
   fun getIdxResponse(callback: (Result<IdxResponse?>) -> Unit)
   fun cancelCurrentTransaction(callback: (Result<Boolean>) -> Unit)
-  fun getRemidiationsFactors(callback: (Result<List<String>>) -> Unit)
+  fun getRemidiations(callback: (Result<List<String>>) -> Unit)
   fun getRemidiationsFields(remidiation: String, fields: String?, callback: (Result<List<String>>) -> Unit)
 
   companion object {
@@ -648,6 +651,64 @@ interface HssOktaFlutterPluginApi {
         }
       }
       run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.startInteractionCodeFlow$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            api.startInteractionCodeFlow() { result: Result<IdxResponse?> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(wrapResult(data))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.continueWithIdentifier$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val identifierArg = args[0] as String
+            api.continueWithIdentifier(identifierArg) { result: Result<IdxResponse?> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(wrapResult(data))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.continueWithPasscode$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val passcodeArg = args[0] as String
+            api.continueWithPasscode(passcodeArg) { result: Result<IdxResponse?> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(wrapResult(data))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
         val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.startSMSPhoneEnrollment$separatedMessageChannelSuffix", codec)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
@@ -766,10 +827,10 @@ interface HssOktaFlutterPluginApi {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.getRemidiationsFactors$separatedMessageChannelSuffix", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.getRemidiations$separatedMessageChannelSuffix", codec)
         if (api != null) {
           channel.setMessageHandler { _, reply ->
-            api.getRemidiationsFactors() { result: Result<List<String>> ->
+            api.getRemidiations() { result: Result<List<String>> ->
               val error = result.exceptionOrNull()
               if (error != null) {
                 reply.reply(wrapError(error))

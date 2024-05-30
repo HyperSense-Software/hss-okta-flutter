@@ -176,6 +176,15 @@ abstract class HssOktaFlutterPluginApi {
   IdxResponse? authenticateWithEmailAndPassword(String email, String password);
 
   @async
+  IdxResponse? startInteractionCodeFlow();
+
+  @async
+  IdxResponse? continueWithIdentifier(String identifier);
+
+  @async
+  IdxResponse? continueWithPasscode(String passcode);
+
+  @async
   bool startSMSPhoneEnrollment(String phoneNumber);
 
   @async
@@ -197,7 +206,7 @@ abstract class HssOktaFlutterPluginApi {
   bool cancelCurrentTransaction();
 
   @async
-  List<String> getRemidiationsFactors();
+  List<String> getRemidiations();
 
   @async
   List<String> getRemidiationsFields(String remidiation, {String? fields});

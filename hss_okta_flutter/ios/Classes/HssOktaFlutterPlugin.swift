@@ -346,6 +346,19 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
     func getRemidiationsFields(remidiation: String,fields: String?, completion: @escaping (Result<[String], Error>) -> Void) {
         idx.getRemidiationsFields(remidiation: remidiation,fields: fields,completion: completion)
     }
+    
+    func startInteractionCodeFlow(completion: @escaping (Result<IdxResponse?, Error>) -> Void) {
+        idx.startInteractionCodeFlow(completion: completion)
+    }
+    
+    func continueWithIdentifier(identifier: String, completion: @escaping (Result<IdxResponse?, Error>) -> Void) {
+        idx.continueWithIdentifier(identifier: identifier, completion: completion)
+    }
+    
+    func continueWithPasscode(passcode: String, completion: @escaping (Result<IdxResponse?, Error>) -> Void) {
+        idx.continueWithPasscode(passcode: passcode, completion: completion)
+    }
+    
 }
  
 

@@ -97,6 +97,21 @@ class HssOktaFlutterChannel extends HssOktaFlutterPlatformInterface {
   }
 
   @override
+  Future<IdxResponse?> startInteractionCodeFlow() async {
+    return await _api.startInteractionCodeFlow();
+  }
+
+  @override
+  Future<IdxResponse?> continueWithIdentifier(String identifier) async {
+    return await _api.continueWithIdentifier(identifier);
+  }
+
+  @override
+  Future<IdxResponse?> continueWithPasscode(String passcode) async {
+    return await _api.continueWithPasscode(passcode);
+  }
+
+  @override
   Future<bool> startSMSPhoneEnrollment(String phoneNumber) async {
     return await _api.startSMSPhoneEnrollment(phoneNumber);
   }
