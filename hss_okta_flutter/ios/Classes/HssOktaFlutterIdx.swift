@@ -229,7 +229,7 @@ public class HSSOktaFlutterIdx{
 
     }
     
-    func getAuthenticationFactors(completion: @escaping (Result<[String?], Error>) -> Void) {
+    func getRemidiations(completion: @escaping (Result<[String], Error>) -> Void) {
         
         if(idxFlow.context == nil){
             Task{
@@ -295,6 +295,62 @@ public class HSSOktaFlutterIdx{
                 completion(.failure(HssOktaError.credentialError(error.localizedDescription)))
             }
         })
+        
+    }
+    
+    func getRemidiationsFields(remidiation: String,fields:String?, completion: @escaping (Result<[String], Error>) -> Void) {
+        
+        if(idxFlow.context == nil){
+            Task{
+                if #available(iOS 15.0, *) {
+                    var response = try await idxFlow.start()
+                    var forms = [String]()
+                    let remidiationForm = response.remediations[remidiation]
+                    
+                    if(fields != nil){
+                        remidiationForm?[fields!]?.form?.forEach({
+                            forms.append($0.name ?? "")
+                        })
+
+                    }else{
+                        remidiationForm?.form.fields.forEach({
+                            forms.append($0.name ?? "")
+                        })
+                    }
+                    
+                    completion(.success(forms))
+                    
+                } else {
+                    completion(.failure(HssOktaError.configError("Only Available to iOS 15.*")))
+                }
+            }
+        }else{
+            
+            idxFlow.resume(completion: {result in
+                
+                switch(result){
+                    
+                case .success(let response):
+                    var forms = [String]()
+                    let remidiationForm = response.remediations[remidiation]
+                    
+                    if(fields != nil){
+                        remidiationForm?[fields!]?.form?.forEach({
+                            forms.append($0.name ?? "")
+                        })
+
+                    }else{
+                        remidiationForm?.form.fields.forEach({
+                            forms.append($0.name ?? "")
+                        })
+                    }
+                    
+                    break
+                case .failure(let error):
+                    completion(.failure(HssOktaError.generalError(error.localizedDescription)))
+                }
+                
+            })}
         
     }
     

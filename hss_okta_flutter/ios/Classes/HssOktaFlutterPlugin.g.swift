@@ -375,7 +375,8 @@ protocol HssOktaFlutterPluginApi {
   func recoverPassword(identifier: String, completion: @escaping (Result<IdxResponse, Error>) -> Void)
   func getIdxResponse(completion: @escaping (Result<IdxResponse?, Error>) -> Void)
   func cancelCurrentTransaction(completion: @escaping (Result<Bool, Error>) -> Void)
-  func getAuthenticationFactors(completion: @escaping (Result<[String?], Error>) -> Void)
+  func getRemidiationsFactors(completion: @escaping (Result<[String], Error>) -> Void)
+  func getRemidiationsFields(remidiation: String, fields: String?, completion: @escaping (Result<[String], Error>) -> Void)
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -696,10 +697,10 @@ class HssOktaFlutterPluginApiSetup {
     } else {
       cancelCurrentTransactionChannel.setMessageHandler(nil)
     }
-    let getAuthenticationFactorsChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.getAuthenticationFactors\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    let getRemidiationsFactorsChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.getRemidiationsFactors\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
-      getAuthenticationFactorsChannel.setMessageHandler { _, reply in
-        api.getAuthenticationFactors { result in
+      getRemidiationsFactorsChannel.setMessageHandler { _, reply in
+        api.getRemidiationsFactors { result in
           switch result {
           case .success(let res):
             reply(wrapResult(res))
@@ -709,7 +710,25 @@ class HssOktaFlutterPluginApiSetup {
         }
       }
     } else {
-      getAuthenticationFactorsChannel.setMessageHandler(nil)
+      getRemidiationsFactorsChannel.setMessageHandler(nil)
+    }
+    let getRemidiationsFieldsChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.getRemidiationsFields\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      getRemidiationsFieldsChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let remidiationArg = args[0] as! String
+        let fieldsArg: String? = nilOrValue(args[1])
+        api.getRemidiationsFields(remidiation: remidiationArg, fields: fieldsArg) { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      getRemidiationsFieldsChannel.setMessageHandler(nil)
     }
   }
 }

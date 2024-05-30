@@ -176,8 +176,17 @@ class Idx {
     return result;
   }
 
-  Future<List<String?>> getAuthenticationFactors() async {
-    var result = await instance.getAuthenticationFactors();
+  Future<List<String?>> getRemidiations() async {
+    var result = await instance.getRemidiations();
+    return result;
+  }
+
+  Future<List<String>> getRemidiationFields(String remidiation,
+      {String? fields}) async {
+    var result = await instance.getRemidiationsFields(
+      remidiation,
+      fields: fields,
+    );
     return result;
   }
 }

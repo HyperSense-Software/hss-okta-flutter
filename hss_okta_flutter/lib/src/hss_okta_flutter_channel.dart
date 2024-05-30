@@ -132,7 +132,16 @@ class HssOktaFlutterChannel extends HssOktaFlutterPlatformInterface {
   }
 
   @override
-  Future<List<String?>> getAuthenticationFactors() {
-    return _api.getAuthenticationFactors();
+  Future<List<String>> getRemidiations() async {
+    final items = await _api.getRemidiationsFactors();
+    return items.nonNulls.toList();
+  }
+
+  @override
+  Future<List<String>> getRemidiationsFields(String remidiation,
+      {String? fields}) async {
+    var items = await _api.getRemidiationsFields(remidiation, fields: fields);
+
+    return items.nonNulls.toList();
   }
 }

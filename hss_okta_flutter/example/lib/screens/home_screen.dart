@@ -317,8 +317,10 @@ class _HomeScreenState extends State<HomeScreen> {
             onPressed: () async {
               try {
                 final plugin = PluginProvider.of(context).plugin;
-                final stuff = await plugin.idx.getAuthenticationFactors();
-
+                final stuff1 = await plugin.idx.getRemidiations();
+                final stuff = await plugin.idx
+                    .getRemidiationFields('identify', fields: 'identifier');
+                print(stuff1);
                 print(stuff);
               } catch (e, s) {
                 print(e);

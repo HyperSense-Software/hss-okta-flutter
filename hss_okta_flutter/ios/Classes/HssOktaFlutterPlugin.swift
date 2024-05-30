@@ -16,6 +16,7 @@ case generalError(String)
 
 
 public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginApi {
+
     let browserAuth = WebAuthentication.shared
     var flow : (any AuthenticationFlow)?
     var status : DirectAuthenticationFlow.Status?
@@ -338,8 +339,12 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
         idx.cancelCurrentTransaction(completion: completion)
     }
     
-    func getAuthenticationFactors(completion: @escaping (Result<[String?], Error>) -> Void) {
-        idx.getAuthenticationFactors(completion: completion)
+    func getRemidiations(completion: @escaping (Result<[String], Error>) -> Void) {
+        idx.getRemidiations(completion: completion)
+    }
+    
+    func getRemidiationsFields(remidiation: String,fields: String?, completion: @escaping (Result<[String], Error>) -> Void) {
+        idx.getRemidiationsFields(remidiation: remidiation,fields: fields,completion: completion)
     }
 }
  
