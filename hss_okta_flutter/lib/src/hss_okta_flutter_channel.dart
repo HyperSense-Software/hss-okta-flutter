@@ -132,7 +132,7 @@ class HssOktaFlutterChannel extends HssOktaFlutterPlatformInterface {
   }
 
   @override
-  Future<Map<String?, String?>> getAuthenticationFactors() {
+  Future<List<String?>> getAuthenticationFactors() {
     return _api.getAuthenticationFactors();
   }
 }

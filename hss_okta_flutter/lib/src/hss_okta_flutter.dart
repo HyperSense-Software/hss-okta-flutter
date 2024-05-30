@@ -176,7 +176,7 @@ class Idx {
     return result;
   }
 
-  Future<Map<String?, String?>> getAuthenticationFactors() async {
+  Future<List<String?>> getAuthenticationFactors() async {
     var result = await instance.getAuthenticationFactors();
     return result;
   }

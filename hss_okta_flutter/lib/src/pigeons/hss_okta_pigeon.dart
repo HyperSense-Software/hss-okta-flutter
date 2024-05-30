@@ -197,7 +197,7 @@ abstract class HssOktaFlutterPluginApi {
   bool cancelCurrentTransaction();
 
   @async
-  Map<String?, String?> getAuthenticationFactors();
+  List<String?> getAuthenticationFactors();
 
   // @async
   // IdxResponse setAuthenticationFactor(String authenticationFactor);

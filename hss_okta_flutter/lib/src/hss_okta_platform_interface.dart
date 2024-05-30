@@ -84,6 +84,6 @@ abstract class HssOktaFlutterPlatformInterface extends PlatformInterface {
 
   Future<bool> cancelCurrentTransaction() => throw UnimplementedError();
 
-  Future<Map<String?, String?>> getAuthenticationFactors() =>
+  Future<List<String?>> getAuthenticationFactors() =>
       throw UnimplementedError();
 }

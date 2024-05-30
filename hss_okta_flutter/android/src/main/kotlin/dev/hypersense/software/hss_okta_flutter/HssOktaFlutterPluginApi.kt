@@ -386,7 +386,7 @@ interface HssOktaFlutterPluginApi {
   fun recoverPassword(identifier: String, callback: (Result<IdxResponse>) -> Unit)
   fun getIdxResponse(callback: (Result<IdxResponse?>) -> Unit)
   fun cancelCurrentTransaction(callback: (Result<Boolean>) -> Unit)
-  fun getAuthenticationFactors(callback: (Result<Map<String?, String?>>) -> Unit)
+  fun getAuthenticationFactors(callback: (Result<List<String?>>) -> Unit)
 
   companion object {
     /** The codec used by HssOktaFlutterPluginApi. */
@@ -768,7 +768,7 @@ interface HssOktaFlutterPluginApi {
         val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.getAuthenticationFactors$separatedMessageChannelSuffix", codec)
         if (api != null) {
           channel.setMessageHandler { _, reply ->
-            api.getAuthenticationFactors() { result: Result<Map<String?, String?>> ->
+            api.getAuthenticationFactors() { result: Result<List<String?>> ->
               val error = result.exceptionOrNull()
               if (error != null) {
                 reply.reply(wrapError(error))

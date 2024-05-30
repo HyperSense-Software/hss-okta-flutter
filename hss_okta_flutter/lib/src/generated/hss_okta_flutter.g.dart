@@ -824,7 +824,7 @@ class HssOktaFlutterPluginApi {
     }
   }
 
-  Future<Map<String?, String?>> getAuthenticationFactors() async {
+  Future<List<String?>> getAuthenticationFactors() async {
     final String __pigeon_channelName = 'dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.getAuthenticationFactors$__pigeon_messageChannelSuffix';
     final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
@@ -847,7 +847,7 @@ class HssOktaFlutterPluginApi {
         message: 'Host platform returned null value for non-null return value.',
       );
     } else {
-      return (__pigeon_replyList[0] as Map<Object?, Object?>?)!.cast<String?, String?>();
+      return (__pigeon_replyList[0] as List<Object?>?)!.cast<String?>();
     }
   }
 }

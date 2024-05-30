@@ -375,7 +375,7 @@ protocol HssOktaFlutterPluginApi {
   func recoverPassword(identifier: String, completion: @escaping (Result<IdxResponse, Error>) -> Void)
   func getIdxResponse(completion: @escaping (Result<IdxResponse?, Error>) -> Void)
   func cancelCurrentTransaction(completion: @escaping (Result<Bool, Error>) -> Void)
-  func getAuthenticationFactors(completion: @escaping (Result<[String?: String?], Error>) -> Void)
+  func getAuthenticationFactors(completion: @escaping (Result<[String?], Error>) -> Void)
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.

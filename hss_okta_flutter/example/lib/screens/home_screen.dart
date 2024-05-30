@@ -317,12 +317,9 @@ class _HomeScreenState extends State<HomeScreen> {
             onPressed: () async {
               try {
                 final plugin = PluginProvider.of(context).plugin;
+                final stuff = await plugin.idx.getAuthenticationFactors();
 
-                final response = await plugin.idx
-                    .authenticateWithEmailAndPassword(
-                        'aldrin.francisco@designli.co', '23321122aA');
-
-                print('token: ${response!.token?.accessToken}');
+                print(stuff);
               } catch (e, s) {
                 print(e);
               }
