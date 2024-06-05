@@ -176,19 +176,31 @@ abstract class HssOktaFlutterPluginApi {
   IdxResponse? authenticateWithEmailAndPassword(String email, String password);
 
   @async
-  IdxResponse? startInteractionCodeFlow();
-
-  @async
-  IdxResponse? continueWithIdentifier(String identifier);
-
-  @async
-  IdxResponse? continueWithPasscode(String passcode);
+  IdxResponse? startInteractionCodeFlow(
+      {String? email, required String remidiation});
 
   @async
   bool startSMSPhoneEnrollment(String phoneNumber);
 
+  // Continues
+
+  // @async
+  // IdxResponse? continueWithPassword({required String password});
+
   @async
   bool continueSMSPhoneEnrollment(String passcode);
+
+  @async
+  IdxResponse? continueWithGoogleAuthenticator(String code);
+
+  // @async
+  // IdxResponse? continueWithIdentifier(String identifier);
+
+  // @async
+  // IdxResponse? continueWithPasscode(String passcode);
+
+  @async
+  IdxResponse continueWithEmailCode(String email, String code);
 
   @async
   bool startUserEnrollmentFlow(
@@ -210,6 +222,10 @@ abstract class HssOktaFlutterPluginApi {
 
   @async
   List<String> getRemidiationsFields(String remidiation, {String? fields});
+
+  @async
+  List<String> getRemidiationAuthenticators(String remidiation,
+      {String? fields});
 
   // @async
   // IdxResponse setAuthenticationFactor(String authenticationFactor);

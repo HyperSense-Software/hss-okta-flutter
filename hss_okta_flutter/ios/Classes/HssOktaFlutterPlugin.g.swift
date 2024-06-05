@@ -369,17 +369,18 @@ protocol HssOktaFlutterPluginApi {
   func removeCredential(tokenId: String, completion: @escaping (Result<Bool, Error>) -> Void)
   func setDefaultToken(tokenId: String, completion: @escaping (Result<Bool, Error>) -> Void)
   func authenticateWithEmailAndPassword(email: String, password: String, completion: @escaping (Result<IdxResponse?, Error>) -> Void)
-  func startInteractionCodeFlow(completion: @escaping (Result<IdxResponse?, Error>) -> Void)
-  func continueWithIdentifier(identifier: String, completion: @escaping (Result<IdxResponse?, Error>) -> Void)
-  func continueWithPasscode(passcode: String, completion: @escaping (Result<IdxResponse?, Error>) -> Void)
+  func startInteractionCodeFlow(email: String?, remidiation: String, completion: @escaping (Result<IdxResponse?, Error>) -> Void)
   func startSMSPhoneEnrollment(phoneNumber: String, completion: @escaping (Result<Bool, Error>) -> Void)
   func continueSMSPhoneEnrollment(passcode: String, completion: @escaping (Result<Bool, Error>) -> Void)
+  func continueWithGoogleAuthenticator(code: String, completion: @escaping (Result<IdxResponse?, Error>) -> Void)
+  func continueWithEmailCode(email: String, code: String, completion: @escaping (Result<IdxResponse, Error>) -> Void)
   func startUserEnrollmentFlow(firstName: String, lastName: String, email: String, completion: @escaping (Result<Bool, Error>) -> Void)
   func recoverPassword(identifier: String, completion: @escaping (Result<IdxResponse, Error>) -> Void)
   func getIdxResponse(completion: @escaping (Result<IdxResponse?, Error>) -> Void)
   func cancelCurrentTransaction(completion: @escaping (Result<Bool, Error>) -> Void)
   func getRemidiations(completion: @escaping (Result<[String], Error>) -> Void)
   func getRemidiationsFields(remidiation: String, fields: String?, completion: @escaping (Result<[String], Error>) -> Void)
+  func getRemidiationAuthenticators(remidiation: String, fields: String?, completion: @escaping (Result<[String], Error>) -> Void)
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -602,8 +603,11 @@ class HssOktaFlutterPluginApiSetup {
     }
     let startInteractionCodeFlowChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.startInteractionCodeFlow\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
-      startInteractionCodeFlowChannel.setMessageHandler { _, reply in
-        api.startInteractionCodeFlow { result in
+      startInteractionCodeFlowChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let emailArg: String? = nilOrValue(args[0])
+        let remidiationArg = args[1] as! String
+        api.startInteractionCodeFlow(email: emailArg, remidiation: remidiationArg) { result in
           switch result {
           case .success(let res):
             reply(wrapResult(res))
@@ -614,40 +618,6 @@ class HssOktaFlutterPluginApiSetup {
       }
     } else {
       startInteractionCodeFlowChannel.setMessageHandler(nil)
-    }
-    let continueWithIdentifierChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.continueWithIdentifier\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-    if let api = api {
-      continueWithIdentifierChannel.setMessageHandler { message, reply in
-        let args = message as! [Any?]
-        let identifierArg = args[0] as! String
-        api.continueWithIdentifier(identifier: identifierArg) { result in
-          switch result {
-          case .success(let res):
-            reply(wrapResult(res))
-          case .failure(let error):
-            reply(wrapError(error))
-          }
-        }
-      }
-    } else {
-      continueWithIdentifierChannel.setMessageHandler(nil)
-    }
-    let continueWithPasscodeChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.continueWithPasscode\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-    if let api = api {
-      continueWithPasscodeChannel.setMessageHandler { message, reply in
-        let args = message as! [Any?]
-        let passcodeArg = args[0] as! String
-        api.continueWithPasscode(passcode: passcodeArg) { result in
-          switch result {
-          case .success(let res):
-            reply(wrapResult(res))
-          case .failure(let error):
-            reply(wrapError(error))
-          }
-        }
-      }
-    } else {
-      continueWithPasscodeChannel.setMessageHandler(nil)
     }
     let startSMSPhoneEnrollmentChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.startSMSPhoneEnrollment\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
@@ -682,6 +652,41 @@ class HssOktaFlutterPluginApiSetup {
       }
     } else {
       continueSMSPhoneEnrollmentChannel.setMessageHandler(nil)
+    }
+    let continueWithGoogleAuthenticatorChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.continueWithGoogleAuthenticator\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      continueWithGoogleAuthenticatorChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let codeArg = args[0] as! String
+        api.continueWithGoogleAuthenticator(code: codeArg) { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      continueWithGoogleAuthenticatorChannel.setMessageHandler(nil)
+    }
+    let continueWithEmailCodeChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.continueWithEmailCode\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      continueWithEmailCodeChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let emailArg = args[0] as! String
+        let codeArg = args[1] as! String
+        api.continueWithEmailCode(email: emailArg, code: codeArg) { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      continueWithEmailCodeChannel.setMessageHandler(nil)
     }
     let startUserEnrollmentFlowChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.startUserEnrollmentFlow\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
@@ -781,6 +786,24 @@ class HssOktaFlutterPluginApiSetup {
       }
     } else {
       getRemidiationsFieldsChannel.setMessageHandler(nil)
+    }
+    let getRemidiationAuthenticatorsChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.getRemidiationAuthenticators\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      getRemidiationAuthenticatorsChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let remidiationArg = args[0] as! String
+        let fieldsArg: String? = nilOrValue(args[1])
+        api.getRemidiationAuthenticators(remidiation: remidiationArg, fields: fieldsArg) { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      getRemidiationAuthenticatorsChannel.setMessageHandler(nil)
     }
   }
 }

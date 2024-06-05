@@ -97,19 +97,18 @@ class HssOktaFlutterChannel extends HssOktaFlutterPlatformInterface {
   }
 
   @override
-  Future<IdxResponse?> startInteractionCodeFlow() async {
-    return await _api.startInteractionCodeFlow();
+  Future<IdxResponse?> startInteractionCodeFlow({
+    String? email,
+    required String remidiation,
+  }) async {
+    return await _api.startInteractionCodeFlow(
+        email: email, remidiation: remidiation);
   }
 
-  @override
-  Future<IdxResponse?> continueWithIdentifier(String identifier) async {
-    return await _api.continueWithIdentifier(identifier);
-  }
-
-  @override
-  Future<IdxResponse?> continueWithPasscode(String passcode) async {
-    return await _api.continueWithPasscode(passcode);
-  }
+  // @override
+  // Future<IdxResponse?> continueWithPasscode(String passcode) async {
+  //   return await _api.continueWithPasscode(passcode);
+  // }
 
   @override
   Future<bool> startSMSPhoneEnrollment(String phoneNumber) async {
@@ -148,7 +147,7 @@ class HssOktaFlutterChannel extends HssOktaFlutterPlatformInterface {
 
   @override
   Future<List<String>> getRemidiations() async {
-    final items = await _api.getRemidiationsFactors();
+    final items = await _api.getRemidiations();
     return items.nonNulls.toList();
   }
 
@@ -158,5 +157,19 @@ class HssOktaFlutterChannel extends HssOktaFlutterPlatformInterface {
     var items = await _api.getRemidiationsFields(remidiation, fields: fields);
 
     return items.nonNulls.toList();
+  }
+
+  @override
+  Future<List<String>> getRemidiationAuthenticators(String remidiation,
+      {String? fields}) async {
+    var items =
+        await _api.getRemidiationAuthenticators(remidiation, fields: fields);
+
+    return items.nonNulls.toList();
+  }
+
+  @override
+  Future<IdxResponse?> continueWithGoogleAuthenticator(String code) {
+    return _api.continueWithGoogleAuthenticator(code);
   }
 }

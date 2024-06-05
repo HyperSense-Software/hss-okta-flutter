@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -315,16 +316,22 @@ class _HomeScreenState extends State<HomeScreen> {
           const Text('Status :'),
           OutlinedButton(
             onPressed: () async {
-              try {
-                final plugin = PluginProvider.of(context).plugin;
-                final stuff1 = await plugin.idx.getRemidiations();
-                final stuff = await plugin.idx
-                    .getRemidiationFields('identify', fields: 'identifier');
-                print(stuff1);
-                print(stuff);
-              } catch (e, s) {
-                print(e);
-              }
+              final plugin = PluginProvider.of(context).plugin;
+              final res = await plugin.idx.authenticateWithEmailAndPassword(
+                  'aldrin.francisco@designli.co', '23321122aA');
+              // final remidiations = await plugin.idx.getRemidiations();
+              // final authenticators = await plugin.idx
+              //     .getRemidiationAuthenticators(
+              //         remidiation: 'select-authenticator-authenticate',
+              //         fields: 'authenticator');
+
+              // print(remidiations);
+              // print(authenticators);
+
+              final result =
+                  await plugin.idx.continueWithGoogleAuthenticator('631036');
+
+              print(result?.token?.accessToken);
             },
             child: const Text(
               'Interaction Code Flow',

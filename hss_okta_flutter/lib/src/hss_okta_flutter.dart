@@ -189,4 +189,33 @@ class Idx {
     );
     return result;
   }
+
+  Future<List<String>> getRemidiationAuthenticators(
+      {String remidiation = 'identify', String? fields}) async {
+    var result = await instance.getRemidiationAuthenticators(remidiation,
+        fields: fields);
+
+    return result;
+  }
+
+  Future<IdxResponse?> startInteractionCodeFlow({
+    required String email,
+    String remidiation = 'identify',
+  }) async {
+    var result = await instance.startInteractionCodeFlow(
+      email: email,
+      remidiation: remidiation,
+    );
+    return result;
+  }
+
+  // Future<IdxResponse?> continueWithPasscode(String passcode) async {
+  //   var result = await instance.continueWithPasscode(passcode);
+  //   return result;
+  // }
+
+  Future<IdxResponse?> continueWithGoogleAuthenticator(String code) async {
+    var result = await instance.continueWithGoogleAuthenticator(code);
+    return result;
+  }
 }

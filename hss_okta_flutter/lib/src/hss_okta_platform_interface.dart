@@ -65,13 +65,12 @@ abstract class HssOktaFlutterPlatformInterface extends PlatformInterface {
           String email, String password) =>
       throw UnimplementedError();
 
-  Future<IdxResponse?> startInteractionCodeFlow() => throw UnimplementedError();
-
-  Future<IdxResponse?> continueWithIdentifier(String identifier) =>
+  Future<IdxResponse?> startInteractionCodeFlow(
+          {String? email, required String remidiation}) =>
       throw UnimplementedError();
 
-  Future<IdxResponse?> continueWithPasscode(String passcode) =>
-      throw UnimplementedError();
+  // Future<IdxResponse?> continueWithPasscode(String passcode) =>
+  //     throw UnimplementedError();
 
   Future<bool> startSMSPhoneEnrollment(String phoneNumber) =>
       throw UnimplementedError();
@@ -96,5 +95,12 @@ abstract class HssOktaFlutterPlatformInterface extends PlatformInterface {
 
   Future<List<String>> getRemidiationsFields(String remidiation,
           {String? fields}) =>
+      throw UnimplementedError();
+
+  Future<List<String>> getRemidiationAuthenticators(String remidiation,
+          {String? fields}) =>
+      throw UnimplementedError();
+
+  Future<IdxResponse?> continueWithGoogleAuthenticator(String code) =>
       throw UnimplementedError();
 }

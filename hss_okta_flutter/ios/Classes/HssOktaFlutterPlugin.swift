@@ -16,6 +16,7 @@ case generalError(String)
 
 
 public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginApi {
+  
 
     let browserAuth = WebAuthentication.shared
     var flow : (any AuthenticationFlow)?
@@ -347,8 +348,8 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
         idx.getRemidiationsFields(remidiation: remidiation,fields: fields,completion: completion)
     }
     
-    func startInteractionCodeFlow(completion: @escaping (Result<IdxResponse?, Error>) -> Void) {
-        idx.startInteractionCodeFlow(completion: completion)
+    func startInteractionCodeFlow(email: String?, remidiation: String, completion: @escaping (Result<IdxResponse?, Error>) -> Void){
+        idx.startInteractionCodeFlow(email: email,remidiation: remidiation, completion: completion)
     }
     
     func continueWithIdentifier(identifier: String, completion: @escaping (Result<IdxResponse?, Error>) -> Void) {
@@ -358,6 +359,22 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
     func continueWithPasscode(passcode: String, completion: @escaping (Result<IdxResponse?, Error>) -> Void) {
         idx.continueWithPasscode(passcode: passcode, completion: completion)
     }
+    func getRemidiationAuthenticators(remidiation: String, fields: String?, completion: @escaping (Result<[String], Error>) -> Void) {
+        idx.getRemidiationAuthenticators(remidiation: remidiation,fields: fields, completion: completion)
+        
+    }
+    
+    
+    func continueWithEmailCode(email: String, code: String, completion: @escaping (Result<IdxResponse, Error>) -> Void) {
+        
+    }
+    
+    func continueWithGoogleAuthenticator(code: String, completion: @escaping (Result<IdxResponse?, Error>) -> Void) {
+        idx.continueWithGoogleAuthenticator(code: code, completion: completion)
+    }
+    
+    
+
     
 }
  
