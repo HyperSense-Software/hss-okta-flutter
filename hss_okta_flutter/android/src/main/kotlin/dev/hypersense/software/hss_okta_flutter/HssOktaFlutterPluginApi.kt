@@ -384,8 +384,9 @@ interface HssOktaFlutterPluginApi {
   fun startSMSPhoneEnrollment(phoneNumber: String, callback: (Result<Boolean>) -> Unit)
   fun continueSMSPhoneEnrollment(passcode: String, callback: (Result<Boolean>) -> Unit)
   fun continueWithGoogleAuthenticator(code: String, callback: (Result<IdxResponse?>) -> Unit)
-  fun continueWithEmailCode(code: String, callback: (Result<IdxResponse?>) -> Unit)
   fun sendEmailCode(callback: (Result<Unit>) -> Unit)
+  fun continueWithEmailCode(code: String, callback: (Result<IdxResponse?>) -> Unit)
+  fun pollEmailCode(callback: (Result<IdxResponse?>) -> Unit)
   fun startUserEnrollmentFlow(firstName: String, lastName: String, email: String, callback: (Result<Boolean>) -> Unit)
   fun recoverPassword(identifier: String, callback: (Result<IdxResponse>) -> Unit)
   fun getIdxResponse(callback: (Result<IdxResponse?>) -> Unit)
@@ -734,6 +735,23 @@ interface HssOktaFlutterPluginApi {
         }
       }
       run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.sendEmailCode$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            api.sendEmailCode() { result: Result<Unit> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(wrapError(error))
+              } else {
+                reply.reply(wrapResult(null))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
         val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.continueWithEmailCode$separatedMessageChannelSuffix", codec)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
@@ -754,15 +772,16 @@ interface HssOktaFlutterPluginApi {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.sendEmailCode$separatedMessageChannelSuffix", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.pollEmailCode$separatedMessageChannelSuffix", codec)
         if (api != null) {
           channel.setMessageHandler { _, reply ->
-            api.sendEmailCode() { result: Result<Unit> ->
+            api.pollEmailCode() { result: Result<IdxResponse?> ->
               val error = result.exceptionOrNull()
               if (error != null) {
                 reply.reply(wrapError(error))
               } else {
-                reply.reply(wrapResult(null))
+                val data = result.getOrNull()
+                reply.reply(wrapResult(data))
               }
             }
           }

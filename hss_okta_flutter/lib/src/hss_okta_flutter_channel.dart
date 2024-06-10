@@ -182,4 +182,9 @@ class HssOktaFlutterChannel extends HssOktaFlutterPlatformInterface {
   Future<void> sendEmailCode() {
     return _api.sendEmailCode();
   }
+
+  @override
+  Future<IdxResponse?> pollEmailCode() {
+    return _api.pollEmailCode();
+  }
 }

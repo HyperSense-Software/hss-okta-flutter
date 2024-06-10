@@ -718,4 +718,62 @@ public class HSSOktaFlutterIdx{
             }
         })
      }
+    
+    func pollEmailCode(completion: @escaping (Result<IdxResponse?, Error>) -> Void) {
+//        TESTING ON HOLD, CAN'T FIND THE MAGIC LINK URI SETTINGS ON OKTA
+        
+        idxFlow.resume(completion: {resumeResult in
+            switch(resumeResult){
+            case .success(let resumeResponse):
+                Task{
+                    guard let authenticator = resumeResponse.remediations[.challengeAuthenticator],
+                                    let codeField = authenticator["credentials.passcode"]
+                                    else{
+                                       completion(.failure(HssOktaError.generalError("Failed to find remediation for challenge Authenticator")))
+                                       return
+                                   }
+                    
+                    
+                    if let pollable = authenticator.pollable{
+                        pollable.startPolling(completion:{ pollResult in
+                            switch(pollResult){
+                            case .success(let response):
+                                
+                                guard response.isLoginSuccessful
+                                else{
+                                    completion(.failure(HssOktaError.generalError("Login Failed : \(response.messages.allMessages.first?.message ?? "Unknown error")")))
+                                    return
+                                }
+                                
+                                response.exchangeCode(completion:{exchangeResult in
+                                    switch(exchangeResult){
+                                    case .success(let token):
+                                        completion(.success(self.mapResponeToIdxResponse(response:response , token: self.mapToOktaToken(token: token))))
+                                    break
+                                    case .failure(let error):
+                                        completion(.failure(HssOktaError.generalError(error.localizedDescription)))
+                                    }
+                                })
+                                
+                                break
+                            case .failure(let error):
+                                completion(.failure(HssOktaError.generalError(error.localizedDescription)))
+                            }
+                            
+                        })
+                    }else{
+                        completion(.failure(HssOktaError.configError("Email is not pollable, Check your org configuration")
+))                    }
+                    
+                   
+                }
+
+                break
+                
+            case .failure(let error):
+                completion(.failure(HssOktaError.generalError(error.localizedDescription)))
+            }
+        })
+
+    }
 }

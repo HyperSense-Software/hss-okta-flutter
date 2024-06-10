@@ -156,7 +156,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _form(BuildContext formContext) {
     return Padding(
       padding: const EdgeInsets.all(24.0),
-      child: Column(
+      child: ListView(
         children: [
           Column(
             children: [
@@ -391,6 +391,20 @@ class _HomeScreenState extends State<HomeScreen> {
               final plugin = PluginProvider.of(context).plugin;
               final res = await plugin.idx.authenticateWithEmailAndPassword(
                   _idxusernamecontroller.text, _idxpasswordcontroller.text);
+              await plugin.idx.sendEmailCode();
+              var result = await plugin.idx.pollEmailCode();
+
+              log(result?.token?.accessToken ?? '');
+            },
+            child: const Text(
+              'Login with Email code polling',
+            ),
+          ),
+          OutlinedButton(
+            onPressed: () async {
+              final plugin = PluginProvider.of(context).plugin;
+              final res = await plugin.idx.authenticateWithEmailAndPassword(
+                  _idxusernamecontroller.text, _idxpasswordcontroller.text);
 
               showDialog(
                   context: context,
@@ -419,7 +433,7 @@ class _HomeScreenState extends State<HomeScreen> {
             child: const Text(
               'Login with Google Authenticator',
             ),
-          )
+          ),
         ],
       ),
     );

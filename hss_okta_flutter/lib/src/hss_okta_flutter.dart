@@ -227,4 +227,9 @@ class Idx {
   Future<void> sendEmailCode() async {
     await instance.sendEmailCode();
   }
+
+  Future<IdxResponse?> pollEmailCode() async {
+    var result = await instance.pollEmailCode();
+    return result;
+  }
 }

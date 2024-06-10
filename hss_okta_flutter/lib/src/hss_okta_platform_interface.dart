@@ -108,4 +108,6 @@ abstract class HssOktaFlutterPlatformInterface extends PlatformInterface {
       throw UnimplementedError();
 
   Future<void> sendEmailCode() => throw UnimplementedError();
+
+  Future<IdxResponse?> pollEmailCode() => throw UnimplementedError();
 }
