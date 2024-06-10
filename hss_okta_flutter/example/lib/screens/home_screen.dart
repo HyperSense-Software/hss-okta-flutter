@@ -322,6 +322,18 @@ class _HomeScreenState extends State<HomeScreen> {
               final res = await plugin.idx.authenticateWithEmailAndPassword(
                   'aldrin.francisco@designli.co', '23321122aA');
 
+              log(res?.token?.accessToken ?? '');
+            },
+            child: const Text(
+              'Login with email and password',
+            ),
+          ),
+          OutlinedButton(
+            onPressed: () async {
+              final plugin = PluginProvider.of(context).plugin;
+              final res = await plugin.idx.authenticateWithEmailAndPassword(
+                  'aldrin.francisco@designli.co', '23321122aA');
+
               await plugin.idx.sendEmailCode();
 
               showDialog(
@@ -348,7 +360,41 @@ class _HomeScreenState extends State<HomeScreen> {
                       ));
             },
             child: const Text(
-              'Interaction Code Flow',
+              'Login with Email code',
+            ),
+          ),
+          OutlinedButton(
+            onPressed: () async {
+              final plugin = PluginProvider.of(context).plugin;
+              final res = await plugin.idx.authenticateWithEmailAndPassword(
+                  'aldrin.francisco@designli.co', '23321122aA');
+
+              showDialog(
+                  context: context,
+                  builder: (c) => AlertDialog(
+                        title: const Text('Email Code'),
+                        content: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            TextField(
+                              controller: _emailCodeController,
+                            ),
+                            OutlinedButton(
+                                onPressed: () async {
+                                  var result = await plugin.idx
+                                      .continueWithGoogleAuthenticator(
+                                          _emailCodeController.text);
+                                  Navigator.pop(context);
+
+                                  log(result?.token?.accessToken ?? '');
+                                },
+                                child: const Text('Submit'))
+                          ],
+                        ),
+                      ));
+            },
+            child: const Text(
+              'Login with Google Authenticator',
             ),
           )
         ],
