@@ -31,6 +31,10 @@ class _HomeScreenState extends State<HomeScreen> {
     text: '',
   );
 
+  final TextEditingController _idxusernamecontroller = TextEditingController();
+
+  final TextEditingController _idxpasswordcontroller = TextEditingController();
+
   final TextEditingController _emailCodeController = TextEditingController();
 
   final PageController _pageController = PageController(initialPage: 0);
@@ -68,6 +72,8 @@ class _HomeScreenState extends State<HomeScreen> {
     _pageController.dispose();
     _usernamecontroller.dispose();
     _passwordcontroller.dispose();
+    _idxpasswordcontroller.dispose();
+    _idxusernamecontroller.dispose();
     _pageController.dispose();
     _streamSubscription?.cancel();
     _streamSubscription = null;
@@ -149,85 +155,81 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _form(BuildContext formContext) {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(24.0),
       child: Column(
         children: [
-          Container(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              children: [
-                TextFormField(
-                  controller: _usernamecontroller,
-                  decoration: const InputDecoration(
-                    label: Text('Username'),
-                    hintText: 'Enter your username',
-                    border: OutlineInputBorder(),
-                  ),
+          Column(
+            children: [
+              TextFormField(
+                controller: _usernamecontroller,
+                decoration: const InputDecoration(
+                  label: Text('Username'),
+                  hintText: 'Enter your username',
+                  border: OutlineInputBorder(),
                 ),
-                const SizedBox(
-                  height: 12,
+              ),
+              const SizedBox(
+                height: 12,
+              ),
+              TextFormField(
+                controller: _passwordcontroller,
+                decoration: const InputDecoration(
+                  label: Text('Password'),
+                  hintText: 'Enter your Password',
+                  border: OutlineInputBorder(),
                 ),
-                TextFormField(
-                  controller: _passwordcontroller,
-                  decoration: const InputDecoration(
-                    label: Text('Password'),
-                    hintText: 'Enter your Password',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                const SizedBox(
-                  height: 12,
-                ),
-                OutlinedButton(
-                    onPressed: () async {
-                      final provider = PluginProvider.of(context);
-                      try {
-                        if (kIsWeb) {
-                          final result =
-                              await provider.pluginWeb.signInWithCredentials(
-                            username: _usernamecontroller.text,
-                            password: _passwordcontroller.text,
-                          );
+              ),
+              const SizedBox(
+                height: 12,
+              ),
+              OutlinedButton(
+                  onPressed: () async {
+                    final provider = PluginProvider.of(context);
+                    try {
+                      if (kIsWeb) {
+                        final result =
+                            await provider.pluginWeb.signInWithCredentials(
+                          username: _usernamecontroller.text,
+                          password: _passwordcontroller.text,
+                        );
 
-                          if (result.status == 'SUCCESS') {
-                            final token = await provider.pluginWeb
-                                .getWithoutPrompt(
-                                    sessionToken: result.sessionToken!,
-                                    scopes: ['openid', 'email', 'profile'],
-                                    responseType: ['token', 'id_token']);
+                        if (result.status == 'SUCCESS') {
+                          final token = await provider.pluginWeb
+                              .getWithoutPrompt(
+                                  sessionToken: result.sessionToken!,
+                                  scopes: ['openid', 'email', 'profile'],
+                                  responseType: ['token', 'id_token']);
 
-                            if (context.mounted) {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (c) => WebProfileScreen(
-                                    tokens: token,
-                                  ),
+                          if (context.mounted) {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (c) => WebProfileScreen(
+                                  tokens: token,
                                 ),
-                              );
-                            }
+                              ),
+                            );
                           }
-                        } else {
-                          await provider.plugin.startDirectAuthenticationFlow(
-                              email: _usernamecontroller.text,
-                              password: _passwordcontroller.text,
-                              factors: [OktaSignInFactor.otp]).then((res) {
-                            _processResult(res, formContext);
+                        }
+                      } else {
+                        await provider.plugin.startDirectAuthenticationFlow(
+                            email: _usernamecontroller.text,
+                            password: _passwordcontroller.text,
+                            factors: [OktaSignInFactor.otp]).then((res) {
+                          _processResult(res, formContext);
 
-                            setState(() {});
-                          });
-                        }
-                      } catch (e, s) {
-                        debugPrint(e.toString() + s.toString());
-                        if (formContext.mounted) {
-                          ScaffoldMessenger.of(formContext).showSnackBar(
-                              SnackBar(
-                                  content: Text('Error: ${e.toString()}')));
-                        }
+                          setState(() {});
+                        });
                       }
-                    },
-                    child: const Text('Direct Authentication Login')),
-              ],
-            ),
+                    } catch (e, s) {
+                      debugPrint(e.toString() + s.toString());
+                      if (formContext.mounted) {
+                        ScaffoldMessenger.of(formContext).showSnackBar(
+                            SnackBar(content: Text('Error: ${e.toString()}')));
+                      }
+                    }
+                  },
+                  child: const Text('Direct Authentication Login')),
+            ],
           ),
           const SizedBox(
             height: 24,
@@ -315,12 +317,33 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(
             height: 12,
           ),
-          const Text('Status :'),
+          TextFormField(
+            controller: _idxusernamecontroller,
+            decoration: const InputDecoration(
+              label: Text('Username'),
+              hintText: 'Enter your username',
+              border: OutlineInputBorder(),
+            ),
+          ),
+          const SizedBox(
+            height: 12,
+          ),
+          TextFormField(
+            controller: _idxpasswordcontroller,
+            decoration: const InputDecoration(
+              label: Text('Password'),
+              hintText: 'Enter your Password',
+              border: OutlineInputBorder(),
+            ),
+          ),
+          const SizedBox(
+            height: 24,
+          ),
           OutlinedButton(
             onPressed: () async {
               final plugin = PluginProvider.of(context).plugin;
               final res = await plugin.idx.authenticateWithEmailAndPassword(
-                  'aldrin.francisco@designli.co', '23321122aA');
+                  _idxusernamecontroller.text, _idxpasswordcontroller.text);
 
               log(res?.token?.accessToken ?? '');
             },
@@ -332,7 +355,7 @@ class _HomeScreenState extends State<HomeScreen> {
             onPressed: () async {
               final plugin = PluginProvider.of(context).plugin;
               final res = await plugin.idx.authenticateWithEmailAndPassword(
-                  'aldrin.francisco@designli.co', '23321122aA');
+                  _idxusernamecontroller.text, _idxpasswordcontroller.text);
 
               await plugin.idx.sendEmailCode();
 
@@ -367,7 +390,7 @@ class _HomeScreenState extends State<HomeScreen> {
             onPressed: () async {
               final plugin = PluginProvider.of(context).plugin;
               final res = await plugin.idx.authenticateWithEmailAndPassword(
-                  'aldrin.francisco@designli.co', '23321122aA');
+                  _idxusernamecontroller.text, _idxpasswordcontroller.text);
 
               showDialog(
                   context: context,
