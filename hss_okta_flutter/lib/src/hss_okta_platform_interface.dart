@@ -103,4 +103,9 @@ abstract class HssOktaFlutterPlatformInterface extends PlatformInterface {
 
   Future<IdxResponse?> continueWithGoogleAuthenticator(String code) =>
       throw UnimplementedError();
+
+  Future<IdxResponse?> continueWithEmailCode(String code) =>
+      throw UnimplementedError();
+
+  Future<void> sendEmailCode() => throw UnimplementedError();
 }

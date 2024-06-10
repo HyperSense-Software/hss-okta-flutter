@@ -31,6 +31,8 @@ class _HomeScreenState extends State<HomeScreen> {
     text: '',
   );
 
+  final TextEditingController _emailCodeController = TextEditingController();
+
   final PageController _pageController = PageController(initialPage: 0);
 
   AuthenticationResult? result;
@@ -319,19 +321,31 @@ class _HomeScreenState extends State<HomeScreen> {
               final plugin = PluginProvider.of(context).plugin;
               final res = await plugin.idx.authenticateWithEmailAndPassword(
                   'aldrin.francisco@designli.co', '23321122aA');
-              // final remidiations = await plugin.idx.getRemidiations();
-              // final authenticators = await plugin.idx
-              //     .getRemidiationAuthenticators(
-              //         remidiation: 'select-authenticator-authenticate',
-              //         fields: 'authenticator');
 
-              // print(remidiations);
-              // print(authenticators);
+              await plugin.idx.sendEmailCode();
 
-              final result =
-                  await plugin.idx.continueWithGoogleAuthenticator('631036');
-
-              print(result?.token?.accessToken);
+              showDialog(
+                  context: context,
+                  builder: (c) => AlertDialog(
+                        title: const Text('Email Code'),
+                        content: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            TextField(
+                              controller: _emailCodeController,
+                            ),
+                            OutlinedButton(
+                                onPressed: () async {
+                                  var result = await plugin.idx
+                                      .continueWithEmailCode(
+                                          _emailCodeController.text);
+                                  Navigator.pop(context);
+                                  log(result?.token?.accessToken ?? '');
+                                },
+                                child: const Text('Submit'))
+                          ],
+                        ),
+                      ));
             },
             child: const Text(
               'Interaction Code Flow',

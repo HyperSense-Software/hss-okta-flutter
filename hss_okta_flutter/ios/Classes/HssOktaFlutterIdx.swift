@@ -645,5 +645,77 @@ public class HSSOktaFlutterIdx{
         })
     }
     
+    func sendEmailCode(completion: @escaping (Result<Void, Error>) -> Void) {
+        idxFlow.resume(completion: {resumeResult in
+            switch(resumeResult){
+            case .success(let resumeResponse):
+                guard let remediation = resumeResponse.remediations[.selectAuthenticatorAuthenticate],
+                      let authenticator = remediation["authenticator"]
+                else{
+                    completion(.failure(HssOktaError.generalError("Failed to select Authenticator authenticate")))
+                    return
+                }
+                let emailAuthenticator = authenticator.options?.first(where: {field -> Bool in
+                    field.label == "Email"
+                })
+                
+                authenticator.selectedOption = emailAuthenticator
+                remediation.proceed(completion:{ result in
+                    completion(.success(()))
+                })
+                
+                break
+            case .failure(let error):
+                completion(.failure(HssOktaError.generalError(error.localizedDescription)))
+                
+            }
+            })
 
+    }
+   
+    
+    func continueWithEmailCode(code: String, completion: @escaping (Result<IdxResponse?, Error>)-> Void) {
+        idxFlow.resume(completion: {resumeResult in
+            switch(resumeResult){
+            case .success(let resumeResponse):
+             guard let authenticator = resumeResponse.remediations[.challengeAuthenticator],
+                let codeField = authenticator["credentials.passcode"]
+                else{
+                   completion(.failure(HssOktaError.generalError("Failed to find remediation for challenge Authenticator")))
+                   return
+               }
+                
+                codeField.value = code
+                authenticator.proceed(completion:{authResult in
+                    switch(authResult){
+                    case .success(let emailAuthResult):
+                        guard emailAuthResult.isLoginSuccessful
+                        else{
+                            completion(.failure(HssOktaError.generalError("Login Failed : \(emailAuthResult.messages.allMessages.first?.message ?? "Unknown error")")))
+                            return
+                        }
+                        
+                        emailAuthResult.exchangeCode(completion:{exchangeResult in
+                            switch(exchangeResult){
+                            case .success(let token):
+                                completion(.success(self.mapResponeToIdxResponse(response:emailAuthResult , token: self.mapToOktaToken(token: token))))
+                            break
+                            case .failure(let error):
+                                completion(.failure(HssOktaError.generalError(error.localizedDescription)))
+                            }
+                        })
+                        
+                        break
+                    case .failure(let error):
+                        completion(.failure(HssOktaError.generalError(error.localizedDescription)))
+                    }})
+                
+                
+                break
+                
+            case .failure(let error):
+                completion(.failure(HssOktaError.generalError(error.localizedDescription)))
+            }
+        })
+     }
 }

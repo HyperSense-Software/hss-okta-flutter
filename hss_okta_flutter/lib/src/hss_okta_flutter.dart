@@ -218,4 +218,13 @@ class Idx {
     var result = await instance.continueWithGoogleAuthenticator(code);
     return result;
   }
+
+  Future<IdxResponse?> continueWithEmailCode(String code) async {
+    var result = await instance.continueWithEmailCode(code);
+    return result;
+  }
+
+  Future<void> sendEmailCode() async {
+    await instance.sendEmailCode();
+  }
 }

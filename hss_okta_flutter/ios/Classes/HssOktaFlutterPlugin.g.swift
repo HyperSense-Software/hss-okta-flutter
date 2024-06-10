@@ -373,7 +373,8 @@ protocol HssOktaFlutterPluginApi {
   func startSMSPhoneEnrollment(phoneNumber: String, completion: @escaping (Result<Bool, Error>) -> Void)
   func continueSMSPhoneEnrollment(passcode: String, completion: @escaping (Result<Bool, Error>) -> Void)
   func continueWithGoogleAuthenticator(code: String, completion: @escaping (Result<IdxResponse?, Error>) -> Void)
-  func continueWithEmailCode(email: String, code: String, completion: @escaping (Result<IdxResponse, Error>) -> Void)
+  func continueWithEmailCode(code: String, completion: @escaping (Result<IdxResponse?, Error>) -> Void)
+  func sendEmailCode(completion: @escaping (Result<Void, Error>) -> Void)
   func startUserEnrollmentFlow(firstName: String, lastName: String, email: String, completion: @escaping (Result<Bool, Error>) -> Void)
   func recoverPassword(identifier: String, completion: @escaping (Result<IdxResponse, Error>) -> Void)
   func getIdxResponse(completion: @escaping (Result<IdxResponse?, Error>) -> Void)
@@ -674,9 +675,8 @@ class HssOktaFlutterPluginApiSetup {
     if let api = api {
       continueWithEmailCodeChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
-        let emailArg = args[0] as! String
-        let codeArg = args[1] as! String
-        api.continueWithEmailCode(email: emailArg, code: codeArg) { result in
+        let codeArg = args[0] as! String
+        api.continueWithEmailCode(code: codeArg) { result in
           switch result {
           case .success(let res):
             reply(wrapResult(res))
@@ -687,6 +687,21 @@ class HssOktaFlutterPluginApiSetup {
       }
     } else {
       continueWithEmailCodeChannel.setMessageHandler(nil)
+    }
+    let sendEmailCodeChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.sendEmailCode\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      sendEmailCodeChannel.setMessageHandler { _, reply in
+        api.sendEmailCode { result in
+          switch result {
+          case .success:
+            reply(wrapResult(nil))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      sendEmailCodeChannel.setMessageHandler(nil)
     }
     let startUserEnrollmentFlowChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.startUserEnrollmentFlow\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {

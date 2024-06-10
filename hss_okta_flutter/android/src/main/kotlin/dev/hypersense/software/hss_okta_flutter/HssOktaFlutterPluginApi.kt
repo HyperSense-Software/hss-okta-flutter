@@ -384,7 +384,8 @@ interface HssOktaFlutterPluginApi {
   fun startSMSPhoneEnrollment(phoneNumber: String, callback: (Result<Boolean>) -> Unit)
   fun continueSMSPhoneEnrollment(passcode: String, callback: (Result<Boolean>) -> Unit)
   fun continueWithGoogleAuthenticator(code: String, callback: (Result<IdxResponse?>) -> Unit)
-  fun continueWithEmailCode(email: String, code: String, callback: (Result<IdxResponse>) -> Unit)
+  fun continueWithEmailCode(code: String, callback: (Result<IdxResponse?>) -> Unit)
+  fun sendEmailCode(callback: (Result<Unit>) -> Unit)
   fun startUserEnrollmentFlow(firstName: String, lastName: String, email: String, callback: (Result<Boolean>) -> Unit)
   fun recoverPassword(identifier: String, callback: (Result<IdxResponse>) -> Unit)
   fun getIdxResponse(callback: (Result<IdxResponse?>) -> Unit)
@@ -737,15 +738,31 @@ interface HssOktaFlutterPluginApi {
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
-            val emailArg = args[0] as String
-            val codeArg = args[1] as String
-            api.continueWithEmailCode(emailArg, codeArg) { result: Result<IdxResponse> ->
+            val codeArg = args[0] as String
+            api.continueWithEmailCode(codeArg) { result: Result<IdxResponse?> ->
               val error = result.exceptionOrNull()
               if (error != null) {
                 reply.reply(wrapError(error))
               } else {
                 val data = result.getOrNull()
                 reply.reply(wrapResult(data))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.sendEmailCode$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            api.sendEmailCode() { result: Result<Unit> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(wrapError(error))
+              } else {
+                reply.reply(wrapResult(null))
               }
             }
           }

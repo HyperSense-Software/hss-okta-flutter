@@ -172,4 +172,14 @@ class HssOktaFlutterChannel extends HssOktaFlutterPlatformInterface {
   Future<IdxResponse?> continueWithGoogleAuthenticator(String code) {
     return _api.continueWithGoogleAuthenticator(code);
   }
+
+  @override
+  Future<IdxResponse?> continueWithEmailCode(String code) {
+    return _api.continueWithEmailCode(code);
+  }
+
+  @override
+  Future<void> sendEmailCode() {
+    return _api.sendEmailCode();
+  }
 }

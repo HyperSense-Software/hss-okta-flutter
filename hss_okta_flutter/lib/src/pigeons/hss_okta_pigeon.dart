@@ -200,7 +200,10 @@ abstract class HssOktaFlutterPluginApi {
   // IdxResponse? continueWithPasscode(String passcode);
 
   @async
-  IdxResponse continueWithEmailCode(String email, String code);
+  IdxResponse? continueWithEmailCode(String code);
+
+  @async
+  void sendEmailCode();
 
   @async
   bool startUserEnrollmentFlow(

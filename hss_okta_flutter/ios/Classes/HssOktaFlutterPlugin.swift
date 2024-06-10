@@ -16,6 +16,10 @@ case generalError(String)
 
 
 public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginApi {
+   
+    
+    
+    
   
 
     let browserAuth = WebAuthentication.shared
@@ -364,18 +368,18 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
         
     }
     
+    func continueWithEmailCode(code: String, completion: @escaping (Result<IdxResponse?, Error>) -> Void) {
+        idx.continueWithEmailCode(code: code, completion: completion)
+    }
     
-    func continueWithEmailCode(email: String, code: String, completion: @escaping (Result<IdxResponse, Error>) -> Void) {
-        
+    func sendEmailCode(completion: @escaping (Result<Void, Error>) -> Void) {
+        idx.sendEmailCode(completion: completion)
     }
     
     func continueWithGoogleAuthenticator(code: String, completion: @escaping (Result<IdxResponse?, Error>) -> Void) {
         idx.continueWithGoogleAuthenticator(code: code, completion: completion)
     }
-    
-    
 
-    
 }
  
 
