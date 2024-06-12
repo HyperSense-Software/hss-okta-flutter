@@ -193,17 +193,11 @@ abstract class HssOktaFlutterPluginApi {
   @async
   IdxResponse? continueWithGoogleAuthenticator(String code);
 
-  // @async
-  // IdxResponse? continueWithIdentifier(String identifier);
-
-  // @async
-  // IdxResponse? continueWithPasscode(String passcode);
+  @async
+  IdxResponse? continueWithPasscode(String passcode);
 
   @async
   void sendEmailCode();
-
-  @async
-  IdxResponse? continueWithEmailCode(String code);
 
   @async
   IdxResponse? pollEmailCode();
@@ -215,8 +209,9 @@ abstract class HssOktaFlutterPluginApi {
       required String email});
 
   @async
-  IdxResponse recoverPassword(String identifier);
+  bool recoverPassword(String identifier);
 
+  @async
   @async
   IdxResponse? getIdxResponse();
 
@@ -233,6 +228,10 @@ abstract class HssOktaFlutterPluginApi {
   List<String> getRemidiationAuthenticators(String remidiation,
       {String? fields});
 
-  // @async
-  // IdxResponse setAuthenticationFactor(String authenticationFactor);
+  // Enrollments
+  @async
+  String getEnrollmentOptions();
+
+  @async
+  bool enrollSecurityQuestion(Map<String, String> questions);
 }

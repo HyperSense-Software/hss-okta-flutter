@@ -316,14 +316,11 @@ class _HssOktaFlutterPluginApiCodec extends StandardMessageCodec {
     } else if (value is IdxResponse) {
       buffer.putUint8(131);
       writeValue(buffer, value.encode());
-    } else if (value is IdxResponse) {
+    } else if (value is OktaToken) {
       buffer.putUint8(132);
       writeValue(buffer, value.encode());
-    } else if (value is OktaToken) {
-      buffer.putUint8(133);
-      writeValue(buffer, value.encode());
     } else if (value is UserInfo) {
-      buffer.putUint8(134);
+      buffer.putUint8(133);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -342,10 +339,8 @@ class _HssOktaFlutterPluginApiCodec extends StandardMessageCodec {
       case 131: 
         return IdxResponse.decode(readValue(buffer)!);
       case 132: 
-        return IdxResponse.decode(readValue(buffer)!);
-      case 133: 
         return OktaToken.decode(readValue(buffer)!);
-      case 134: 
+      case 133: 
         return UserInfo.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
@@ -765,6 +760,28 @@ class HssOktaFlutterPluginApi {
     }
   }
 
+  Future<IdxResponse?> continueWithPasscode(String passcode) async {
+    final String __pigeon_channelName = 'dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.continueWithPasscode$__pigeon_messageChannelSuffix';
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
+      __pigeon_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: __pigeon_binaryMessenger,
+    );
+    final List<Object?>? __pigeon_replyList =
+        await __pigeon_channel.send(<Object?>[passcode]) as List<Object?>?;
+    if (__pigeon_replyList == null) {
+      throw _createConnectionError(__pigeon_channelName);
+    } else if (__pigeon_replyList.length > 1) {
+      throw PlatformException(
+        code: __pigeon_replyList[0]! as String,
+        message: __pigeon_replyList[1] as String?,
+        details: __pigeon_replyList[2],
+      );
+    } else {
+      return (__pigeon_replyList[0] as IdxResponse?);
+    }
+  }
+
   Future<void> sendEmailCode() async {
     final String __pigeon_channelName = 'dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.sendEmailCode$__pigeon_messageChannelSuffix';
     final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
@@ -784,28 +801,6 @@ class HssOktaFlutterPluginApi {
       );
     } else {
       return;
-    }
-  }
-
-  Future<IdxResponse?> continueWithEmailCode(String code) async {
-    final String __pigeon_channelName = 'dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.continueWithEmailCode$__pigeon_messageChannelSuffix';
-    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
-      __pigeon_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: __pigeon_binaryMessenger,
-    );
-    final List<Object?>? __pigeon_replyList =
-        await __pigeon_channel.send(<Object?>[code]) as List<Object?>?;
-    if (__pigeon_replyList == null) {
-      throw _createConnectionError(__pigeon_channelName);
-    } else if (__pigeon_replyList.length > 1) {
-      throw PlatformException(
-        code: __pigeon_replyList[0]! as String,
-        message: __pigeon_replyList[1] as String?,
-        details: __pigeon_replyList[2],
-      );
-    } else {
-      return (__pigeon_replyList[0] as IdxResponse?);
     }
   }
 
@@ -858,7 +853,7 @@ class HssOktaFlutterPluginApi {
     }
   }
 
-  Future<IdxResponse> recoverPassword(String identifier) async {
+  Future<bool> recoverPassword(String identifier) async {
     final String __pigeon_channelName = 'dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.recoverPassword$__pigeon_messageChannelSuffix';
     final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
@@ -881,7 +876,7 @@ class HssOktaFlutterPluginApi {
         message: 'Host platform returned null value for non-null return value.',
       );
     } else {
-      return (__pigeon_replyList[0] as IdxResponse?)!;
+      return (__pigeon_replyList[0] as bool?)!;
     }
   }
 
@@ -1012,6 +1007,60 @@ class HssOktaFlutterPluginApi {
       );
     } else {
       return (__pigeon_replyList[0] as List<Object?>?)!.cast<String?>();
+    }
+  }
+
+  Future<String> getEnrollmentOptions() async {
+    final String __pigeon_channelName = 'dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.getEnrollmentOptions$__pigeon_messageChannelSuffix';
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
+      __pigeon_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: __pigeon_binaryMessenger,
+    );
+    final List<Object?>? __pigeon_replyList =
+        await __pigeon_channel.send(null) as List<Object?>?;
+    if (__pigeon_replyList == null) {
+      throw _createConnectionError(__pigeon_channelName);
+    } else if (__pigeon_replyList.length > 1) {
+      throw PlatformException(
+        code: __pigeon_replyList[0]! as String,
+        message: __pigeon_replyList[1] as String?,
+        details: __pigeon_replyList[2],
+      );
+    } else if (__pigeon_replyList[0] == null) {
+      throw PlatformException(
+        code: 'null-error',
+        message: 'Host platform returned null value for non-null return value.',
+      );
+    } else {
+      return (__pigeon_replyList[0] as String?)!;
+    }
+  }
+
+  Future<bool> enrollSecurityQuestion(Map<String?, String?> questions) async {
+    final String __pigeon_channelName = 'dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.enrollSecurityQuestion$__pigeon_messageChannelSuffix';
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
+      __pigeon_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: __pigeon_binaryMessenger,
+    );
+    final List<Object?>? __pigeon_replyList =
+        await __pigeon_channel.send(<Object?>[questions]) as List<Object?>?;
+    if (__pigeon_replyList == null) {
+      throw _createConnectionError(__pigeon_channelName);
+    } else if (__pigeon_replyList.length > 1) {
+      throw PlatformException(
+        code: __pigeon_replyList[0]! as String,
+        message: __pigeon_replyList[1] as String?,
+        details: __pigeon_replyList[2],
+      );
+    } else if (__pigeon_replyList[0] == null) {
+      throw PlatformException(
+        code: 'null-error',
+        message: 'Host platform returned null value for non-null return value.',
+      );
+    } else {
+      return (__pigeon_replyList[0] as bool?)!;
     }
   }
 }

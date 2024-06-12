@@ -16,6 +16,8 @@ case generalError(String)
 
 
 public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginApi {
+ 
+    
     
 
     let browserAuth = WebAuthentication.shared
@@ -328,7 +330,7 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
         idx.startUserEnrollmentFlow(firstName: firstName, lastName: lastName, email: email, completion: completion)
     }
     
-    func recoverPassword(identifier: String, completion: @escaping (Result<IdxResponse, Error>) -> Void) {
+    func recoverPassword(identifier: String, completion: @escaping (Result<Bool, Error>) -> Void) {
         idx.recoverPassword(identifier: identifier, completion: completion)
     }
     
@@ -363,10 +365,7 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
         idx.getRemidiationAuthenticators(remidiation: remidiation,fields: fields, completion: completion)
         
     }
-    
-    func continueWithEmailCode(code: String, completion: @escaping (Result<IdxResponse?, Error>) -> Void) {
-        idx.continueWithEmailCode(code: code, completion: completion)
-    }
+
     
     func sendEmailCode(completion: @escaping (Result<Void, Error>) -> Void) {
         idx.sendEmailCode(completion: completion)
@@ -379,14 +378,21 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
     func pollEmailCode(completion: @escaping (Result<IdxResponse?, Error>) -> Void) {
         idx.pollEmailCode(completion: completion)
     }
+    
+    func getEnrollmentOptions(completion: @escaping (Result<String, Error>) -> Void) {
+       
+    }
+    
+    func enrollSecurityQuestion(questions: [String : String], completion: @escaping (Result<Bool, Error>) -> Void) {
+        
+    }
 
 }
- 
 
 
 // Move this somewhere else
 extension Response.Intent{
-        public var getIndex: Int64{
+    public var getIndex: Int64{
         switch self{
         case .enrollNewUser:
             return   0
@@ -397,7 +403,7 @@ extension Response.Intent{
         case .credentialUnenrollment:
             return 3
         case .credentialRecovery:
-          return 4
+            return 4
         case .credentialModify:
             return  5
         default:
@@ -405,7 +411,9 @@ extension Response.Intent{
         }
     }
     
+    
 }
+ 
 
 extension Date {
     var millisecondsSince1970:Int64 {

@@ -161,7 +161,7 @@ class Idx {
     return result;
   }
 
-  Future<IdxResponse> recoverPassword(String identifier) async {
+  Future<bool> recoverPassword(String identifier) async {
     var result = await instance.recoverPassword(identifier);
     return result;
   }
@@ -209,18 +209,13 @@ class Idx {
     return result;
   }
 
-  // Future<IdxResponse?> continueWithPasscode(String passcode) async {
-  //   var result = await instance.continueWithPasscode(passcode);
-  //   return result;
-  // }
-
-  Future<IdxResponse?> continueWithGoogleAuthenticator(String code) async {
-    var result = await instance.continueWithGoogleAuthenticator(code);
+  Future<IdxResponse?> continueWithPasscode(String passcode) async {
+    var result = await instance.continueWithPasscode(passcode);
     return result;
   }
 
-  Future<IdxResponse?> continueWithEmailCode(String code) async {
-    var result = await instance.continueWithEmailCode(code);
+  Future<IdxResponse?> continueWithGoogleAuthenticator(String code) async {
+    var result = await instance.continueWithGoogleAuthenticator(code);
     return result;
   }
 
@@ -230,6 +225,11 @@ class Idx {
 
   Future<IdxResponse?> pollEmailCode() async {
     var result = await instance.pollEmailCode();
+    return result;
+  }
+
+  Future<String> getEnrollmentOptions() async {
+    var result = await instance.getEnrollmentOptions();
     return result;
   }
 }

@@ -171,7 +171,18 @@ public class HSSOktaFlutterIdx{
         
     }
     
-    func recoverPassword(identifier: String, completion: @escaping (Result<IdxResponse, Error>) -> Void) {
+    func recoverPassword(identifier: String, completion: @escaping (Result<Bool, Error>) -> Void) {
+        
+        if(idxFlow.context == nil){
+            Task{
+                if #available(iOS 15.0, *) {
+                    try await idxFlow.start()
+                } else {
+                    completion(.failure(HssOktaError.generalError("This methid is only available for iOS 15.0 and above")))
+                }
+            }
+        }
+        
             idxFlow.resume(completion:{ result in
                 switch(result){
                 case .success(let resultResponse):
@@ -192,21 +203,25 @@ public class HSSOktaFlutterIdx{
                                     guard let remediation = response.remediations[.identifyRecovery],
                                           let identifierField = remediation["identifier"]
                                     else {
-                                        // Handle error
+                                        completion(.failure(HssOktaError.generalError("Failed to find remediation identify recovery")))
                                         return
                                     }
 
                                     identifierField.value = identifier
-
-                                    if #available(iOS 15.0, *) {
-                                        response =  try await recoverable.recover()
-                                        
-                                        completion(.success(self.mapResponeToIdxResponse(response:response, token: nil)))
-                                        
-                                    } else {
-                                        completion(.failure(HssOktaError.generalError("This methid is only available for iOS 15.0 and above")))
-                                    }
                                     
+                                    remediation.proceed(completion:{ proceedResult in
+                                        
+                                        switch(proceedResult){
+                                        case .success(let proceedRespnse):
+                                            completion(.success(true))
+                                            break
+                                            
+                                        case .failure(let error):
+                                            completion(.failure(HssOktaError.generalError(error.localizedDescription)))
+                                        }
+                                        
+                                    })
+
                                 }
                                 
                                 break
@@ -589,6 +604,8 @@ public class HSSOktaFlutterIdx{
                     let googleAuthOption = authenticator.options?.first(where: {field -> Bool in
                         field.label == "Google Authenticator"
                     })
+                
+                
                     
                     authenticator.selectedOption = googleAuthOption
 //                    authenticator.value = code
@@ -674,50 +691,7 @@ public class HSSOktaFlutterIdx{
     }
    
     
-    func continueWithEmailCode(code: String, completion: @escaping (Result<IdxResponse?, Error>)-> Void) {
-        idxFlow.resume(completion: {resumeResult in
-            switch(resumeResult){
-            case .success(let resumeResponse):
-             guard let authenticator = resumeResponse.remediations[.challengeAuthenticator],
-                let codeField = authenticator["credentials.passcode"]
-                else{
-                   completion(.failure(HssOktaError.generalError("Failed to find remediation for challenge Authenticator")))
-                   return
-               }
-                
-                codeField.value = code
-                authenticator.proceed(completion:{authResult in
-                    switch(authResult){
-                    case .success(let emailAuthResult):
-                        guard emailAuthResult.isLoginSuccessful
-                        else{
-                            completion(.failure(HssOktaError.generalError("Login Failed : \(emailAuthResult.messages.allMessages.first?.message ?? "Unknown error")")))
-                            return
-                        }
-                        
-                        emailAuthResult.exchangeCode(completion:{exchangeResult in
-                            switch(exchangeResult){
-                            case .success(let token):
-                                completion(.success(self.mapResponeToIdxResponse(response:emailAuthResult , token: self.mapToOktaToken(token: token))))
-                            break
-                            case .failure(let error):
-                                completion(.failure(HssOktaError.generalError(error.localizedDescription)))
-                            }
-                        })
-                        
-                        break
-                    case .failure(let error):
-                        completion(.failure(HssOktaError.generalError(error.localizedDescription)))
-                    }})
-                
-                
-                break
-                
-            case .failure(let error):
-                completion(.failure(HssOktaError.generalError(error.localizedDescription)))
-            }
-        })
-     }
+  
     
     func pollEmailCode(completion: @escaping (Result<IdxResponse?, Error>) -> Void) {
 //        TESTING ON HOLD, CAN'T FIND THE MAGIC LINK URI SETTINGS ON OKTA
@@ -775,5 +749,26 @@ public class HSSOktaFlutterIdx{
             }
         })
 
+    }
+    
+    func getEnrollmentOptions(completion: @escaping (Result<String, Error>) -> Void) {
+        idxFlow.resume(completion: {resumeResult in
+            switch(resumeResult){
+            case .success(let resumeResponse):
+                guard let remediation = resumeResponse.remediations[.identify]
+                else{
+                    completion(.failure(HssOktaError.generalError("Failed to find remediation for enroll authenticator")))
+                    return
+                }
+                
+                let r = remediation.authenticators
+                
+
+                break
+                
+            case .failure(let error):
+                completion(.failure(HssOktaError.generalError(error.localizedDescription)))
+            }
+        })
     }
 }

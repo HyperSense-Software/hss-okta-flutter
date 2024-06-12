@@ -69,8 +69,8 @@ abstract class HssOktaFlutterPlatformInterface extends PlatformInterface {
           {String? email, required String remidiation}) =>
       throw UnimplementedError();
 
-  // Future<IdxResponse?> continueWithPasscode(String passcode) =>
-  //     throw UnimplementedError();
+  Future<IdxResponse?> continueWithPasscode(String passcode) =>
+      throw UnimplementedError();
 
   Future<bool> startSMSPhoneEnrollment(String phoneNumber) =>
       throw UnimplementedError();
@@ -84,8 +84,7 @@ abstract class HssOktaFlutterPlatformInterface extends PlatformInterface {
   }) =>
       throw UnimplementedError();
 
-  Future<IdxResponse> recoverPassword(String identifier) =>
-      throw UnimplementedError();
+  Future<bool> recoverPassword(String identifier) => throw UnimplementedError();
 
   Future<IdxResponse?> getIdxResponse() => throw UnimplementedError();
 
@@ -104,10 +103,12 @@ abstract class HssOktaFlutterPlatformInterface extends PlatformInterface {
   Future<IdxResponse?> continueWithGoogleAuthenticator(String code) =>
       throw UnimplementedError();
 
-  Future<IdxResponse?> continueWithEmailCode(String code) =>
-      throw UnimplementedError();
-
   Future<void> sendEmailCode() => throw UnimplementedError();
 
   Future<IdxResponse?> pollEmailCode() => throw UnimplementedError();
+
+  Future<String> getEnrollmentOptions() => throw UnimplementedError();
+
+  Future<bool> enrollSecurityQuestion(Map<String, String> question) =>
+      throw UnimplementedError();
 }

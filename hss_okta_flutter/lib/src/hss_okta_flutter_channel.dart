@@ -105,10 +105,10 @@ class HssOktaFlutterChannel extends HssOktaFlutterPlatformInterface {
         email: email, remidiation: remidiation);
   }
 
-  // @override
-  // Future<IdxResponse?> continueWithPasscode(String passcode) async {
-  //   return await _api.continueWithPasscode(passcode);
-  // }
+  @override
+  Future<IdxResponse?> continueWithPasscode(String passcode) async {
+    return await _api.continueWithPasscode(passcode);
+  }
 
   @override
   Future<bool> startSMSPhoneEnrollment(String phoneNumber) async {
@@ -131,7 +131,7 @@ class HssOktaFlutterChannel extends HssOktaFlutterPlatformInterface {
   }
 
   @override
-  Future<IdxResponse> recoverPassword(String identifier) {
+  Future<bool> recoverPassword(String identifier) {
     return _api.recoverPassword(identifier);
   }
 
@@ -173,10 +173,10 @@ class HssOktaFlutterChannel extends HssOktaFlutterPlatformInterface {
     return _api.continueWithGoogleAuthenticator(code);
   }
 
-  @override
-  Future<IdxResponse?> continueWithEmailCode(String code) {
-    return _api.continueWithEmailCode(code);
-  }
+  // @override
+  // Future<IdxResponse?> continueWithEmailCode(String code) {
+  //   return _api.continueWithEmailCode(code);
+  // }
 
   @override
   Future<void> sendEmailCode() {
@@ -186,5 +186,15 @@ class HssOktaFlutterChannel extends HssOktaFlutterPlatformInterface {
   @override
   Future<IdxResponse?> pollEmailCode() {
     return _api.pollEmailCode();
+  }
+
+  @override
+  Future<String> getEnrollmentOptions() {
+    return _api.getEnrollmentOptions();
+  }
+
+  @override
+  Future<bool> enrollSecurityQuestion(Map<String, String> question) {
+    return _api.enrollSecurityQuestion(question);
   }
 }

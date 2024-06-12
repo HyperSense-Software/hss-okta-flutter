@@ -372,7 +372,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             OutlinedButton(
                                 onPressed: () async {
                                   var result = await plugin.idx
-                                      .continueWithEmailCode(
+                                      .continueWithPasscode(
                                           _emailCodeController.text);
                                   Navigator.pop(context);
                                   log(result?.token?.accessToken ?? '');
@@ -409,7 +409,7 @@ class _HomeScreenState extends State<HomeScreen> {
               showDialog(
                   context: context,
                   builder: (c) => AlertDialog(
-                        title: const Text('Email Code'),
+                        title: const Text('Google OTP code'),
                         content: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
@@ -432,6 +432,18 @@ class _HomeScreenState extends State<HomeScreen> {
             },
             child: const Text(
               'Login with Google Authenticator',
+            ),
+          ),
+          OutlinedButton(
+            onPressed: () async {
+              final plugin = PluginProvider.of(context).plugin;
+              final res =
+                  await plugin.idx.recoverPassword(_idxusernamecontroller.text);
+
+              // log(res?.token?.accessToken ?? '');
+            },
+            child: const Text(
+              'Recover Password',
             ),
           ),
         ],
