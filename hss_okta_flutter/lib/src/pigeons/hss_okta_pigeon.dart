@@ -184,9 +184,6 @@ abstract class HssOktaFlutterPluginApi {
 
   // Continues
 
-  // @async
-  // IdxResponse? continueWithPassword({required String password});
-
   @async
   bool continueSMSPhoneEnrollment(String passcode);
 

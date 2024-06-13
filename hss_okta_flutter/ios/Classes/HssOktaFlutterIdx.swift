@@ -4,6 +4,14 @@ public class HSSOktaFlutterIdx{
     
     init() throws{
         idxFlow = try InteractionCodeFlow()
+        
+        Task{
+                        if #available(iOS 15.0, *) {
+                try await idxFlow.start()
+            } else {
+                throw HssOktaError.configError("This Wrapper is only available for iOS 15.0")
+            }
+        }
     }
     
     
@@ -172,16 +180,7 @@ public class HSSOktaFlutterIdx{
     }
     
     func recoverPassword(identifier: String, completion: @escaping (Result<Bool, Error>) -> Void) {
-        
-        if(idxFlow.context == nil){
-            Task{
-                if #available(iOS 15.0, *) {
-                    try await idxFlow.start()
-                } else {
-                    completion(.failure(HssOktaError.generalError("This methid is only available for iOS 15.0 and above")))
-                }
-            }
-        }
+      
         
             idxFlow.resume(completion:{ result in
                 switch(result){
@@ -194,12 +193,7 @@ public class HSSOktaFlutterIdx{
                             case .success(let recoverResult):
                                 Task{
                                     var response = recoverResult
-                                    var remediations = [String]()
-                                    
-                                    response.remediations.forEach{ r in
-                                        remediations.append(r.name)
-                                    }
-                                    
+
                                     guard let remediation = response.remediations[.identifyRecovery],
                                           let identifierField = remediation["identifier"]
                                     else {
@@ -209,11 +203,37 @@ public class HSSOktaFlutterIdx{
 
                                     identifierField.value = identifier
                                     
+                                
+                                    
                                     remediation.proceed(completion:{ proceedResult in
                                         
                                         switch(proceedResult){
-                                        case .success(let proceedRespnse):
-                                            completion(.success(true))
+                                        case .success(let proceedResponse):
+                                           guard let verification = proceedResponse.remediations[.authenticatorVerificationData],
+                                                 let methodType = verification.form["authenticator.methodType"]
+                                                    
+                                            else{
+                                               return
+                                           }
+                                            
+                                            let option = methodType.options?.first
+                                            
+                                            methodType.selectedOption = option
+                                            
+                                            verification.proceed(completion:{
+                                                verificationResult in
+                                                switch(verificationResult){
+                                                case .success(let verificationResultResponse):
+                                                    
+                                                    
+                                                    
+                                                    completion(.success(true))
+                                                    break
+                                                case .failure(let error):
+                                                    completion(.failure(HssOktaError.generalError(error.localizedDescription)))
+                                                }
+                                            })
+
                                             break
                                             
                                         case .failure(let error):
@@ -234,7 +254,7 @@ public class HSSOktaFlutterIdx{
                        
                        
                     }else{
-                        completion(.failure(HssOktaError.generalError("Password Recovery is not enabled")))
+                        completion(.failure(HssOktaError.generalError("Failed to recover password : \(response.messages.allMessages.first?.message ?? "Unknown error")")))
                     }
                     break
                 case .failure(let error):
@@ -245,32 +265,7 @@ public class HSSOktaFlutterIdx{
     }
     
     func getRemidiations(completion: @escaping (Result<[String], Error>) -> Void) {
-        
-        if(idxFlow.context == nil){
-            Task{
-                if #available(iOS 15.0, *) {
-                    idxFlow.start(completion: {response in
-                        switch(response){
-                        case .success(let result):
-                            var remidiationOptions = [String]()
-                            
-                            result.remediations.forEach{ option in
-                                remidiationOptions.append(option.name)
-                            }
-                            
-                            completion(.success(remidiationOptions))
-                            
-                        case .failure(let error):
-                            completion(.failure(HssOktaError.generalError(error.localizedDescription)))
-                        }
-                        
-                    })
-                } else {
-                    completion(.failure(HssOktaError.configError("Only Available to iOS 15.*")))
-                }
-            }
-        }else{
-            
+        Task{
             
             idxFlow.resume(completion: {resumeResult in
                 switch(resumeResult){
@@ -288,7 +283,8 @@ public class HSSOktaFlutterIdx{
                     completion(.failure(HssOktaError.generalError(error.localizedDescription)))
                 }
                 
-            })}
+            })
+        }
     }
     
     func getIdxResponse(completion: @escaping (Result<IdxResponse?, Error>) -> Void){
@@ -322,44 +318,7 @@ public class HSSOktaFlutterIdx{
     }
     
     func getRemidiationsFields(remidiation: String,fields:String?, completion: @escaping (Result<[String], Error>) -> Void) {
-        
-        if(idxFlow.context == nil){
-            Task{
-                if #available(iOS 15.0, *) {
-                     idxFlow.start(completion: {response in
-                        
-                        switch(response){
-                        case .success(let result):
-                            var forms = [String]()
-                            let remidiationForm = result.remediations[remidiation]
-                            
-                            if(fields != nil){
-                                remidiationForm?[fields!]?.form?.forEach({
-                                    forms.append($0.name ?? "")
-                                })
-
-                            }else{
-                                remidiationForm?.form.fields.forEach({
-                                    forms.append($0.name ?? "")
-                                })
-                            }
-                            completion(.success(forms))
-                            break
-                            
-                        case .failure(let error):
-                            completion(.failure(HssOktaError.generalError(error.localizedDescription)))
-                        }
-                    })
-                    
-                    
-              
-                    
-                } else {
-                    completion(.failure(HssOktaError.configError("Only Available to iOS 15.*")))
-                }
-            }
-        }else{
-            
+      
             idxFlow.resume(completion: {result in
                 
                 switch(result){
@@ -386,7 +345,7 @@ public class HSSOktaFlutterIdx{
                     completion(.failure(HssOktaError.generalError(error.localizedDescription)))
                 }
                 
-            })}
+            })
         
     }
     
@@ -465,15 +424,14 @@ public class HSSOktaFlutterIdx{
                     case .success(let result):
                         
                         var response = result
-                        guard let remediation = result.remediations[.identify],
-                              let identifier = remediation["identifier"],
+                        guard let remediation = result.remediations[.challengeAuthenticator],
                                 let passcodeField = remediation["credentials.passcode"]
                         else{
                             completion(.failure(HssOktaError.generalError(response.messages.allMessages.first?.message ?? "Remidation was not found")))
                             return
                         }
                         
-                        identifier.value = response.user?.username
+                  
                         passcodeField.value = passcode
                         
                         if #available(iOS 15.0, *) {
@@ -529,38 +487,7 @@ public class HSSOktaFlutterIdx{
     }
     
     func getRemidiationAuthenticators(remidiation: String, fields: String?, completion: @escaping (Result<[String], Error>) -> Void) {
-        if(idxFlow.context == nil){
-            Task{
-                if #available(iOS 15.0, *) {
-                     idxFlow.start(completion: {result in
-                                              switch(result){
-                        case .success(let response):
-                            var authenticators = [String]()
-                            let remediation = response.remediations[remidiation]
-                            
-                            if(fields == nil){
-                                response.authenticators.forEach({
-                                    authenticators.append($0.displayName ?? "")
-                                })
 
-                            }else{
-                                remediation?[fields!]?.options?.forEach({
-                                    authenticators.append($0.label ?? "")
-                                })
-                            }
-                            completion(.success(authenticators))
-                            break
-                            
-                        case .failure(let error):
-                            completion(.failure(HssOktaError.generalError(error.localizedDescription)))
-                        }
-                    })
-                    
-                } else {
-                    completion(.failure(HssOktaError.configError("Only Available to iOS 15.*")))
-                }
-            }
-        }else{
             
             idxFlow.resume(completion: {result in
                 
@@ -587,7 +514,7 @@ public class HSSOktaFlutterIdx{
                     completion(.failure(HssOktaError.generalError(error.localizedDescription)))
                 }
                 
-            })}
+            })
     }
     
     func continueWithGoogleAuthenticator(code: String, completion: @escaping (Result<IdxResponse?, Error>) -> Void){
