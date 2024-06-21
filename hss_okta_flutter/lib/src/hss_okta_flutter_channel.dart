@@ -122,12 +122,10 @@ class HssOktaFlutterChannel extends HssOktaFlutterPlatformInterface {
 
   @override
   Future<bool> startUserEnrollmentFlow({
-    required String firstName,
-    required String lastName,
     required String email,
+    required Map<String, String> details,
   }) {
-    return _api.startUserEnrollmentFlow(
-        firstName: firstName, lastName: lastName, email: email);
+    return _api.startUserEnrollmentFlow(email: email, details: details);
   }
 
   @override

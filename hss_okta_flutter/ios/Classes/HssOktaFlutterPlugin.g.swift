@@ -371,13 +371,13 @@ protocol HssOktaFlutterPluginApi {
   func continueWithPasscode(passcode: String, completion: @escaping (Result<IdxResponse?, Error>) -> Void)
   func sendEmailCode(completion: @escaping (Result<Void, Error>) -> Void)
   func pollEmailCode(completion: @escaping (Result<IdxResponse?, Error>) -> Void)
-  func startUserEnrollmentFlow(firstName: String, lastName: String, email: String, completion: @escaping (Result<Bool, Error>) -> Void)
   func recoverPassword(identifier: String, completion: @escaping (Result<Bool, Error>) -> Void)
   func getIdxResponse(completion: @escaping (Result<IdxResponse?, Error>) -> Void)
   func cancelCurrentTransaction(completion: @escaping (Result<Bool, Error>) -> Void)
   func getRemidiations(completion: @escaping (Result<[String], Error>) -> Void)
   func getRemidiationsFields(remidiation: String, fields: String?, completion: @escaping (Result<[String], Error>) -> Void)
   func getRemidiationAuthenticators(remidiation: String, fields: String?, completion: @escaping (Result<[String], Error>) -> Void)
+  func startUserEnrollmentFlow(email: String, details: [String: String], completion: @escaping (Result<Bool, Error>) -> Void)
   func getEnrollmentOptions(completion: @escaping (Result<String, Error>) -> Void)
   func enrollSecurityQuestion(questions: [String: String], completion: @escaping (Result<Bool, Error>) -> Void)
 }
@@ -716,25 +716,6 @@ class HssOktaFlutterPluginApiSetup {
     } else {
       pollEmailCodeChannel.setMessageHandler(nil)
     }
-    let startUserEnrollmentFlowChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.startUserEnrollmentFlow\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-    if let api = api {
-      startUserEnrollmentFlowChannel.setMessageHandler { message, reply in
-        let args = message as! [Any?]
-        let firstNameArg = args[0] as! String
-        let lastNameArg = args[1] as! String
-        let emailArg = args[2] as! String
-        api.startUserEnrollmentFlow(firstName: firstNameArg, lastName: lastNameArg, email: emailArg) { result in
-          switch result {
-          case .success(let res):
-            reply(wrapResult(res))
-          case .failure(let error):
-            reply(wrapError(error))
-          }
-        }
-      }
-    } else {
-      startUserEnrollmentFlowChannel.setMessageHandler(nil)
-    }
     let recoverPasswordChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.recoverPassword\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       recoverPasswordChannel.setMessageHandler { message, reply in
@@ -832,6 +813,24 @@ class HssOktaFlutterPluginApiSetup {
       }
     } else {
       getRemidiationAuthenticatorsChannel.setMessageHandler(nil)
+    }
+    let startUserEnrollmentFlowChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.startUserEnrollmentFlow\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      startUserEnrollmentFlowChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let emailArg = args[0] as! String
+        let detailsArg = args[1] as! [String: String]
+        api.startUserEnrollmentFlow(email: emailArg, details: detailsArg) { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      startUserEnrollmentFlowChannel.setMessageHandler(nil)
     }
     let getEnrollmentOptionsChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.getEnrollmentOptions\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {

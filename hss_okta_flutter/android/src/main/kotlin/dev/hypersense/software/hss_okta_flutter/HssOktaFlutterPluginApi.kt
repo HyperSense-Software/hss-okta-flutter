@@ -378,13 +378,13 @@ interface HssOktaFlutterPluginApi {
   fun continueWithPasscode(passcode: String, callback: (Result<IdxResponse?>) -> Unit)
   fun sendEmailCode(callback: (Result<Unit>) -> Unit)
   fun pollEmailCode(callback: (Result<IdxResponse?>) -> Unit)
-  fun startUserEnrollmentFlow(firstName: String, lastName: String, email: String, callback: (Result<Boolean>) -> Unit)
   fun recoverPassword(identifier: String, callback: (Result<Boolean>) -> Unit)
   fun getIdxResponse(callback: (Result<IdxResponse?>) -> Unit)
   fun cancelCurrentTransaction(callback: (Result<Boolean>) -> Unit)
   fun getRemidiations(callback: (Result<List<String>>) -> Unit)
   fun getRemidiationsFields(remidiation: String, fields: String?, callback: (Result<List<String>>) -> Unit)
   fun getRemidiationAuthenticators(remidiation: String, fields: String?, callback: (Result<List<String>>) -> Unit)
+  fun startUserEnrollmentFlow(email: String, details: Map<String, String>, callback: (Result<Boolean>) -> Unit)
   fun getEnrollmentOptions(callback: (Result<String>) -> Unit)
   fun enrollSecurityQuestion(questions: Map<String, String>, callback: (Result<Boolean>) -> Unit)
 
@@ -783,28 +783,6 @@ interface HssOktaFlutterPluginApi {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.startUserEnrollmentFlow$separatedMessageChannelSuffix", codec)
-        if (api != null) {
-          channel.setMessageHandler { message, reply ->
-            val args = message as List<Any?>
-            val firstNameArg = args[0] as String
-            val lastNameArg = args[1] as String
-            val emailArg = args[2] as String
-            api.startUserEnrollmentFlow(firstNameArg, lastNameArg, emailArg) { result: Result<Boolean> ->
-              val error = result.exceptionOrNull()
-              if (error != null) {
-                reply.reply(wrapError(error))
-              } else {
-                val data = result.getOrNull()
-                reply.reply(wrapResult(data))
-              }
-            }
-          }
-        } else {
-          channel.setMessageHandler(null)
-        }
-      }
-      run {
         val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.recoverPassword$separatedMessageChannelSuffix", codec)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
@@ -907,6 +885,27 @@ interface HssOktaFlutterPluginApi {
             val remidiationArg = args[0] as String
             val fieldsArg = args[1] as String?
             api.getRemidiationAuthenticators(remidiationArg, fieldsArg) { result: Result<List<String>> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(wrapResult(data))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.startUserEnrollmentFlow$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val emailArg = args[0] as String
+            val detailsArg = args[1] as Map<String, String>
+            api.startUserEnrollmentFlow(emailArg, detailsArg) { result: Result<Boolean> ->
               val error = result.exceptionOrNull()
               if (error != null) {
                 reply.reply(wrapError(error))

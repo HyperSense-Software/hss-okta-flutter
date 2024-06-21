@@ -200,12 +200,6 @@ abstract class HssOktaFlutterPluginApi {
   IdxResponse? pollEmailCode();
 
   @async
-  bool startUserEnrollmentFlow(
-      {required String firstName,
-      required String lastName,
-      required String email});
-
-  @async
   bool recoverPassword(String identifier);
 
   @async
@@ -226,6 +220,13 @@ abstract class HssOktaFlutterPluginApi {
       {String? fields});
 
   // Enrollments
+
+  @async
+  bool startUserEnrollmentFlow({
+    required String email,
+    required Map<String, String> details,
+  });
+
   @async
   String getEnrollmentOptions();
 

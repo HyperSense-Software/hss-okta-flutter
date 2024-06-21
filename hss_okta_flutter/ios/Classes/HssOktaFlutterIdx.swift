@@ -143,34 +143,38 @@ public class HSSOktaFlutterIdx{
         
     }
     
-    func startUserEnrollmentFlow(firstName: String, lastName: String, email: String, completion: @escaping (Result<Bool, Error>) -> Void) {
+    func startUserEnrollmentFlow(email: String,details: [String : String],  completion: @escaping (Result<Bool, Error>) -> Void) {
             Task{
                 if #available(iOS 15.0, *) {
-                    var response = try await idxFlow.start()
-                    guard let remediation = response.remediations[.selectEnrollProfile] else {
+                    
+                    var response = idxFlow.context != nil ? try await idxFlow.resume() : try await idxFlow.start()
+                    
+                    guard let selectEnrollRemediation = response.remediations[.selectEnrollProfile] else {
                         completion(.failure(HssOktaError.generalError("The organization doesn't have enrollProfile enabled")))
                         return
                     }
                     
-                    response = try await remediation.proceed()
-                    guard let remediation = response.remediations[.enrollProfile],
-                          let firstNameField = remediation["userProfile.firstName"],
-                          let lastNameField = remediation["userProfile.lastName"],
-                          let emailField = remediation["userProfile.email"]
+                    response = try await selectEnrollRemediation.proceed()
+                    
+                    guard let enrollRemediation = response.remediations[.enrollProfile],
+                          let emailField = enrollRemediation["userProfile.email"],
+                          let passwordField = enrollRemediation["credentials.passcode"]
                     else {
                         let error = response.messages.first?.message
                         completion(.failure(HssOktaError.generalError("Failed with remidation : \(error ?? "unknown error")")))
                         return
                     }
                     
-                    firstNameField.value = firstName
-                    lastNameField.value = lastName
                     emailField.value = email
+                    passwordField.value = "23321122aA"
+                    details.forEach({key,value in
+                        enrollRemediation[key]?.value = value
+                    })
                     
-                    _ = try await remediation.proceed()
+                    response =  try await enrollRemediation.proceed()
+                   
                     completion(.success(true))
-
-                    
+                   
                 } else {
                     completion(.failure(HssOktaError.generalError("This is only available for iOS 15.0 and above")))
                 }
@@ -555,14 +559,14 @@ public class HSSOktaFlutterIdx{
                                 case .success(let googleAuthResult):
                                     guard googleAuthResult.isLoginSuccessful
                                     else{
-                                        completion(.failure(HssOktaError.generalError("Login Failed : \(newResponse.messages.allMessages.first?.message ?? "Unknown error")")))
+                                        completion(.failure(HssOktaError.generalError("Login Failed : \(googleAuthResult.messages.allMessages.first?.message ?? "Unknown error")")))
                                         return
                                     }
                                     
                                     googleAuthResult.exchangeCode(completion:{exchangeResult in
                                         switch(exchangeResult){
                                         case .success(let token):
-                                            completion(.success(self.mapResponeToIdxResponse(response: newResponse, token: self.mapToOktaToken(token: token))))
+                                            completion(.success(self.mapResponeToIdxResponse(response: googleAuthResult, token: self.mapToOktaToken(token: token))))
                                         break
                                         case .failure(let error):
                                             completion(.failure(HssOktaError.generalError(error.localizedDescription)))

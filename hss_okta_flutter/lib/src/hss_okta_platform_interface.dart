@@ -78,9 +78,8 @@ abstract class HssOktaFlutterPlatformInterface extends PlatformInterface {
       throw UnimplementedError();
 
   Future<bool> startUserEnrollmentFlow({
-    required String firstName,
-    required String lastName,
     required String email,
+    required Map<String, String> details,
   }) =>
       throw UnimplementedError();
 

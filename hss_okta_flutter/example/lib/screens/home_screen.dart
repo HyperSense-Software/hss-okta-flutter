@@ -328,8 +328,10 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(
             height: 12,
           ),
+          // Hide input
           TextFormField(
             controller: _idxpasswordcontroller,
+            obscureText: true,
             decoration: const InputDecoration(
               label: Text('Password'),
               hintText: 'Enter your Password',
@@ -346,6 +348,15 @@ class _HomeScreenState extends State<HomeScreen> {
                   _idxusernamecontroller.text, _idxpasswordcontroller.text);
 
               log(res?.token?.accessToken ?? '');
+
+              if (mounted) {
+                await showDialog(
+                    context: context,
+                    builder: (c) => AlertDialog(
+                          title: const Text('Success'),
+                          content: Text('Token: ${res?.token?.accessToken}'),
+                        ));
+              }
             },
             child: const Text(
               'Login with email and password',
@@ -375,7 +386,25 @@ class _HomeScreenState extends State<HomeScreen> {
                                       .continueWithPasscode(
                                           _emailCodeController.text);
                                   Navigator.pop(context);
-                                  log(result?.token?.accessToken ?? '');
+
+                                  if (mounted) {
+                                    if (result?.isLoginSuccessful ?? false) {
+                                      await showDialog(
+                                          context: context,
+                                          builder: (c) => AlertDialog(
+                                                title: const Text('Success'),
+                                                content: Text(
+                                                    'Token: ${result?.token?.accessToken}'),
+                                              ));
+                                    } else {
+                                      if (res?.messages.isNotEmpty ?? false) {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(SnackBar(
+                                                content: Text(
+                                                    'Error: ${res?.messages?.first ?? ''}')));
+                                      }
+                                    }
+                                  }
                                 },
                                 child: const Text('Submit'))
                           ],
@@ -423,7 +452,17 @@ class _HomeScreenState extends State<HomeScreen> {
                                           _emailCodeController.text);
                                   Navigator.pop(context);
 
-                                  log(result?.token?.accessToken ?? '');
+                                  if (mounted) {
+                                    if (result?.isLoginSuccessful ?? false) {
+                                      await showDialog(
+                                          context: context,
+                                          builder: (c) => AlertDialog(
+                                                title: const Text('Success'),
+                                                content: Text(
+                                                    'Token: ${result?.token?.accessToken}'),
+                                              ));
+                                    }
+                                  }
                                 },
                                 child: const Text('Submit'))
                           ],
@@ -444,6 +483,22 @@ class _HomeScreenState extends State<HomeScreen> {
             },
             child: const Text(
               'Recover Password',
+            ),
+          ),
+          OutlinedButton(
+            onPressed: () async {
+              final plugin = PluginProvider.of(context).plugin;
+              final res = await plugin.idx.startUserEnrollmentFlow(
+                  email: 'akfrancisco23@gmail.com,',
+                  details: {
+                    'userProfile.firstName': 'aldrin',
+                    'userProfile.lastName': 'fren'
+                  });
+              
+              log(result?.token?.accessToken ?? '');
+            },
+            child: const Text(
+              'Enroll Account',
             ),
           ),
         ],

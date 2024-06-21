@@ -16,9 +16,6 @@ case generalError(String)
 
 
 public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginApi {
- 
-    
-    
 
     let browserAuth = WebAuthentication.shared
     var flow : (any AuthenticationFlow)?
@@ -326,8 +323,8 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
         idx.continueSMSPhoneEnrollment(passcode: passcode, completion: completion)
     }
     
-    func startUserEnrollmentFlow(firstName: String, lastName: String, email: String, completion: @escaping (Result<Bool, Error>) -> Void) {
-        idx.startUserEnrollmentFlow(firstName: firstName, lastName: lastName, email: email, completion: completion)
+    func startUserEnrollmentFlow(email: String,details: [String : String],  completion: @escaping (Result<Bool, Error>) -> Void) {
+        idx.startUserEnrollmentFlow(email: email,details:details, completion: completion)
     }
     
     func recoverPassword(identifier: String, completion: @escaping (Result<Bool, Error>) -> Void) {

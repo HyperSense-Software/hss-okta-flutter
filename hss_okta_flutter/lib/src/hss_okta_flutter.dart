@@ -152,12 +152,13 @@ class Idx {
   }
 
   Future<bool> startUserEnrollmentFlow({
-    required String firstName,
-    required String lastName,
     required String email,
+    required Map<String, String> details,
   }) async {
     var result = await instance.startUserEnrollmentFlow(
-        firstName: firstName, lastName: lastName, email: email);
+      email: email,
+      details: details,
+    );
     return result;
   }
 

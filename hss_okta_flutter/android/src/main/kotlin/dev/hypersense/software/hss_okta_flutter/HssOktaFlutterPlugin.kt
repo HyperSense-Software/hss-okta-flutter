@@ -4,6 +4,7 @@ package dev.hypersense.software.hss_okta_flutter
 import android.content.Context
 import android.media.metrics.Event
 import android.os.Build
+import android.util.Log
 import com.okta.authfoundation.claims.*
 import com.okta.authfoundation.client.OidcClient
 import com.okta.authfoundation.client.OidcClientResult
@@ -15,6 +16,8 @@ import com.okta.authfoundation.credential.CredentialDataSource.Companion.createC
 import com.okta.authfoundation.credential.RevokeTokenType
 import com.okta.authfoundation.credential.Token
 import com.okta.authfoundationbootstrap.*
+import com.okta.idx.kotlin.client.InteractionCodeFlow
+import com.okta.idx.kotlin.client.InteractionCodeFlow.Companion.createInteractionCodeFlow
 import com.okta.oauth2.DeviceAuthorizationFlow
 import com.okta.oauth2.DeviceAuthorizationFlow.Companion.createDeviceAuthorizationFlow
 import io.flutter.embedding.engine.plugins.FlutterPlugin
@@ -26,14 +29,20 @@ import dev.hypersense.software.hss_okta.DeviceAuthorizationSession
 import dev.hypersense.software.hss_okta.DirectAuthRequest
 import dev.hypersense.software.hss_okta.HssOktaFlutterPluginApi
 import dev.hypersense.software.hss_okta.DirectAuthenticationResult
+import dev.hypersense.software.hss_okta.IdxResponse
 import dev.hypersense.software.hss_okta.OktaToken
 import dev.hypersense.software.hss_okta.UserInfo
 import io.flutter.plugin.common.EventChannel
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.channels.produce
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import okhttp3.HttpUrl.Companion.toHttpUrl
+import okhttp3.internal.wait
 
 class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
     private var context : Context? = null
@@ -45,10 +54,12 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
 
     private lateinit var deviceAuthorizationFlow : DeviceAuthorizationFlow
     private lateinit var deviceAuthorizationFlowContext : DeviceAuthorizationFlow.Context
-
+    private lateinit var idx : HssOktaFlutterIdx
+   
    private fun initializeOIDC() {
-       println("Initializing OIDC Configuration")
-       var credential: Credential
+       if(context == null){
+           throw  Exception("Context is null")
+       }
 
        val oidcConfiguration = OidcConfiguration(
            clientId =  BuildConfig.CLIENT_ID,
@@ -61,18 +72,9 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
            oidcConfiguration,
            "${BuildConfig.ISSUER}/.well-known/openid-configuration".toHttpUrl(),)
 
-
-       if(context == null){
-           throw  Exception("Context is null")
-       }
-
        CredentialBootstrap.initialize(oidcClient.createCredentialDataSource(context!!))
 
-       println("Done Initializing OIDC Configuration /()")
-
-       CoroutineScope(Dispatchers.IO).launch{
-           credential = CredentialBootstrap.defaultCredential()
-       }
+      this.idx = HssOktaFlutterIdx(oidcClient)
    }
 
     override fun onAttachedToEngine(binding: FlutterPlugin.FlutterPluginBinding) {
@@ -94,12 +96,12 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
 
         context = binding.applicationContext
 
+
         initializeOIDC()
     }
     
     override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
         HssOktaFlutterPluginApi.setUp(binding.binaryMessenger, null)
-
     }
 
 
@@ -329,8 +331,104 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
        throw NotImplementedError()
     }
 
+    override fun authenticateWithEmailAndPassword(
+        email: String,
+        password: String,
+        callback: (Result<IdxResponse?>) -> Unit
+    ) {
+        CoroutineScope(Dispatchers.IO).launch {
+            idx.authenticateWithEmailAndPassword(email, password, callback)
+        }
+    }
 
-    private fun composeOktaResult(res : Token, userInfoResult : OidcUserInfo) : AuthenticationResult{
+    override fun startInteractionCodeFlow(
+        email: String?,
+        remidiation: String,
+        callback: (Result<IdxResponse?>) -> Unit
+    ) {
+        TODO("Not yet implemented")
+    }
+
+    override fun startSMSPhoneEnrollment(phoneNumber: String, callback: (Result<Boolean>) -> Unit) {
+        TODO("Not yet implemented")
+    }
+
+    override fun continueSMSPhoneEnrollment(passcode: String, callback: (Result<Boolean>) -> Unit) {
+        TODO("Not yet implemented")
+    }
+
+    override fun continueWithGoogleAuthenticator(
+        code: String,
+        callback: (Result<IdxResponse?>) -> Unit
+    ) {
+        TODO("Not yet implemented")
+    }
+
+    override fun continueWithPasscode(passcode: String, callback: (Result<IdxResponse?>) -> Unit) {
+        TODO("Not yet implemented")
+    }
+
+    override fun sendEmailCode(callback: (Result<Unit>) -> Unit) {
+        TODO("Not yet implemented")
+    }
+
+    override fun pollEmailCode(callback: (Result<IdxResponse?>) -> Unit) {
+        TODO("Not yet implemented")
+    }
+
+    override fun startUserEnrollmentFlow(
+        email: String,
+        details: Map<String, String>,
+        callback: (Result<Boolean>) -> Unit
+    ) {
+        TODO("Not yet implemented")
+    }
+
+    override fun recoverPassword(identifier: String, callback: (Result<Boolean>) -> Unit) {
+        TODO("Not yet implemented")
+    }
+
+    override fun getIdxResponse(callback: (Result<IdxResponse?>) -> Unit) {
+        TODO("Not yet implemented")
+    }
+
+    override fun cancelCurrentTransaction(callback: (Result<Boolean>) -> Unit) {
+        TODO("Not yet implemented")
+    }
+
+    override fun getRemidiations(callback: (Result<List<String>>) -> Unit) {
+        TODO("Not yet implemented")
+    }
+
+    override fun getRemidiationsFields(
+        remidiation: String,
+        fields: String?,
+        callback: (Result<List<String>>) -> Unit
+    ) {
+        TODO("Not yet implemented")
+    }
+
+    override fun getRemidiationAuthenticators(
+        remidiation: String,
+        fields: String?,
+        callback: (Result<List<String>>) -> Unit
+    ) {
+        TODO("Not yet implemented")
+    }
+
+    override fun getEnrollmentOptions(callback: (Result<String>) -> Unit) {
+        TODO("Not yet implemented")
+    }
+
+    override fun enrollSecurityQuestion(
+        questions: Map<String, String>,
+        callback: (Result<Boolean>) -> Unit
+    ) {
+        TODO("Not yet implemented")
+    }
+
+
+     private fun composeOktaResult(res : Token, userInfoResult : OidcUserInfo) : AuthenticationResult{
         return AuthenticationResult(
             result = DirectAuthenticationResult.SUCCESS,
             token = OktaToken(
@@ -359,9 +457,8 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
 
 }
 
-enum class HssOktaError(value : String){
-    CONFIG_ERROR("Config Error"),
-    CREDENTIAL_ERROR("Credential Error"),
-    GENERAL_ERROR("General Error")
+class HssOktaException : Exception{
+    constructor() : super()
+    constructor(message : String) : super(message)
+    constructor(message: String,cause :Throwable) : super(message,cause)
 }
-
