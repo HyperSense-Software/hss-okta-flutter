@@ -36,11 +36,13 @@ class HssOktaFlutterIdx(oidcClient : OidcClient) {
         val emailField = remediation?.form?.get("identifier")
         val passwordField = remediation?.form?.get("credentials.passcode")
 
-       if(remediation == null || emailField == null || passwordField == null)
-           throw HssOktaException("Failed in finding remediation identify")
+       if(remediation == null || emailField == null || passwordField == null){
+           callback.invoke(Result.failure(HssOktaException("Failed in finding remediation identify")))
+       }
 
-       emailField.value = email
-       passwordField.value = password
+
+       emailField!!.value = email
+       passwordField!!.value = password
 
        val proceedResponse = flow.proceed(remediation).getOrThrow()
 
@@ -68,7 +70,7 @@ class HssOktaFlutterIdx(oidcClient : OidcClient) {
     ) {
  
          var response = flow.resume().getOrThrow()
-         val remediation = response.remediations["selectAuthenticatorAuthenticate"]
+         val remediation = response.remediations["select-authenticator-authenticate"]
          val authenticator = remediation?.get("authenticator")
          val googleAuthOption = authenticator?.options?.find { it.label == "Google Authenticator" }
 
@@ -79,7 +81,7 @@ class HssOktaFlutterIdx(oidcClient : OidcClient) {
          authenticator?.selectedOption = googleAuthOption
          var proceedResponse = flow.proceed(remediation!!).getOrThrow()
 
-         val googleAuth = proceedResponse.remediations["challengeAuthenticator"]
+         val googleAuth = proceedResponse.remediations["challenge-authenticator"]
          val codeField = googleAuth?.get("credentials.passcode")
 
          if(googleAuth == null || codeField == null)
@@ -92,9 +94,18 @@ class HssOktaFlutterIdx(oidcClient : OidcClient) {
 
                  callback.invoke(Result.success(composeIdxResult(token,proceedResponse)))
              }else{
-                 callback.invoke(Result.failure(HssOktaException(
-                     result.messages.messages.first().message ?: "Login Failed, Check your username/password or proceed with another remediation",
-                 )))
+                 val messages = result.messages.messages
+                 if(messages.isEmpty()){
+                     callback.invoke(Result.success(composeIdxResult(
+                     null,result
+                     )))
+                     
+                 }else{
+                     callback.invoke(Result.failure(HssOktaException(
+                         result.messages.messages.first().message,
+                     )))
+                 }
+
              }
          }
     }
