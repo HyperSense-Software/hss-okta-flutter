@@ -365,11 +365,15 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
     }
 
     override fun continueWithPasscode(passcode: String, callback: (Result<IdxResponse?>) -> Unit) {
-        TODO("Not yet implemented")
+        CoroutineScope(Dispatchers.IO).launch {
+            idx.continueWithPasscode(passcode,callback)
+        }
     }
 
     override fun sendEmailCode(callback: (Result<Unit>) -> Unit) {
-        TODO("Not yet implemented")
+        CoroutineScope(Dispatchers.IO).launch{
+            idx.sendEmailCode(callback)
+        }
     }
 
     override fun pollEmailCode(callback: (Result<IdxResponse?>) -> Unit) {

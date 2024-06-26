@@ -99,7 +99,7 @@ class HssOktaFlutterIdx(oidcClient : OidcClient) {
                      callback.invoke(Result.success(composeIdxResult(
                      null,result
                      )))
-                     
+
                  }else{
                      callback.invoke(Result.failure(HssOktaException(
                          result.messages.messages.first().message,
@@ -108,6 +108,58 @@ class HssOktaFlutterIdx(oidcClient : OidcClient) {
 
              }
          }
+
+
+    }
+
+    suspend  fun sendEmailCode(callback: (Result<Unit>) -> Unit) {
+        var response = flow.resume().getOrThrow()
+        val remediation = response.remediations["selectAuthenticatorAuthenticate"]
+        val authenticator = remediation?.get("authenticator")
+        val emailAuthenticator = authenticator?.options?.find { it.label == "Email" }
+
+        if(remediation == null || authenticator == null || emailAuthenticator == null){
+            callback.invoke(Result.failure(HssOktaException("Failed to find remediation")))
+        }
+
+        authenticator?.selectedOption = emailAuthenticator
+        val result = flow.proceed(remediation = remediation!!).getOrThrow()
+        callback.invoke(Result.success(Unit))
+
+
+
+    }
+
+    suspend fun continueWithPasscode(passcode: String, callback: (Result<IdxResponse?>) -> Unit) {
+        var response = flow.resume().getOrThrow()
+        val remediation = response.remediations["challengeAuthenticator"]
+        val passCodeField = remediation?.get("credentials.passcode")
+
+        if(remediation == null || passcode == null || passCodeField == null){
+            callback.invoke(Result.failure(HssOktaException("Failed to find remediation")))
+        }
+        passCodeField?.value = passcode
+        val proceedResponse = flow.proceed(remediation = remediation!!).getOrThrow()
+
+        if(proceedResponse.isLoginSuccessful){
+            val token = flow.exchangeInteractionCodeForTokens(remediation = remediation).getOrThrow()
+
+            callback.invoke(Result.success(composeIdxResult(token,proceedResponse)))
+        }else{
+            val messages = proceedResponse.messages.messages
+            if(messages.isEmpty()){
+                callback.invoke(Result.success(composeIdxResult(
+                    null,proceedResponse
+                )))
+
+            }else{
+                callback.invoke(Result.failure(HssOktaException(
+                    proceedResponse.messages.messages.first().message,
+                )))
+            }
+
+        }
+
     }
     
     private fun composeIdxResult(token : Token?, response : com.okta.idx.kotlin.dto.IdxResponse) : IdxResponse {
