@@ -361,7 +361,7 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
         code: String,
         callback: (Result<IdxResponse?>) -> Unit
     ) {
-        TODO("Not yet implemented")
+        CoroutineScope(Dispatchers.IO).launch { idx.continueWithGoogleAuthenticator(code,callback) }
     }
 
     override fun continueWithPasscode(passcode: String, callback: (Result<IdxResponse?>) -> Unit) {
