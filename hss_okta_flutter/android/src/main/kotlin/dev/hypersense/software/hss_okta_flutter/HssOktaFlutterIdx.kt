@@ -161,6 +161,11 @@ class HssOktaFlutterIdx(oidcClient : OidcClient) {
         }
 
     }
+
+    suspend fun getIdxResponse(callback: (Result<IdxResponse?>) -> Unit){
+        var response = flow.resume().getOrThrow()
+        callback.invoke(Result.success(composeIdxResult(null,response)))
+    }
     
     private fun composeIdxResult(token : Token?, response : com.okta.idx.kotlin.dto.IdxResponse) : IdxResponse {
 

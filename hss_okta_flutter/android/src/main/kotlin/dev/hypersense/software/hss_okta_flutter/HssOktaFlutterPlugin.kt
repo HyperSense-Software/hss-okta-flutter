@@ -391,9 +391,13 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
     override fun recoverPassword(identifier: String, callback: (Result<Boolean>) -> Unit) {
         TODO("Not yet implemented")
     }
-
+    
     override fun getIdxResponse(callback: (Result<IdxResponse?>) -> Unit) {
-        TODO("Not yet implemented")
+        CoroutineScope(Dispatchers.IO).launch{
+            idx.getIdxResponse(callback)
+        }
+
+
     }
 
     override fun cancelCurrentTransaction(callback: (Result<Boolean>) -> Unit) {
