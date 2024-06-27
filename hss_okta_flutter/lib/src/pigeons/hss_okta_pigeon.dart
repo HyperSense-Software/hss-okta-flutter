@@ -104,7 +104,8 @@ class IdxResponse {
   final bool isLoginSuccessful;
   final RequestIntent intent;
   final List<String?> messages;
-  List<String?>? authenticationFactors;
+  List<String?>? remediations;
+  List<String?>? authenticators;
   OktaToken? token;
 
   IdxResponse({
@@ -114,7 +115,8 @@ class IdxResponse {
     required this.intent,
     required this.isLoginSuccessful,
     required this.messages,
-    this.authenticationFactors,
+    this.authenticators,
+    this.remediations,
     this.token,
   });
 }
@@ -209,15 +211,15 @@ abstract class HssOktaFlutterPluginApi {
   @async
   bool cancelCurrentTransaction();
 
-  @async
-  List<String> getRemidiations();
+  // @async
+  // List<String> getRemidiations();
 
-  @async
-  List<String> getRemidiationsFields(String remidiation, {String? fields});
+  // @async
+  // List<String> getRemidiationsFields(String remidiation, {String? fields});
 
-  @async
-  List<String> getRemidiationAuthenticators(String remidiation,
-      {String? fields});
+  // @async
+  // List<String> getRemidiationAuthenticators(String remidiation,
+  //     {String? fields});
 
   // Enrollments
 

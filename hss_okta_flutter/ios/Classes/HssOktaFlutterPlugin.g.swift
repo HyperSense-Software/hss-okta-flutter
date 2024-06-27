@@ -249,7 +249,8 @@ struct IdxResponse {
   var isLoginSuccessful: Bool
   var intent: RequestIntent
   var messages: [String?]
-  var authenticationFactors: [String?]? = nil
+  var remediations: [String?]? = nil
+  var authenticators: [String?]? = nil
   var token: OktaToken? = nil
 
   // swift-format-ignore: AlwaysUseLowerCamelCase
@@ -260,8 +261,9 @@ struct IdxResponse {
     let isLoginSuccessful = __pigeon_list[3] as! Bool
     let intent = RequestIntent(rawValue: __pigeon_list[4] as! Int)!
     let messages = __pigeon_list[5] as! [String?]
-    let authenticationFactors: [String?]? = nilOrValue(__pigeon_list[6])
-    let token: OktaToken? = nilOrValue(__pigeon_list[7])
+    let remediations: [String?]? = nilOrValue(__pigeon_list[6])
+    let authenticators: [String?]? = nilOrValue(__pigeon_list[7])
+    let token: OktaToken? = nilOrValue(__pigeon_list[8])
 
     return IdxResponse(
       expiresAt: expiresAt,
@@ -270,7 +272,8 @@ struct IdxResponse {
       isLoginSuccessful: isLoginSuccessful,
       intent: intent,
       messages: messages,
-      authenticationFactors: authenticationFactors,
+      remediations: remediations,
+      authenticators: authenticators,
       token: token
     )
   }
@@ -282,7 +285,8 @@ struct IdxResponse {
       isLoginSuccessful,
       intent.rawValue,
       messages,
-      authenticationFactors,
+      remediations,
+      authenticators,
       token,
     ]
   }
@@ -374,9 +378,6 @@ protocol HssOktaFlutterPluginApi {
   func recoverPassword(identifier: String, completion: @escaping (Result<Bool, Error>) -> Void)
   func getIdxResponse(completion: @escaping (Result<IdxResponse?, Error>) -> Void)
   func cancelCurrentTransaction(completion: @escaping (Result<Bool, Error>) -> Void)
-  func getRemidiations(completion: @escaping (Result<[String], Error>) -> Void)
-  func getRemidiationsFields(remidiation: String, fields: String?, completion: @escaping (Result<[String], Error>) -> Void)
-  func getRemidiationAuthenticators(remidiation: String, fields: String?, completion: @escaping (Result<[String], Error>) -> Void)
   func startUserEnrollmentFlow(email: String, details: [String: String], completion: @escaping (Result<Bool, Error>) -> Void)
   func getEnrollmentOptions(completion: @escaping (Result<String, Error>) -> Void)
   func enrollSecurityQuestion(questions: [String: String], completion: @escaping (Result<Bool, Error>) -> Void)
@@ -762,57 +763,6 @@ class HssOktaFlutterPluginApiSetup {
       }
     } else {
       cancelCurrentTransactionChannel.setMessageHandler(nil)
-    }
-    let getRemidiationsChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.getRemidiations\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-    if let api = api {
-      getRemidiationsChannel.setMessageHandler { _, reply in
-        api.getRemidiations { result in
-          switch result {
-          case .success(let res):
-            reply(wrapResult(res))
-          case .failure(let error):
-            reply(wrapError(error))
-          }
-        }
-      }
-    } else {
-      getRemidiationsChannel.setMessageHandler(nil)
-    }
-    let getRemidiationsFieldsChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.getRemidiationsFields\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-    if let api = api {
-      getRemidiationsFieldsChannel.setMessageHandler { message, reply in
-        let args = message as! [Any?]
-        let remidiationArg = args[0] as! String
-        let fieldsArg: String? = nilOrValue(args[1])
-        api.getRemidiationsFields(remidiation: remidiationArg, fields: fieldsArg) { result in
-          switch result {
-          case .success(let res):
-            reply(wrapResult(res))
-          case .failure(let error):
-            reply(wrapError(error))
-          }
-        }
-      }
-    } else {
-      getRemidiationsFieldsChannel.setMessageHandler(nil)
-    }
-    let getRemidiationAuthenticatorsChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.getRemidiationAuthenticators\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-    if let api = api {
-      getRemidiationAuthenticatorsChannel.setMessageHandler { message, reply in
-        let args = message as! [Any?]
-        let remidiationArg = args[0] as! String
-        let fieldsArg: String? = nilOrValue(args[1])
-        api.getRemidiationAuthenticators(remidiation: remidiationArg, fields: fieldsArg) { result in
-          switch result {
-          case .success(let res):
-            reply(wrapResult(res))
-          case .failure(let error):
-            reply(wrapError(error))
-          }
-        }
-      }
-    } else {
-      getRemidiationAuthenticatorsChannel.setMessageHandler(nil)
     }
     let startUserEnrollmentFlowChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.startUserEnrollmentFlow\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {

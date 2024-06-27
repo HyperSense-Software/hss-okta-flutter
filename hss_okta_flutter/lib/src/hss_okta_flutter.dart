@@ -177,27 +177,27 @@ class Idx {
     return result;
   }
 
-  Future<List<String?>> getRemidiations() async {
-    var result = await instance.getRemidiations();
-    return result;
-  }
+  // Future<List<String?>> getRemidiations() async {
+  //   var result = await instance.getRemidiations();
+  //   return result;
+  // }
 
-  Future<List<String>> getRemidiationFields(String remidiation,
-      {String? fields}) async {
-    var result = await instance.getRemidiationsFields(
-      remidiation,
-      fields: fields,
-    );
-    return result;
-  }
+  // Future<List<String>> getRemidiationFields(String remidiation,
+  //     {String? fields}) async {
+  //   var result = await instance.getRemidiationsFields(
+  //     remidiation,
+  //     fields: fields,
+  //   );
+  //   return result;
+  // }
 
-  Future<List<String>> getRemidiationAuthenticators(
-      {String remidiation = 'identify', String? fields}) async {
-    var result = await instance.getRemidiationAuthenticators(remidiation,
-        fields: fields);
+  // Future<List<String>> getRemidiationAuthenticators(
+  //     {String remidiation = 'identify', String? fields}) async {
+  //   var result = await instance.getRemidiationAuthenticators(remidiation,
+  //       fields: fields);
 
-    return result;
-  }
+  //   return result;
+  // }
 
   Future<IdxResponse?> startInteractionCodeFlow({
     required String email,

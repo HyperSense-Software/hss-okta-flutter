@@ -257,7 +257,8 @@ data class IdxResponse (
   val isLoginSuccessful: Boolean,
   val intent: RequestIntent,
   val messages: List<String?>,
-  val authenticationFactors: List<String?>? = null,
+  val remediations: List<String?>? = null,
+  val authenticators: List<String?>? = null,
   val token: OktaToken? = null
 
 ) {
@@ -270,9 +271,10 @@ data class IdxResponse (
       val isLoginSuccessful = __pigeon_list[3] as Boolean
       val intent = RequestIntent.ofRaw(__pigeon_list[4] as Int)!!
       val messages = __pigeon_list[5] as List<String?>
-      val authenticationFactors = __pigeon_list[6] as List<String?>?
-      val token = __pigeon_list[7] as OktaToken?
-      return IdxResponse(expiresAt, user, canCancel, isLoginSuccessful, intent, messages, authenticationFactors, token)
+      val remediations = __pigeon_list[6] as List<String?>?
+      val authenticators = __pigeon_list[7] as List<String?>?
+      val token = __pigeon_list[8] as OktaToken?
+      return IdxResponse(expiresAt, user, canCancel, isLoginSuccessful, intent, messages, remediations, authenticators, token)
     }
   }
   fun toList(): List<Any?> {
@@ -283,7 +285,8 @@ data class IdxResponse (
       isLoginSuccessful,
       intent.raw,
       messages,
-      authenticationFactors,
+      remediations,
+      authenticators,
       token,
     )
   }
@@ -381,9 +384,6 @@ interface HssOktaFlutterPluginApi {
   fun recoverPassword(identifier: String, callback: (Result<Boolean>) -> Unit)
   fun getIdxResponse(callback: (Result<IdxResponse?>) -> Unit)
   fun cancelCurrentTransaction(callback: (Result<Boolean>) -> Unit)
-  fun getRemidiations(callback: (Result<List<String>>) -> Unit)
-  fun getRemidiationsFields(remidiation: String, fields: String?, callback: (Result<List<String>>) -> Unit)
-  fun getRemidiationAuthenticators(remidiation: String, fields: String?, callback: (Result<List<String>>) -> Unit)
   fun startUserEnrollmentFlow(email: String, details: Map<String, String>, callback: (Result<Boolean>) -> Unit)
   fun getEnrollmentOptions(callback: (Result<String>) -> Unit)
   fun enrollSecurityQuestion(questions: Map<String, String>, callback: (Result<Boolean>) -> Unit)
@@ -825,66 +825,6 @@ interface HssOktaFlutterPluginApi {
         if (api != null) {
           channel.setMessageHandler { _, reply ->
             api.cancelCurrentTransaction() { result: Result<Boolean> ->
-              val error = result.exceptionOrNull()
-              if (error != null) {
-                reply.reply(wrapError(error))
-              } else {
-                val data = result.getOrNull()
-                reply.reply(wrapResult(data))
-              }
-            }
-          }
-        } else {
-          channel.setMessageHandler(null)
-        }
-      }
-      run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.getRemidiations$separatedMessageChannelSuffix", codec)
-        if (api != null) {
-          channel.setMessageHandler { _, reply ->
-            api.getRemidiations() { result: Result<List<String>> ->
-              val error = result.exceptionOrNull()
-              if (error != null) {
-                reply.reply(wrapError(error))
-              } else {
-                val data = result.getOrNull()
-                reply.reply(wrapResult(data))
-              }
-            }
-          }
-        } else {
-          channel.setMessageHandler(null)
-        }
-      }
-      run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.getRemidiationsFields$separatedMessageChannelSuffix", codec)
-        if (api != null) {
-          channel.setMessageHandler { message, reply ->
-            val args = message as List<Any?>
-            val remidiationArg = args[0] as String
-            val fieldsArg = args[1] as String?
-            api.getRemidiationsFields(remidiationArg, fieldsArg) { result: Result<List<String>> ->
-              val error = result.exceptionOrNull()
-              if (error != null) {
-                reply.reply(wrapError(error))
-              } else {
-                val data = result.getOrNull()
-                reply.reply(wrapResult(data))
-              }
-            }
-          }
-        } else {
-          channel.setMessageHandler(null)
-        }
-      }
-      run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.getRemidiationAuthenticators$separatedMessageChannelSuffix", codec)
-        if (api != null) {
-          channel.setMessageHandler { message, reply ->
-            val args = message as List<Any?>
-            val remidiationArg = args[0] as String
-            val fieldsArg = args[1] as String?
-            api.getRemidiationAuthenticators(remidiationArg, fieldsArg) { result: Result<List<String>> ->
               val error = result.exceptionOrNull()
               if (error != null) {
                 reply.reply(wrapError(error))

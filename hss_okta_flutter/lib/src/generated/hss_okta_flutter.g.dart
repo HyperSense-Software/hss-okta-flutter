@@ -252,7 +252,8 @@ class IdxResponse {
     required this.isLoginSuccessful,
     required this.intent,
     required this.messages,
-    this.authenticationFactors,
+    this.remediations,
+    this.authenticators,
     this.token,
   });
 
@@ -268,7 +269,9 @@ class IdxResponse {
 
   List<String?> messages;
 
-  List<String?>? authenticationFactors;
+  List<String?>? remediations;
+
+  List<String?>? authenticators;
 
   OktaToken? token;
 
@@ -280,7 +283,8 @@ class IdxResponse {
       isLoginSuccessful,
       intent.index,
       messages,
-      authenticationFactors,
+      remediations,
+      authenticators,
       token,
     ];
   }
@@ -294,8 +298,9 @@ class IdxResponse {
       isLoginSuccessful: result[3]! as bool,
       intent: RequestIntent.values[result[4]! as int],
       messages: (result[5] as List<Object?>?)!.cast<String?>(),
-      authenticationFactors: (result[6] as List<Object?>?)?.cast<String?>(),
-      token: result[7] as OktaToken?,
+      remediations: (result[6] as List<Object?>?)?.cast<String?>(),
+      authenticators: (result[7] as List<Object?>?)?.cast<String?>(),
+      token: result[8] as OktaToken?,
     );
   }
 }
@@ -899,87 +904,6 @@ class HssOktaFlutterPluginApi {
       );
     } else {
       return (__pigeon_replyList[0] as bool?)!;
-    }
-  }
-
-  Future<List<String?>> getRemidiations() async {
-    final String __pigeon_channelName = 'dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.getRemidiations$__pigeon_messageChannelSuffix';
-    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
-      __pigeon_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: __pigeon_binaryMessenger,
-    );
-    final List<Object?>? __pigeon_replyList =
-        await __pigeon_channel.send(null) as List<Object?>?;
-    if (__pigeon_replyList == null) {
-      throw _createConnectionError(__pigeon_channelName);
-    } else if (__pigeon_replyList.length > 1) {
-      throw PlatformException(
-        code: __pigeon_replyList[0]! as String,
-        message: __pigeon_replyList[1] as String?,
-        details: __pigeon_replyList[2],
-      );
-    } else if (__pigeon_replyList[0] == null) {
-      throw PlatformException(
-        code: 'null-error',
-        message: 'Host platform returned null value for non-null return value.',
-      );
-    } else {
-      return (__pigeon_replyList[0] as List<Object?>?)!.cast<String?>();
-    }
-  }
-
-  Future<List<String?>> getRemidiationsFields(String remidiation, {String? fields}) async {
-    final String __pigeon_channelName = 'dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.getRemidiationsFields$__pigeon_messageChannelSuffix';
-    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
-      __pigeon_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: __pigeon_binaryMessenger,
-    );
-    final List<Object?>? __pigeon_replyList =
-        await __pigeon_channel.send(<Object?>[remidiation, fields]) as List<Object?>?;
-    if (__pigeon_replyList == null) {
-      throw _createConnectionError(__pigeon_channelName);
-    } else if (__pigeon_replyList.length > 1) {
-      throw PlatformException(
-        code: __pigeon_replyList[0]! as String,
-        message: __pigeon_replyList[1] as String?,
-        details: __pigeon_replyList[2],
-      );
-    } else if (__pigeon_replyList[0] == null) {
-      throw PlatformException(
-        code: 'null-error',
-        message: 'Host platform returned null value for non-null return value.',
-      );
-    } else {
-      return (__pigeon_replyList[0] as List<Object?>?)!.cast<String?>();
-    }
-  }
-
-  Future<List<String?>> getRemidiationAuthenticators(String remidiation, {String? fields}) async {
-    final String __pigeon_channelName = 'dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.getRemidiationAuthenticators$__pigeon_messageChannelSuffix';
-    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
-      __pigeon_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: __pigeon_binaryMessenger,
-    );
-    final List<Object?>? __pigeon_replyList =
-        await __pigeon_channel.send(<Object?>[remidiation, fields]) as List<Object?>?;
-    if (__pigeon_replyList == null) {
-      throw _createConnectionError(__pigeon_channelName);
-    } else if (__pigeon_replyList.length > 1) {
-      throw PlatformException(
-        code: __pigeon_replyList[0]! as String,
-        message: __pigeon_replyList[1] as String?,
-        details: __pigeon_replyList[2],
-      );
-    } else if (__pigeon_replyList[0] == null) {
-      throw PlatformException(
-        code: 'null-error',
-        message: 'Host platform returned null value for non-null return value.',
-      );
-    } else {
-      return (__pigeon_replyList[0] as List<Object?>?)!.cast<String?>();
     }
   }
 

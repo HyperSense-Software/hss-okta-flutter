@@ -267,30 +267,7 @@ public class HSSOktaFlutterIdx{
             })
 
     }
-    
-    func getRemidiations(completion: @escaping (Result<[String], Error>) -> Void) {
-        Task{
-            
-            idxFlow.resume(completion: {resumeResult in
-                switch(resumeResult){
-                case .success(let response):
-                    
-                    var remidiationOptions = [String]()
-                    
-                    response.remediations.forEach{ option in
-                        remidiationOptions.append(option.name)
-                    }
-                    completion(.success(remidiationOptions))
-                    
-                    break
-                case .failure(let error):
-                    completion(.failure(HssOktaError.generalError(error.localizedDescription)))
-                }
-                
-            })
-        }
-    }
-    
+  
     func getIdxResponse(completion: @escaping (Result<IdxResponse?, Error>) -> Void){
         return resumeFlow(completion: {res in
             switch(res){
@@ -318,38 +295,6 @@ public class HSSOktaFlutterIdx{
                 completion(.failure(HssOktaError.credentialError(error.localizedDescription)))
             }
         })
-        
-    }
-    
-    func getRemidiationsFields(remidiation: String,fields:String?, completion: @escaping (Result<[String], Error>) -> Void) {
-      
-            idxFlow.resume(completion: {result in
-                
-                switch(result){
-                    
-                case .success(let response):
-                    var forms = [String]()
-                    let remidiationForm = response.remediations[remidiation]
-                    
-                    if(fields != nil){
-                        remidiationForm?[fields!]?.form?.forEach({
-                            forms.append($0.name ?? "")
-                        })
-
-                    }else{
-                        remidiationForm?.form.fields.forEach({
-                            forms.append($0.name ?? "")
-                        })
-                    }
-                    
-                    completion(.success(forms))
-                    
-                    break
-                case .failure(let error):
-                    completion(.failure(HssOktaError.generalError(error.localizedDescription)))
-                }
-                
-            })
         
     }
     
@@ -475,10 +420,18 @@ public class HSSOktaFlutterIdx{
     }
     
     func mapResponeToIdxResponse(response : Response,token : OktaToken?) -> IdxResponse{
-        return IdxResponse(expiresAt: response.expiresAt?.millisecondsSince1970, user: UserInfo(userId: response.user?.id ?? "", givenName: response.user?.profile?.firstName ?? "", middleName:"", familyName: response.user?.profile?.lastName ?? "", gender: "", email: "", phoneNumber: "", username: response.user?.username ?? ""), canCancel: response.canCancel,isLoginSuccessful: response.isLoginSuccessful, intent: RequestIntent(rawValue: Int(response.intent.getIndex)) ?? RequestIntent.unknown,messages: response.messages.allMessages.map{$0.message},token: token)
+        
+        var remediationOptions = response.remediations.map{$0.name}
+        var authenticators = response.authenticators.map{$0.displayName}
+
+        return IdxResponse(expiresAt: response.expiresAt?.millisecondsSince1970, user: UserInfo(userId: response.user?.id ?? "", givenName: response.user?.profile?.firstName ?? "", middleName:"", familyName: response.user?.profile?.lastName ?? "", gender: "", email: "", phoneNumber: "", username: response.user?.username ?? ""), canCancel: response.canCancel,isLoginSuccessful: response.isLoginSuccessful, intent: RequestIntent(rawValue: Int(response.intent.getIndex)) ?? RequestIntent.unknown,messages: response.messages.allMessages.map{$0.message},remediations: remediationOptions, authenticators: authenticators, token: token)
             }
     
     func mapToOktaToken(token : Token) -> OktaToken{
+        
+        
+        
+        
       return  OktaToken(
             id: token.id,
             token: token.idToken?.rawValue ?? "",
@@ -490,36 +443,6 @@ public class HSSOktaFlutterIdx{
         )
     }
     
-    func getRemidiationAuthenticators(remidiation: String, fields: String?, completion: @escaping (Result<[String], Error>) -> Void) {
-
-            
-            idxFlow.resume(completion: {result in
-                
-                switch(result){
-                    
-                case .success(let response):
-                    var authenticators = [String]()
-                    let remediation = response.remediations[remidiation]
-                    
-                    if(fields == nil){
-                        response.authenticators.forEach({
-                            authenticators.append($0.displayName ?? "")
-                        })
-
-                    }else{
-                        remediation?[fields!]?.options?.forEach({
-                            authenticators.append($0.label ?? "")
-                        })
-                    }
-                    completion(.success(authenticators))
-                    break
-         
-                case .failure(let error):
-                    completion(.failure(HssOktaError.generalError(error.localizedDescription)))
-                }
-                
-            })
-    }
     
     func continueWithGoogleAuthenticator(code: String, completion: @escaping (Result<IdxResponse?, Error>) -> Void){
         idxFlow.resume(completion: {resume in

@@ -143,28 +143,28 @@ class HssOktaFlutterChannel extends HssOktaFlutterPlatformInterface {
     return _api.cancelCurrentTransaction();
   }
 
-  @override
-  Future<List<String>> getRemidiations() async {
-    final items = await _api.getRemidiations();
-    return items.nonNulls.toList();
-  }
+  // @override
+  // Future<List<String>> getRemidiations() async {
+  //   final items = await _api.getRemidiations();
+  //   return items.nonNulls.toList();
+  // }
 
-  @override
-  Future<List<String>> getRemidiationsFields(String remidiation,
-      {String? fields}) async {
-    var items = await _api.getRemidiationsFields(remidiation, fields: fields);
+  // @override
+  // Future<List<String>> getRemidiationsFields(String remidiation,
+  //     {String? fields}) async {
+  //   var items = await _api.getRemidiationsFields(remidiation, fields: fields);
 
-    return items.nonNulls.toList();
-  }
+  //   return items.nonNulls.toList();
+  // }
 
-  @override
-  Future<List<String>> getRemidiationAuthenticators(String remidiation,
-      {String? fields}) async {
-    var items =
-        await _api.getRemidiationAuthenticators(remidiation, fields: fields);
+  // @override
+  // Future<List<String>> getRemidiationAuthenticators(String remidiation,
+  //     {String? fields}) async {
+  //   var items =
+  //       await _api.getRemidiationAuthenticators(remidiation, fields: fields);
 
-    return items.nonNulls.toList();
-  }
+  //   return items.nonNulls.toList();
+  // }
 
   @override
   Future<IdxResponse?> continueWithGoogleAuthenticator(String code) {
