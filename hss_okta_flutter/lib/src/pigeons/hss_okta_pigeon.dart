@@ -178,10 +178,6 @@ abstract class HssOktaFlutterPluginApi {
   IdxResponse? authenticateWithEmailAndPassword(String email, String password);
 
   @async
-  IdxResponse? startInteractionCodeFlow(
-      {String? email, required String remidiation});
-
-  @async
   bool startSMSPhoneEnrollment(String phoneNumber);
 
   // Continues

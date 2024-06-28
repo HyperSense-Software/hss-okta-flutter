@@ -396,12 +396,10 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
         CoroutineScope(Dispatchers.IO).launch{
             idx.getIdxResponse(callback)
         }
-
-
     }
 
     override fun cancelCurrentTransaction(callback: (Result<Boolean>) -> Unit) {
-        TODO("Not yet implemented")
+        callback.invoke(Result.failure(HssOktaException("Not available on Android")))
     }
 
     override fun getEnrollmentOptions(callback: (Result<String>) -> Unit) {

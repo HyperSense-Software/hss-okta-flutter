@@ -65,10 +65,6 @@ abstract class HssOktaFlutterPlatformInterface extends PlatformInterface {
           String email, String password) =>
       throw UnimplementedError();
 
-  Future<IdxResponse?> startInteractionCodeFlow(
-          {String? email, required String remidiation}) =>
-      throw UnimplementedError();
-
   Future<IdxResponse?> continueWithPasscode(String passcode) =>
       throw UnimplementedError();
 

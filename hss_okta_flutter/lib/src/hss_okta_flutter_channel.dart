@@ -97,15 +97,6 @@ class HssOktaFlutterChannel extends HssOktaFlutterPlatformInterface {
   }
 
   @override
-  Future<IdxResponse?> startInteractionCodeFlow({
-    String? email,
-    required String remidiation,
-  }) async {
-    return await _api.startInteractionCodeFlow(
-        email: email, remidiation: remidiation);
-  }
-
-  @override
   Future<IdxResponse?> continueWithPasscode(String passcode) async {
     return await _api.continueWithPasscode(passcode);
   }
@@ -143,38 +134,10 @@ class HssOktaFlutterChannel extends HssOktaFlutterPlatformInterface {
     return _api.cancelCurrentTransaction();
   }
 
-  // @override
-  // Future<List<String>> getRemidiations() async {
-  //   final items = await _api.getRemidiations();
-  //   return items.nonNulls.toList();
-  // }
-
-  // @override
-  // Future<List<String>> getRemidiationsFields(String remidiation,
-  //     {String? fields}) async {
-  //   var items = await _api.getRemidiationsFields(remidiation, fields: fields);
-
-  //   return items.nonNulls.toList();
-  // }
-
-  // @override
-  // Future<List<String>> getRemidiationAuthenticators(String remidiation,
-  //     {String? fields}) async {
-  //   var items =
-  //       await _api.getRemidiationAuthenticators(remidiation, fields: fields);
-
-  //   return items.nonNulls.toList();
-  // }
-
   @override
   Future<IdxResponse?> continueWithGoogleAuthenticator(String code) {
     return _api.continueWithGoogleAuthenticator(code);
   }
-
-  // @override
-  // Future<IdxResponse?> continueWithEmailCode(String code) {
-  //   return _api.continueWithEmailCode(code);
-  // }
 
   @override
   Future<void> sendEmailCode() {

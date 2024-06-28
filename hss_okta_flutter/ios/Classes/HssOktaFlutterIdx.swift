@@ -6,7 +6,7 @@ public class HSSOktaFlutterIdx{
         idxFlow = try InteractionCodeFlow()
         
         Task{
-                        if #available(iOS 15.0, *) {
+                if #available(iOS 15.0, *) {
                 try await idxFlow.start()
             } else {
                 throw HssOktaError.configError("This Wrapper is only available for iOS 15.0")
@@ -296,40 +296,6 @@ public class HSSOktaFlutterIdx{
             }
         })
         
-    }
-    
-    func startInteractionCodeFlow(email: String?,remidiation: String, completion: @escaping (Result<IdxResponse?, Error>) -> Void) {
-        idxFlow.start(completion: { result in
-            switch(result){
-            case .success(let response):
-                
-                guard let remidiation = response.remediations[remidiation]
-                else{
-                    completion(.failure(HssOktaError.generalError("Failed to find remidiation \(remidiation)")))
-                    return
-                }
-                
-                if(email != nil){
-                    let field = remidiation["identifier"]
-                    field?.value = email
-                }
-          
-                
-                remidiation.proceed(completion:{ remidiate in
-                    switch(remidiate){
-                    case .success(let r):
-                        completion(.success(self.mapResponeToIdxResponse(response: r, token: nil)))
-                        break
-                    case .failure(let error):
-                        completion(.failure(HssOktaError.generalError(error.localizedDescription)))
-                    }
-                })
-            
-            case.failure(let error):
-                completion(.failure(HssOktaError.generalError(error.localizedDescription)))
-            }
-            
-        })
     }
     
     func continueWithIdentifier(identifier: String, completion: @escaping (Result<IdxResponse?, Error>) -> Void) {
