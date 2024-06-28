@@ -89,15 +89,15 @@ abstract class HssOktaFlutterPlatformInterface extends PlatformInterface {
 
   Future<bool> cancelCurrentTransaction() => throw UnimplementedError();
 
-  Future<List<String>> getRemidiations() => throw UnimplementedError();
+  // Future<List<String>> getRemidiations() => throw UnimplementedError();
 
-  Future<List<String>> getRemidiationsFields(String remidiation,
-          {String? fields}) =>
-      throw UnimplementedError();
+  // Future<List<String>> getRemidiationsFields(String remidiation,
+  //         {String? fields}) =>
+  //     throw UnimplementedError();
 
-  Future<List<String>> getRemidiationAuthenticators(String remidiation,
-          {String? fields}) =>
-      throw UnimplementedError();
+  // Future<List<String>> getRemidiationAuthenticators(String remidiation,
+  //         {String? fields}) =>
+  //     throw UnimplementedError();
 
   Future<IdxResponse?> continueWithGoogleAuthenticator(String code) =>
       throw UnimplementedError();

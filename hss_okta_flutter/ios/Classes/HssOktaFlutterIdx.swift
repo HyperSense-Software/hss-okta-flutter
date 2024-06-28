@@ -396,7 +396,7 @@ public class HSSOktaFlutterIdx{
                         
                         guard response.isLoginSuccessful
                             else{
-                            completion(.failure(HssOktaError.generalError(response.messages.allMessages.first?.message ?? "Unknown error")))
+                            completion(.failure(HssOktaError.generalError(response.messages.allMessages.first?.message ?? "Login Failed, Check remediation options")))
                             return
                         }
                         

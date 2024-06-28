@@ -404,26 +404,6 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
         TODO("Not yet implemented")
     }
 
-    override fun getRemidiations(callback: (Result<List<String>>) -> Unit) {
-        TODO("Not yet implemented")
-    }
-
-    override fun getRemidiationsFields(
-        remidiation: String,
-        fields: String?,
-        callback: (Result<List<String>>) -> Unit
-    ) {
-        TODO("Not yet implemented")
-    }
-
-    override fun getRemidiationAuthenticators(
-        remidiation: String,
-        fields: String?,
-        callback: (Result<List<String>>) -> Unit
-    ) {
-        TODO("Not yet implemented")
-    }
-
     override fun getEnrollmentOptions(callback: (Result<String>) -> Unit) {
         TODO("Not yet implemented")
     }
@@ -436,7 +416,7 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
     }
 
 
-     private fun composeOktaResult(res : Token, userInfoResult : OidcUserInfo) : AuthenticationResult{
+    private fun composeOktaResult(res : Token, userInfoResult : OidcUserInfo) : AuthenticationResult{
         return AuthenticationResult(
             result = DirectAuthenticationResult.SUCCESS,
             token = OktaToken(
@@ -460,6 +440,8 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
             )
         )
     }
+
+
 
 
 

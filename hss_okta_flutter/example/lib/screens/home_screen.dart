@@ -347,15 +347,22 @@ class _HomeScreenState extends State<HomeScreen> {
               final res = await plugin.idx.authenticateWithEmailAndPassword(
                   _idxusernamecontroller.text, _idxpasswordcontroller.text);
 
-              log(res?.token?.accessToken ?? '');
-
               if (mounted) {
-                await showDialog(
-                    context: context,
-                    builder: (c) => AlertDialog(
-                          title: const Text('Success'),
-                          content: Text('Token: ${res?.token?.accessToken}'),
-                        ));
+                if (res?.isLoginSuccessful ?? false) {
+                  await showDialog(
+                      context: context,
+                      builder: (c) => AlertDialog(
+                            title: const Text('Success'),
+                            content: Text('Token: ${res?.token?.accessToken}'),
+                          ));
+                } else {
+                  await showDialog(
+                      context: context,
+                      builder: (c) => AlertDialog(
+                            title: const Text('Fail'),
+                            content: Text('${res?.messages.first}'),
+                          ));
+                }
               }
             },
             child: const Text(
@@ -494,7 +501,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     'userProfile.firstName': 'aldrin',
                     'userProfile.lastName': 'fren'
                   });
-              
+
               log(result?.token?.accessToken ?? '');
             },
             child: const Text(

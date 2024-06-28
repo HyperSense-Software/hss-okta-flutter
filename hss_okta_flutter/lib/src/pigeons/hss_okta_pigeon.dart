@@ -211,18 +211,6 @@ abstract class HssOktaFlutterPluginApi {
   @async
   bool cancelCurrentTransaction();
 
-  // @async
-  // List<String> getRemidiations();
-
-  // @async
-  // List<String> getRemidiationsFields(String remidiation, {String? fields});
-
-  // @async
-  // List<String> getRemidiationAuthenticators(String remidiation,
-  //     {String? fields});
-
-  // Enrollments
-
   @async
   bool startUserEnrollmentFlow({
     required String email,

@@ -170,6 +170,9 @@ class HssOktaFlutterIdx(oidcClient : OidcClient) {
     private fun composeIdxResult(token : Token?, response : com.okta.idx.kotlin.dto.IdxResponse) : IdxResponse {
 
         val user = response.user
+
+        val remediationOptions = response.remediations.map{it.name}
+        val authenticators = response.authenticators.map { it.displayName }
         
         if (token != null) {
             return IdxResponse(
@@ -196,13 +199,15 @@ class HssOktaFlutterIdx(oidcClient : OidcClient) {
                     scope = token.scope,
                     tokenType = token.tokenType,
                     id = token.idToken
-                )
+                ), authenticators = authenticators, remediations = remediationOptions
 
 
             )
         }else{
             return IdxResponse(
                 expiresAt = null,
+                remediations = remediationOptions,
+                authenticators = authenticators,
                 user = UserInfo(
                     userId = user?.id ?: "",
                     givenName = user?.profile?.firstName?: "",
