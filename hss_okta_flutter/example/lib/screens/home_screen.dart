@@ -360,7 +360,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       context: context,
                       builder: (c) => AlertDialog(
                             title: const Text('Fail'),
-                            content: Text('${res?.messages.first}'),
+                            content: Text(
+                                '${res?.messages.firstOrNull ?? "Check remediation options"}'),
                           ));
                 }
               }
