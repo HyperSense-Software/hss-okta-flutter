@@ -341,14 +341,6 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
         }
     }
 
-    override fun startInteractionCodeFlow(
-        email: String?,
-        remidiation: String,
-        callback: (Result<IdxResponse?>) -> Unit
-    ) {
-        TODO("Not yet implemented")
-    }
-
     override fun startSMSPhoneEnrollment(phoneNumber: String, callback: (Result<Boolean>) -> Unit) {
         TODO("Not yet implemented")
     }

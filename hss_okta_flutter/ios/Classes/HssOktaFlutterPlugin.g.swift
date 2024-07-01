@@ -368,7 +368,6 @@ protocol HssOktaFlutterPluginApi {
   func removeCredential(tokenId: String, completion: @escaping (Result<Bool, Error>) -> Void)
   func setDefaultToken(tokenId: String, completion: @escaping (Result<Bool, Error>) -> Void)
   func authenticateWithEmailAndPassword(email: String, password: String, completion: @escaping (Result<IdxResponse?, Error>) -> Void)
-  func startInteractionCodeFlow(email: String?, remidiation: String, completion: @escaping (Result<IdxResponse?, Error>) -> Void)
   func startSMSPhoneEnrollment(phoneNumber: String, completion: @escaping (Result<Bool, Error>) -> Void)
   func continueSMSPhoneEnrollment(passcode: String, completion: @escaping (Result<Bool, Error>) -> Void)
   func continueWithGoogleAuthenticator(code: String, completion: @escaping (Result<IdxResponse?, Error>) -> Void)
@@ -600,24 +599,6 @@ class HssOktaFlutterPluginApiSetup {
       }
     } else {
       authenticateWithEmailAndPasswordChannel.setMessageHandler(nil)
-    }
-    let startInteractionCodeFlowChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.startInteractionCodeFlow\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
-    if let api = api {
-      startInteractionCodeFlowChannel.setMessageHandler { message, reply in
-        let args = message as! [Any?]
-        let emailArg: String? = nilOrValue(args[0])
-        let remidiationArg = args[1] as! String
-        api.startInteractionCodeFlow(email: emailArg, remidiation: remidiationArg) { result in
-          switch result {
-          case .success(let res):
-            reply(wrapResult(res))
-          case .failure(let error):
-            reply(wrapError(error))
-          }
-        }
-      }
-    } else {
-      startInteractionCodeFlowChannel.setMessageHandler(nil)
     }
     let startSMSPhoneEnrollmentChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.startSMSPhoneEnrollment\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {

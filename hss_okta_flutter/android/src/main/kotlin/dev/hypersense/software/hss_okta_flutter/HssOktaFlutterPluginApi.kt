@@ -374,7 +374,6 @@ interface HssOktaFlutterPluginApi {
   fun removeCredential(tokenId: String, callback: (Result<Boolean>) -> Unit)
   fun setDefaultToken(tokenId: String, callback: (Result<Boolean>) -> Unit)
   fun authenticateWithEmailAndPassword(email: String, password: String, callback: (Result<IdxResponse?>) -> Unit)
-  fun startInteractionCodeFlow(email: String?, remidiation: String, callback: (Result<IdxResponse?>) -> Unit)
   fun startSMSPhoneEnrollment(phoneNumber: String, callback: (Result<Boolean>) -> Unit)
   fun continueSMSPhoneEnrollment(passcode: String, callback: (Result<Boolean>) -> Unit)
   fun continueWithGoogleAuthenticator(code: String, callback: (Result<IdxResponse?>) -> Unit)
@@ -633,27 +632,6 @@ interface HssOktaFlutterPluginApi {
             val emailArg = args[0] as String
             val passwordArg = args[1] as String
             api.authenticateWithEmailAndPassword(emailArg, passwordArg) { result: Result<IdxResponse?> ->
-              val error = result.exceptionOrNull()
-              if (error != null) {
-                reply.reply(wrapError(error))
-              } else {
-                val data = result.getOrNull()
-                reply.reply(wrapResult(data))
-              }
-            }
-          }
-        } else {
-          channel.setMessageHandler(null)
-        }
-      }
-      run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.startInteractionCodeFlow$separatedMessageChannelSuffix", codec)
-        if (api != null) {
-          channel.setMessageHandler { message, reply ->
-            val args = message as List<Any?>
-            val emailArg = args[0] as String?
-            val remidiationArg = args[1] as String
-            api.startInteractionCodeFlow(emailArg, remidiationArg) { result: Result<IdxResponse?> ->
               val error = result.exceptionOrNull()
               if (error != null) {
                 reply.reply(wrapError(error))
