@@ -73,7 +73,7 @@ abstract class HssOktaFlutterPlatformInterface extends PlatformInterface {
   Future<bool> continueSMSPhoneEnrollment(String passcode) =>
       throw UnimplementedError();
 
-  Future<bool> startUserEnrollmentFlow({
+  Future<IdxResponse?> startUserEnrollmentFlow({
     required String email,
     required Map<String, String> details,
   }) =>

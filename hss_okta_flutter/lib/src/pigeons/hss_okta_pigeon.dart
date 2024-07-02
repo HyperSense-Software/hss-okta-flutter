@@ -208,7 +208,7 @@ abstract class HssOktaFlutterPluginApi {
   bool cancelCurrentTransaction();
 
   @async
-  bool startUserEnrollmentFlow({
+  IdxResponse? startUserEnrollmentFlow({
     required String email,
     required Map<String, String> details,
   });

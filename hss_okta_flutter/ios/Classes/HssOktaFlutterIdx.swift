@@ -1,4 +1,5 @@
 import OktaIdx
+
 public class HSSOktaFlutterIdx{
     var idxFlow : InteractionCodeFlow
     
@@ -19,8 +20,7 @@ public class HSSOktaFlutterIdx{
         Task{
             do{
                 
-                idxFlow = try InteractionCodeFlow();
-                
+                    
                 if #available(iOS 15.0, *) {
                     var response = try await idxFlow.start()
                     
@@ -143,11 +143,12 @@ public class HSSOktaFlutterIdx{
         
     }
     
-    func startUserEnrollmentFlow(email: String,details: [String : String],  completion: @escaping (Result<Bool, Error>) -> Void) {
+    func startUserEnrollmentFlow(email: String, details: [String : String], completion: @escaping (Result<IdxResponse?, Error>) -> Void)  {
             Task{
                 if #available(iOS 15.0, *) {
                     
-                    var response = idxFlow.context != nil ? try await idxFlow.resume() : try await idxFlow.start()
+                    var response = try await idxFlow.resume()
+                    
                     
                     guard let selectEnrollRemediation = response.remediations[.selectEnrollProfile] else {
                         completion(.failure(HssOktaError.generalError("The organization doesn't have enrollProfile enabled")))
@@ -156,24 +157,27 @@ public class HSSOktaFlutterIdx{
                     
                     response = try await selectEnrollRemediation.proceed()
                     
+                    
                     guard let enrollRemediation = response.remediations[.enrollProfile],
-                          let emailField = enrollRemediation["userProfile.email"],
-                          let passwordField = enrollRemediation["credentials.passcode"]
+                          let emailField = enrollRemediation["userProfile.email"]
+//                          let passwordField = enrollRemediation["credentials.passcode"]
                     else {
                         let error = response.messages.first?.message
                         completion(.failure(HssOktaError.generalError("Failed with remidation : \(error ?? "unknown error")")))
                         return
                     }
                     
+                    
+                    
                     emailField.value = email
-                    passwordField.value = "23321122aA"
+//                    passwordField.value = "23321122aA"
                     details.forEach({key,value in
                         enrollRemediation[key]?.value = value
                     })
                     
                     response =  try await enrollRemediation.proceed()
                    
-                    completion(.success(true))
+                    completion(.success(self.mapResponeToIdxResponse(response: response, token: nil)))
                    
                 } else {
                     completion(.failure(HssOktaError.generalError("This is only available for iOS 15.0 and above")))
@@ -228,9 +232,6 @@ public class HSSOktaFlutterIdx{
                                                 verificationResult in
                                                 switch(verificationResult){
                                                 case .success(let verificationResultResponse):
-                                                    
-                                                    
-                                                    
                                                     completion(.success(true))
                                                     break
                                                 case .failure(let error):

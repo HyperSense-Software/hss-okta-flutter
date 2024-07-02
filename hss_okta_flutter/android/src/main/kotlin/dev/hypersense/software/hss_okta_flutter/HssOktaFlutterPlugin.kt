@@ -375,7 +375,7 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
     override fun startUserEnrollmentFlow(
         email: String,
         details: Map<String, String>,
-        callback: (Result<Boolean>) -> Unit
+        callback: (Result<IdxResponse?>) -> Unit
     ) {
         TODO("Not yet implemented")
     }
@@ -395,6 +395,7 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
     }
 
     override fun getEnrollmentOptions(callback: (Result<String>) -> Unit) {
+
         TODO("Not yet implemented")
     }
 

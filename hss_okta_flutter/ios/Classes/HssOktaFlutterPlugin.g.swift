@@ -377,7 +377,7 @@ protocol HssOktaFlutterPluginApi {
   func recoverPassword(identifier: String, completion: @escaping (Result<Bool, Error>) -> Void)
   func getIdxResponse(completion: @escaping (Result<IdxResponse?, Error>) -> Void)
   func cancelCurrentTransaction(completion: @escaping (Result<Bool, Error>) -> Void)
-  func startUserEnrollmentFlow(email: String, details: [String: String], completion: @escaping (Result<Bool, Error>) -> Void)
+  func startUserEnrollmentFlow(email: String, details: [String: String], completion: @escaping (Result<IdxResponse?, Error>) -> Void)
   func getEnrollmentOptions(completion: @escaping (Result<String, Error>) -> Void)
   func enrollSecurityQuestion(questions: [String: String], completion: @escaping (Result<Bool, Error>) -> Void)
 }

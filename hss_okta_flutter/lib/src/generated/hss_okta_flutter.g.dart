@@ -885,7 +885,7 @@ class HssOktaFlutterPluginApi {
     }
   }
 
-  Future<bool> startUserEnrollmentFlow({required String email, required Map<String?, String?> details}) async {
+  Future<IdxResponse?> startUserEnrollmentFlow({required String email, required Map<String?, String?> details}) async {
     final String __pigeon_channelName = 'dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.startUserEnrollmentFlow$__pigeon_messageChannelSuffix';
     final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
@@ -902,13 +902,8 @@ class HssOktaFlutterPluginApi {
         message: __pigeon_replyList[1] as String?,
         details: __pigeon_replyList[2],
       );
-    } else if (__pigeon_replyList[0] == null) {
-      throw PlatformException(
-        code: 'null-error',
-        message: 'Host platform returned null value for non-null return value.',
-      );
     } else {
-      return (__pigeon_replyList[0] as bool?)!;
+      return (__pigeon_replyList[0] as IdxResponse?);
     }
   }
 

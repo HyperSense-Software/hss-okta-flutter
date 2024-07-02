@@ -324,7 +324,7 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
         idx.continueSMSPhoneEnrollment(passcode: passcode, completion: completion)
     }
     
-    func startUserEnrollmentFlow(email: String,details: [String : String],  completion: @escaping (Result<Bool, Error>) -> Void) {
+    func startUserEnrollmentFlow(email: String, details: [String : String], completion: @escaping (Result<IdxResponse?, Error>) -> Void)  {
         idx.startUserEnrollmentFlow(email: email,details:details, completion: completion)
     }
     
@@ -339,19 +339,7 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
     func cancelCurrentTransaction(completion: @escaping (Result<Bool, Error>) -> Void) {
         idx.cancelCurrentTransaction(completion: completion)
     }
-    
-//    func getRemidiations(completion: @escaping (Result<[String], Error>) -> Void) {
-//        idx.getRemidiations(completion: completion)
-//    }
-//    
-//    func getRemidiationsFields(remidiation: String,fields: String?, completion: @escaping (Result<[String], Error>) -> Void) {
-//        idx.getRemidiationsFields(remidiation: remidiation,fields: fields,completion: completion)
-//    }
-    
-    func startInteractionCodeFlow(email: String?, remidiation: String, completion: @escaping (Result<IdxResponse?, Error>) -> Void){
-        idx.startInteractionCodeFlow(email: email,remidiation: remidiation, completion: completion)
-    }
-    
+  
     func continueWithIdentifier(identifier: String, completion: @escaping (Result<IdxResponse?, Error>) -> Void) {
         idx.continueWithIdentifier(identifier: identifier, completion: completion)
     }
@@ -359,11 +347,6 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
     func continueWithPasscode(passcode: String, completion: @escaping (Result<IdxResponse?, Error>) -> Void) {
         idx.continueWithPasscode(passcode: passcode, completion: completion)
     }
-//    func getRemidiationAuthenticators(remidiation: String, fields: String?, completion: @escaping (Result<[String], Error>) -> Void) {
-//        idx.getRemidiationAuthenticators(remidiation: remidiation,fields: fields, completion: completion)
-//        
-//    }
-
     
     func sendEmailCode(completion: @escaping (Result<Void, Error>) -> Void) {
         idx.sendEmailCode(completion: completion)

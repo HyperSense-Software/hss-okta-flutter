@@ -383,7 +383,7 @@ interface HssOktaFlutterPluginApi {
   fun recoverPassword(identifier: String, callback: (Result<Boolean>) -> Unit)
   fun getIdxResponse(callback: (Result<IdxResponse?>) -> Unit)
   fun cancelCurrentTransaction(callback: (Result<Boolean>) -> Unit)
-  fun startUserEnrollmentFlow(email: String, details: Map<String, String>, callback: (Result<Boolean>) -> Unit)
+  fun startUserEnrollmentFlow(email: String, details: Map<String, String>, callback: (Result<IdxResponse?>) -> Unit)
   fun getEnrollmentOptions(callback: (Result<String>) -> Unit)
   fun enrollSecurityQuestion(questions: Map<String, String>, callback: (Result<Boolean>) -> Unit)
 
@@ -823,7 +823,7 @@ interface HssOktaFlutterPluginApi {
             val args = message as List<Any?>
             val emailArg = args[0] as String
             val detailsArg = args[1] as Map<String, String>
-            api.startUserEnrollmentFlow(emailArg, detailsArg) { result: Result<Boolean> ->
+            api.startUserEnrollmentFlow(emailArg, detailsArg) { result: Result<IdxResponse?> ->
               val error = result.exceptionOrNull()
               if (error != null) {
                 reply.reply(wrapError(error))

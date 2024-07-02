@@ -112,7 +112,7 @@ class HssOktaFlutterChannel extends HssOktaFlutterPlatformInterface {
   }
 
   @override
-  Future<bool> startUserEnrollmentFlow({
+  Future<IdxResponse?> startUserEnrollmentFlow({
     required String email,
     required Map<String, String> details,
   }) {
