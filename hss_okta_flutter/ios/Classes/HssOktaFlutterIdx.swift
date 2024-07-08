@@ -71,8 +71,7 @@ public class HSSOktaFlutterIdx{
                     completion: {res in
                         switch(res){
                         case .success(let response):
-             
-                                
+
                                 guard let remediation = response.remediations[.selectAuthenticatorEnroll],
                                       let authenticatorField = remediation["authenticator"],
                                       let phoneOption = authenticatorField.options?.first(where: { option in
@@ -103,8 +102,6 @@ public class HSSOktaFlutterIdx{
                     })
         }
     }
-    
-    
     
     func continueSMSPhoneEnrollment(passcode: String, completion: @escaping (Result<Bool, Error>) -> Void) {
         
@@ -385,32 +382,7 @@ public class HSSOktaFlutterIdx{
                 }
         })
     }
-    
-    func mapResponeToIdxResponse(response : Response,token : OktaToken?) -> IdxResponse{
-        
-        var remediationOptions = response.remediations.map{$0.name}
-        var authenticators = response.authenticators.map{$0.displayName}
 
-        return IdxResponse(expiresAt: response.expiresAt?.millisecondsSince1970, user: UserInfo(userId: response.user?.id ?? "", givenName: response.user?.profile?.firstName ?? "", middleName:"", familyName: response.user?.profile?.lastName ?? "", gender: "", email: "", phoneNumber: "", username: response.user?.username ?? ""), canCancel: response.canCancel,isLoginSuccessful: response.isLoginSuccessful, intent: RequestIntent(rawValue: Int(response.intent.getIndex)) ?? RequestIntent.unknown,messages: response.messages.allMessages.map{$0.message},remediations: remediationOptions, authenticators: authenticators, token: token)
-            }
-    
-    func mapToOktaToken(token : Token) -> OktaToken{
-        
-        
-        
-        
-      return  OktaToken(
-            id: token.id,
-            token: token.idToken?.rawValue ?? "",
-            issuedAt: Int64(((token.issuedAt?.timeIntervalSince1970 ?? 0) * 1000.0).rounded()),
-            tokenType: token.tokenType,
-            accessToken: token.accessToken,
-            scope: token.scope ?? "",
-            refreshToken: token.refreshToken ?? ""
-        )
-    }
-    
-    
     func continueWithGoogleAuthenticator(code: String, completion: @escaping (Result<IdxResponse?, Error>) -> Void){
         idxFlow.resume(completion: {resume in
             switch(resume){
@@ -510,10 +482,7 @@ public class HSSOktaFlutterIdx{
             })
 
     }
-   
-    
-  
-    
+
     func pollEmailCode(completion: @escaping (Result<IdxResponse?, Error>) -> Void) {
 //        TESTING ON HOLD, CAN'T FIND THE MAGIC LINK URI SETTINGS ON OKTA
         
@@ -592,4 +561,29 @@ public class HSSOktaFlutterIdx{
             }
         })
     }
+
+    func mapResponeToIdxResponse(response : Response,token : OktaToken?) -> IdxResponse{
+        
+        var remediationOptions = response.remediations.map{$0.name}
+        var authenticators = response.authenticators.map{$0.displayName}
+
+        return IdxResponse(expiresAt: response.expiresAt?.millisecondsSince1970, user: UserInfo(userId: response.user?.id ?? "", givenName: response.user?.profile?.firstName ?? "", middleName:"", familyName: response.user?.profile?.lastName ?? "", gender: "", email: "", phoneNumber: "", username: response.user?.username ?? ""), canCancel: response.canCancel,isLoginSuccessful: response.isLoginSuccessful, intent: RequestIntent(rawValue: Int(response.intent.getIndex)) ?? RequestIntent.unknown,messages: response.messages.allMessages.map{$0.message},remediations: remediationOptions, authenticators: authenticators, token: token)
+            }
+    
+    func mapToOktaToken(token : Token) -> OktaToken{
+        
+        
+        
+        
+      return  OktaToken(
+            id: token.id,
+            token: token.idToken?.rawValue ?? "",
+            issuedAt: Int64(((token.issuedAt?.timeIntervalSince1970 ?? 0) * 1000.0).rounded()),
+            tokenType: token.tokenType,
+            accessToken: token.accessToken,
+            scope: token.scope ?? "",
+            refreshToken: token.refreshToken ?? ""
+        )
+    }
+    
 }

@@ -7,6 +7,7 @@ import 'package:hss_okta_flutter_example/web/redirect_form.dart';
 import 'package:hss_okta_flutter_example/web/web_profile_screen.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 

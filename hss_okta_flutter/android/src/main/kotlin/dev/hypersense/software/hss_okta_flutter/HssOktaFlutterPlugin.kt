@@ -60,25 +60,24 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
        if(context == null){
            throw  Exception("Context is null")
        }
-
+       
        val oidcConfiguration = OidcConfiguration(
            clientId =  BuildConfig.CLIENT_ID,
            defaultScope = BuildConfig.SCOPES,
        )
 
-       println("${BuildConfig.ISSUER.toHttpUrl()}")
-
+   
        val oidcClient = OidcClient.createFromDiscoveryUrl(
            oidcConfiguration,
            "${BuildConfig.ISSUER}/.well-known/openid-configuration".toHttpUrl(),)
-
+       
        CredentialBootstrap.initialize(oidcClient.createCredentialDataSource(context!!))
-
+      
       this.idx = HssOktaFlutterIdx(oidcClient)
    }
 
     override fun onAttachedToEngine(binding: FlutterPlugin.FlutterPluginBinding) {
-
+        
         HssOktaFlutterPluginApi.setUp(binding.binaryMessenger, this)
 
         browserSignInEventChannel = EventChannel(binding.binaryMessenger,browserSignInChannelName)
@@ -93,7 +92,7 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
             WebSignOutNativeViewFactory.platformViewName,
             WebSignOutNativeViewFactory(browserSignOutEventChannel)
         )
-
+        
         context = binding.applicationContext
 
 
