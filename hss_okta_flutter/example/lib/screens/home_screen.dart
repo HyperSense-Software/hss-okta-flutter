@@ -43,16 +43,18 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     _initStreams();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
-      PluginProvider.of(context).pluginWeb
-        ..subscribe((authState) {
-          if (authState.isAuthenticated) {
-            _authStateController.add(authState);
-          }
-        })
-        ..unsubscribe((authState) {
-          _streamSubscription?.cancel();
-          _streamSubscription = null;
-        });
+      if (kIsWeb) {
+        PluginProvider.of(context).pluginWeb
+          ..subscribe((authState) {
+            if (authState.isAuthenticated) {
+              _authStateController.add(authState);
+            }
+          })
+          ..unsubscribe((authState) {
+            _streamSubscription?.cancel();
+            _streamSubscription = null;
+          });
+      }
     });
 
     super.initState();
