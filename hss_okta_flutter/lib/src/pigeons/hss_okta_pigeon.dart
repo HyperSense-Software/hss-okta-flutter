@@ -9,6 +9,10 @@ import 'package:pigeon/pigeon.dart';
         'android/src/main/kotlin/dev/hypersense/software/hss_okta_flutter/HssOktaFlutterPluginApi.kt',
     kotlinOptions: KotlinOptions(
       package: "dev.hypersense.software.hss_okta",
+      errorClassName: "HssOktaFlutterException",
+    ),
+    swiftOptions: SwiftOptions(
+      errorClassName: "HssOktaFlutterException",
     ),
   ),
 )

@@ -7,12 +7,6 @@ import WebAuthenticationUI
 
 
 
-enum HssOktaError: Error {
-case configError(String)
-case credentialError(String)
-case generalError(String)
-}
-
 
 public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginApi {
 
@@ -61,22 +55,26 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
                             
                         case .mfaRequired(_):
                             completion(.success(AuthenticationResult(result: DirectAuthenticationResult.mfaRequired)))
-                        default:
-                            break
+                    
                             
                         }
                     }else{
-                        completion(.failure(HssOktaError.generalError("Incorrect flow")))
+                        completion(.failure(HssOktaFlutterException(
+                            code: "Error", message: "Incorrect flow",details: ""
+                        )))
                     }
                     
                 }catch let error{
-                    debugPrint(error)
-                    completion(.failure(error))
+                    completion(.failure(HssOktaFlutterException(
+                        code: "Error", message: error.localizedDescription,details: ""
+                    )))
                 }
             }
         }else{
             
-            completion(.failure(HssOktaError.configError("Configuration Error, Check okta.plist")))
+            completion(.failure(HssOktaFlutterException(
+                code: "No .plist found", message: "Create a .plist containing okta configs",details: ""
+            )))
         }
     }
     
@@ -91,13 +89,19 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
                         
                         completion(.success(constructAuthenticationResult(resultEnum: DirectAuthenticationResult.success, token: token, userInfo: userInfo)))
                     }else{
-                        completion(.failure(HssOktaError.generalError("Failed to resume flow, MFA Failed")))
+                        completion(.failure(HssOktaFlutterException(
+                            code: "Error", message:"failed to resume flow MFA failed",details: ""
+                        )))
                     }
                 }else{
-                        completion(.failure(HssOktaError.configError("Incorrect Flow")))
+                    completion(.failure(HssOktaFlutterException(
+                        code: "Incorrect flow", message: "You have the incorrect flow",details: ""
+                    )))
                 }
             }catch let error{
-                completion(.failure(HssOktaError.generalError(error.localizedDescription)))
+                completion(.failure(HssOktaFlutterException(
+                    code: "Error", message: error.localizedDescription, details: ""
+                )))
             }
         }
     }
@@ -110,7 +114,9 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
                 do{
                     try await credential.refresh()
                 }catch let error{
-                    completion(.failure(HssOktaError.generalError(error.localizedDescription)))
+                    completion(.failure(HssOktaFlutterException(
+                        code: "Error", message: error.localizedDescription,details: ""
+                    )))
                 }
             }
             completion(.success(true))
@@ -151,10 +157,14 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
                         
                     }else{
                         
-                        completion(.failure(HssOktaError.generalError("No default credential found")))
+                        completion(.failure(HssOktaFlutterException(
+                            code: "No Credential found", message: "There is no default credential stored",details: ""
+                        )))
                     }
-                }catch let e{
-                    completion(.failure(HssOktaError.generalError(e.localizedDescription)))
+                }catch let error{
+                    completion(.failure(HssOktaFlutterException(
+                        code: "Error", message: error.localizedDescription,details: ""
+                    )))
 
                 }
             }
@@ -180,13 +190,17 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
                         }
                         
                         
-                    }catch let e{
-                        completion(.failure(e))
+                    }catch let error{
+                        completion(.failure(HssOktaFlutterException(
+                            code: "Error", message: error.localizedDescription,details: ""
+                        )))
                     }
                 }
             }
-        }catch let e{
-            completion(.failure(e))
+        }catch let error{
+            completion(.failure(HssOktaFlutterException(
+                code: "Error", message: error.localizedDescription,details: ""
+            )))
         }
     }
     
@@ -206,9 +220,11 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
                     }
                 }
                 
-            }catch let e{
+            }catch let error{
                 
-                completion(.failure(HssOktaError.generalError("Failed to Sign in : \(e.localizedDescription)")))
+                completion(.failure(HssOktaFlutterException(
+                    code: "Error", message: error.localizedDescription,details: ""
+                )))
             }
         }
     }
@@ -224,7 +240,7 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
                     Credential.default = try Credential.store(token)
                     
                     if let result = Credential.default{
-                        let userInfo = try await result.userInfo()
+                       let userInfo = try await result.userInfo()
                         
                         completion(.success(
                             constructAuthenticationResult(
@@ -235,10 +251,14 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
                         
                     }
                     
-                    completion(.failure(HssOktaError.credentialError("Failed to save credentials")))
+                    completion(.failure(HssOktaFlutterException(
+                        code: "Error", message: "Failed saving credentails",details: ""
+                    )))
                 }
             }catch let error{
-                completion(.failure(HssOktaError.generalError(error.localizedDescription)))
+                completion(.failure(HssOktaFlutterException(
+                    code: "Error", message: error.localizedDescription, details: ""
+                )))
             }
             
         }
@@ -260,7 +280,9 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
                 }
                
             }catch let error{
-                completion(.failure(error))
+                completion(.failure(HssOktaFlutterException(
+                    code: "Error", message: error.localizedDescription,details: ""
+                )))
             }
         }
     }
@@ -276,7 +298,9 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
                     completion(.success(true))
                     
                 }catch let error{
-                    completion(.failure(error))
+                    completion(.failure(HssOktaFlutterException(
+                        code: "Error", message: error.localizedDescription,details: ""
+                    )))
                 }
             }
         }
@@ -290,7 +314,9 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
                 completion(.success(true))
                 
             }catch let error{
-                completion(.failure(error))
+                completion(.failure(HssOktaFlutterException(
+                    code: "Error", message: error.localizedDescription,details: ""
+                )))
             }
         }}
 

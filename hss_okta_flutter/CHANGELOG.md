@@ -85,3 +85,8 @@
 
 # 1.4.2
 * Fixed Outdated web stub causing example running issues
+
+# 1.4.3
+* updated dependencies
+* generated pigeon files for exceptions
+* updated exception throws with the generated ones for better stacktrace and exception logging
