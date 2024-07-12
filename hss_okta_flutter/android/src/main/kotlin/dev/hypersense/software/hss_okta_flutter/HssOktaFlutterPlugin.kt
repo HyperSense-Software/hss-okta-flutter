@@ -26,6 +26,7 @@ import dev.hypersense.software.hss_okta.DeviceAuthorizationSession
 import dev.hypersense.software.hss_okta.DirectAuthRequest
 import dev.hypersense.software.hss_okta.HssOktaFlutterPluginApi
 import dev.hypersense.software.hss_okta.DirectAuthenticationResult
+import dev.hypersense.software.hss_okta.HssOktaFlutterException
 import dev.hypersense.software.hss_okta.OktaToken
 import dev.hypersense.software.hss_okta.UserInfo
 import io.flutter.plugin.common.EventChannel
@@ -112,7 +113,11 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
 
             when(val res = flow.start(request.username,request.password)){
                 is OidcClientResult.Error -> {
-                    callback.invoke(Result.failure(res.exception))
+                    callback.invoke(Result.failure(HssOktaFlutterException(
+                        code = "Start error",
+                        message = res.exception.message,
+                        details = res.exception.stackTrace
+                    )))
                 }
                 is OidcClientResult.Success -> {
 
@@ -133,9 +138,16 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
     ) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                callback.invoke(Result.failure(Exception("Okta Android doesn't provide MFA OTP")))
+                callback.invoke(Result.failure(HssOktaFlutterException(
+                    code= "Error",
+                    message ="Okta Android doesn't provide MFA OTP")))
             }catch (e: java.lang.Exception){
-                callback.invoke(Result.failure(e))
+
+                callback.invoke(Result.failure(HssOktaFlutterException(
+                    code = "Error",
+                    message = e.message,
+                    details = e.stackTrace
+                )))
             }
         }
     }
@@ -144,7 +156,12 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
     override fun refreshDefaultToken(callback: (Result<Boolean?>) -> Unit) {
         CoroutineScope(Dispatchers.IO).launch {
             when(val result = CredentialBootstrap.defaultCredential().refreshToken()){
-                is OidcClientResult.Error -> callback.invoke(Result.failure(Exception(result.exception)))
+                is OidcClientResult.Error ->   callback.invoke(Result.failure(
+                    HssOktaFlutterException(
+                    code = "Error",
+                    message = result.exception.message,
+                    details = result.exception.stackTrace
+                )))
                 is OidcClientResult.Success -> callback.invoke(Result.success(true))
             }
         }
@@ -153,7 +170,12 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
     override fun revokeDefaultToken(callback: (Result<Boolean?>) -> Unit) {
         CoroutineScope(Dispatchers.IO).launch {
             when(val result = CredentialBootstrap.defaultCredential().revokeToken(RevokeTokenType.ACCESS_TOKEN)){
-                is OidcClientResult.Error -> callback.invoke(Result.failure(Exception(result.exception)))
+                is OidcClientResult.Error -> callback.invoke(Result.failure(
+                    HssOktaFlutterException(
+                    code = "Error",
+                    message = result.exception.message,
+                    details = result.exception.stackTrace
+                )))
                 is OidcClientResult.Success -> callback.invoke(Result.success(true))
             }
         }
@@ -164,20 +186,30 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
             val credential = try{
                 CredentialBootstrap.defaultCredential();
             }catch(e: java.lang.Exception){
-                callback.invoke(Result.failure(e))
+                callback.invoke(Result.failure(HssOktaFlutterException(
+                    code = "Error",
+                    message = e.message,
+                    details = e.stackTrace
+                )))
                 null
             } ?: return@launch
 
             val userInfo = try{
                 credential.getUserInfo().getOrThrow()
             }catch(e: java.lang.Exception){
-               callback.invoke(Result.failure(e))
+                callback.invoke(Result.failure(HssOktaFlutterException(
+                    code = "Error",
+                    message = e.message,
+                    details = e.stackTrace
+                )))
                 null
             } ?: return@launch
 
             if(credential.token?.idToken == null){
                 credential.delete()
-                callback.invoke(Result.failure(Exception("Token error : Previous token is empty and will be deleted")))
+                callback.invoke(Result.failure(HssOktaFlutterException(
+                    code ="Token error",
+                    message = "Previous token is empty and will be deleted")))
             }
 
 
@@ -193,7 +225,11 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
             when(val session = deviceAuthorizationFlow.start()){
 
                 is OidcClientResult.Error -> {
-                    callback.invoke(Result.failure(Exception(session.exception)))
+                    callback.invoke(Result.failure(HssOktaFlutterException(
+                        code = "Error",
+                        message = session.exception.message,
+                        details = session.exception.stackTrace
+                    )))
                 }
                 is OidcClientResult.Success -> {
                     deviceAuthorizationFlowContext = session.result
@@ -208,7 +244,11 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
             }
         }
         }catch (exception : Exception){
-            callback.invoke(Result.failure(exception))
+            callback.invoke(Result.failure(HssOktaFlutterException(
+                code = "Error",
+                message = exception.message,
+                details = exception.stackTrace
+            )))
         }
     }
 
@@ -218,13 +258,21 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
 
                 when(val session = deviceAuthorizationFlow.resume(deviceAuthorizationFlowContext)){
                     is OidcClientResult.Error -> {
-                        callback.invoke(Result.failure(Exception(session.exception)))
+                        callback.invoke(Result.failure(HssOktaFlutterException(
+                            code = "Error",
+                            message = session.exception.message,
+                            details = session.exception.stackTrace
+                        )))
                     }
                     is OidcClientResult.Success -> {
                         CredentialBootstrap.defaultCredential().storeToken(session.result)
 
                         when(val userInfo = CredentialBootstrap.defaultCredential().getUserInfo()){
-                            is OidcClientResult.Error -> callback.invoke(Result.failure(Exception(userInfo.exception)))
+                            is OidcClientResult.Error ->  callback.invoke(Result.failure(HssOktaFlutterException(
+                                code = "Error",
+                                message = userInfo.exception.message,
+                                details = userInfo.exception.stackTrace
+                            )))
                             is OidcClientResult.Success ->{
                                 callback.invoke(Result.success(
                                     composeOktaResult(session.result,userInfo.result)
@@ -237,7 +285,11 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
                 }
             }
         }catch (exception : Exception){
-            callback.invoke(Result.failure(exception))
+            callback.invoke(Result.failure(HssOktaFlutterException(
+                code = "Error",
+                message = exception.message,
+                details = exception.stackTrace
+            )))
         }}
 
     override fun startTokenExchangeFlow(
@@ -250,12 +302,20 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
 
             val tokenExchangeFlow: TokenExchangeFlow = CredentialBootstrap.oidcClient.createTokenExchangeFlow()
             when(val result =tokenExchangeFlow.start(idToken, deviceSecret)){
-                is OidcClientResult.Error -> callback.invoke(Result.failure(result.exception))
+                is OidcClientResult.Error -> callback.invoke(Result.failure(HssOktaFlutterException(
+                    code = "Error",
+                    message = result.exception.message,
+                    details = result.exception.stackTrace
+                )))
                 is OidcClientResult.Success ->{
                     CredentialBootstrap.defaultCredential().storeToken(token = result.result)
 
                     when(val userInfo = CredentialBootstrap.defaultCredential().getUserInfo()){
-                        is OidcClientResult.Error -> callback.invoke(Result.failure(userInfo.exception))
+                        is OidcClientResult.Error ->  callback.invoke(Result.failure(HssOktaFlutterException(
+                            code = "Error",
+                            message = userInfo.exception.message,
+                            details = userInfo.exception.stackTrace
+                        )))
                         is OidcClientResult.Success ->{
                             callback.invoke(Result.success(
                                 composeOktaResult(result.result,userInfo.result)
@@ -275,7 +335,11 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
 
                callback.invoke(Result.success(ids))
            }catch (exception : Exception){
-               callback.invoke(Result.failure(exception))
+               callback.invoke(Result.failure(HssOktaFlutterException(
+                   code = "Error",
+                   message = exception.message,
+                   details = exception.stackTrace
+               )))
            }
 
        }
@@ -296,9 +360,13 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
                    }))
                }
 
-                callback.invoke(Result.failure(Exception("No token found")))
+                callback.invoke(Result.failure(HssOktaFlutterException(code = "Error","No token found")))
             }catch (exception : Exception){
-                  callback.invoke(Result.failure(exception))
+                callback.invoke(Result.failure(HssOktaFlutterException(
+                    code = "Error",
+                    message = exception.message,
+                    details = exception.stackTrace
+                )))
             }
 
         }
@@ -315,10 +383,17 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
                     callback.invoke(Result.success(true))
                 }
 
-                callback.invoke(Result.failure(Exception("Failed to delete credential, Token not found")))
+                callback.invoke(Result.failure(
+                    HssOktaFlutterException(
+                    code = "Error",
+                    message ="Failed to delete credential, Token not found")))
 
             }catch (exception : Exception){
-                callback.invoke(Result.failure(exception))
+                callback.invoke(Result.failure(HssOktaFlutterException(
+                    code = "Error",
+                    message = exception.message,
+                    details = exception.stackTrace
+                )))
             }
 
         }
@@ -326,7 +401,7 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
 
     /// NOT AVAILABLE FOR ANDROID
     override fun setDefaultToken(tokenId: String, callback: (Result<Boolean>) -> Unit) {
-       throw NotImplementedError()
+       throw HssOktaFlutterException(code = "Missing", message = "This is not available for Android")
     }
 
 
@@ -358,10 +433,3 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
 
 
 }
-
-enum class HssOktaError(value : String){
-    CONFIG_ERROR("Config Error"),
-    CREDENTIAL_ERROR("Credential Error"),
-    GENERAL_ERROR("General Error")
-}
-
