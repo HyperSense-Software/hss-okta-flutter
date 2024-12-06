@@ -90,3 +90,6 @@
 * updated dependencies
 * generated pigeon files for exceptions
 * updated exception throws with the generated ones for better stacktrace and exception logging
+
+# 1.4.4
+* Changes scope argument from string to list of strings

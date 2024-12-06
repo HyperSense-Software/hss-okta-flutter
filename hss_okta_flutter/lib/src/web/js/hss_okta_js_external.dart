@@ -83,7 +83,7 @@ class OktaConfig {
     String? issuer,
     String? clientId,
     String? redirectUri,
-    String? scopes,
+    List<String>? scopes,
     String? state,
     bool? pkce,
     String? authorizeUrl,
