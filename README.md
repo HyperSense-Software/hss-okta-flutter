@@ -116,9 +116,10 @@ Web:
     
     void main(){
     await oktaWeb.initializeClient(OktaConfig({
-    issuer: 'com.dev.okta.myApp'
-    clientId: '123456'
-    redirectUri: 'https:localhost:8080/callback'
+    issuer: 'com.dev.okta.myApp',
+    clientId: '123456',
+    redirectUri: 'https:localhost:8080/callback',
+    scopes: ['openid','email','profile]
     }));
     
     final token = await oktaWeb.token.startPopUpAuthentication();
