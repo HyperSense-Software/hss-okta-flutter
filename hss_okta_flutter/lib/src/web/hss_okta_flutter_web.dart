@@ -269,8 +269,8 @@ class HssOktaFlutterWeb extends HssOktaFlutterWebPlatformInterface {
 
   /// Revokes refreshToken or accessToken, clears all local tokens,
   /// then redirects to Okta to end the SSO session.
-  Future<bool?> signOut() async {
-    return promiseToFuture<bool?>(auth.signOut());
+  Future<bool?> signOut([SignoutOptions? options]) async {
+    return promiseToFuture<bool?>(auth.signOut(options));
   }
 
   /// Produces a unique authState object and emits an authStateChange event.

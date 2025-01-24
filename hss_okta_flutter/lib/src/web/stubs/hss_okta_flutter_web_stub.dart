@@ -153,7 +153,8 @@ class HssOktaFlutterWeb {
 
   /// Revokes refreshToken or accessToken, clears all local tokens,
   /// then redirects to Okta to end the SSO session.
-  Future<bool?> signOut() => throw UnimplementedError();
+  Future<bool?> signOut([SignoutOptions? options]) =>
+      throw UnimplementedError();
 
   Future<AuthState> updateAuthState() => throw UnimplementedError();
 
