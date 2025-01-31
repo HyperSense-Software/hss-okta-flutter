@@ -112,8 +112,13 @@ class _WebProfileScreenState extends State<WebProfileScreen> {
           const Spacer(),
           OutlinedButton(
             onPressed: () async {
-              // Sign out
-              Navigator.of(context).popUntil((r) => r.isFirst);
+              final provider = PluginProvider.of(context);
+              final result = await provider.pluginWeb.signOut() ?? false;
+              if (context.mounted) {
+                if (result) {
+                  Navigator.of(context).popUntil((r) => r.isFirst);
+                }
+              }
             },
             child: const Text("Sign out"),
           ),
