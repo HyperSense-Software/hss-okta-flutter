@@ -372,3 +372,16 @@ class SessionAPI {
     String? redirectUrl,
   );
 }
+
+class SignoutOptions {
+  external factory SignoutOptions({
+    bool? revokeAccessToken,
+    bool? revokeRefreshToken,
+    AbstractToken? accessToken,
+    AbstractToken? refreshToken,
+    bool? clearTokensBeforeRedirect,
+    String? postLogoutRedirectUri,
+    IDToken? idToken,
+    String? state,
+  });
+}
