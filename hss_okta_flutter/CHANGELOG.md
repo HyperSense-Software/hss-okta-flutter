@@ -93,3 +93,7 @@
 
 # 1.4.4
 * Changes scope argument from string to list of strings
+
+# 1.4.5
+* Fixed Logout in web
+* Added Logout in example
