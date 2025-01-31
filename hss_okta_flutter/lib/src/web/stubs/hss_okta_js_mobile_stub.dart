@@ -1,5 +1,3 @@
-// import 'package:hss_okta_flutter/hss_okta_flutter.dart';
-
 import 'hss_okta_authn_stub.dart';
 
 // ignore_for_file: public_member_api_docs, sort_constructors_first
