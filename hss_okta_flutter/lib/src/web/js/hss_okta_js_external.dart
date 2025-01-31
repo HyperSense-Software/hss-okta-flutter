@@ -25,7 +25,7 @@ class OktaAuth {
     SigninWithCredentialsOptions opts,
   );
 
-  external Future<bool?> signOut();
+  external Future<bool?> signOut([SignoutOptions? options]);
 
   external Future<bool> closeSession();
 
@@ -449,4 +449,29 @@ class SessionAPI {
     String? sessionToken,
     String? redirectUrl,
   );
+}
+
+@JS()
+@anonymous
+class SignoutRedirectUrlOptions {
+  external factory SignoutRedirectUrlOptions({
+    String? postLogoutRedirectUri,
+    IDToken? idToken,
+    String? state,
+  });
+}
+
+@JS()
+@anonymous
+class SignoutOptions extends SignoutRedirectUrlOptions {
+  external factory SignoutOptions({
+    bool? revokeAccessToken,
+    bool? revokeRefreshToken,
+    AbstractToken? accessToken,
+    AbstractToken? refreshToken,
+    bool? clearTokensBeforeRedirect,
+    String? postLogoutRedirectUri,
+    IDToken? idToken,
+    String? state,
+  });
 }
