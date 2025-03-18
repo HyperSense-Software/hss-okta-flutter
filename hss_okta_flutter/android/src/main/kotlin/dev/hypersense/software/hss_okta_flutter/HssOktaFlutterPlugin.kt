@@ -113,10 +113,11 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
 
             when(val res = flow.start(request.username,request.password)){
                 is OidcClientResult.Error -> {
+
                     callback.invoke(Result.failure(HssOktaFlutterException(
                         code = "Start error",
                         message = res.exception.message,
-                        details = res.exception.stackTrace
+                        details = res.exception.stackTraceToString()
                     )))
                 }
                 is OidcClientResult.Success -> {
@@ -146,12 +147,11 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
                 callback.invoke(Result.failure(HssOktaFlutterException(
                     code = "Error",
                     message = e.message,
-                    details = e.stackTrace
+                    details = e.stackTraceToString()
                 )))
             }
         }
     }
-
 
     override fun refreshDefaultToken(callback: (Result<Boolean?>) -> Unit) {
         CoroutineScope(Dispatchers.IO).launch {
@@ -160,7 +160,7 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
                     HssOktaFlutterException(
                     code = "Error",
                     message = result.exception.message,
-                    details = result.exception.stackTrace
+                    details = result.exception.stackTraceToString()
                 )))
                 is OidcClientResult.Success -> callback.invoke(Result.success(true))
             }
@@ -174,7 +174,7 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
                     HssOktaFlutterException(
                     code = "Error",
                     message = result.exception.message,
-                    details = result.exception.stackTrace
+                    details = result.exception.stackTraceToString()
                 )))
                 is OidcClientResult.Success -> callback.invoke(Result.success(true))
             }
@@ -189,7 +189,7 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
                 callback.invoke(Result.failure(HssOktaFlutterException(
                     code = "Error",
                     message = e.message,
-                    details = e.stackTrace
+                    details = e.stackTraceToString()
                 )))
                 null
             } ?: return@launch
@@ -200,7 +200,7 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
                 callback.invoke(Result.failure(HssOktaFlutterException(
                     code = "Error",
                     message = e.message,
-                    details = e.stackTrace
+                    details = e.stackTraceToString()
                 )))
                 null
             } ?: return@launch
@@ -228,7 +228,7 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
                     callback.invoke(Result.failure(HssOktaFlutterException(
                         code = "Error",
                         message = session.exception.message,
-                        details = session.exception.stackTrace
+                        details = session.exception.stackTraceToString()
                     )))
                 }
                 is OidcClientResult.Success -> {
@@ -247,7 +247,7 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
             callback.invoke(Result.failure(HssOktaFlutterException(
                 code = "Error",
                 message = exception.message,
-                details = exception.stackTrace
+                details = exception.stackTraceToString()
             )))
         }
     }
@@ -261,7 +261,7 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
                         callback.invoke(Result.failure(HssOktaFlutterException(
                             code = "Error",
                             message = session.exception.message,
-                            details = session.exception.stackTrace
+                            details = session.exception.stackTraceToString()
                         )))
                     }
                     is OidcClientResult.Success -> {
@@ -271,7 +271,7 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
                             is OidcClientResult.Error ->  callback.invoke(Result.failure(HssOktaFlutterException(
                                 code = "Error",
                                 message = userInfo.exception.message,
-                                details = userInfo.exception.stackTrace
+                                details = userInfo.exception.stackTraceToString()
                             )))
                             is OidcClientResult.Success ->{
                                 callback.invoke(Result.success(
@@ -288,7 +288,7 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
             callback.invoke(Result.failure(HssOktaFlutterException(
                 code = "Error",
                 message = exception.message,
-                details = exception.stackTrace
+                details = exception.stackTraceToString()
             )))
         }}
 
@@ -305,7 +305,7 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
                 is OidcClientResult.Error -> callback.invoke(Result.failure(HssOktaFlutterException(
                     code = "Error",
                     message = result.exception.message,
-                    details = result.exception.stackTrace
+                    details = result.exception.stackTraceToString()
                 )))
                 is OidcClientResult.Success ->{
                     CredentialBootstrap.defaultCredential().storeToken(token = result.result)
@@ -314,7 +314,7 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
                         is OidcClientResult.Error ->  callback.invoke(Result.failure(HssOktaFlutterException(
                             code = "Error",
                             message = userInfo.exception.message,
-                            details = userInfo.exception.stackTrace
+                            details = userInfo.exception.stackTraceToString()
                         )))
                         is OidcClientResult.Success ->{
                             callback.invoke(Result.success(
@@ -338,7 +338,7 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
                callback.invoke(Result.failure(HssOktaFlutterException(
                    code = "Error",
                    message = exception.message,
-                   details = exception.stackTrace
+                   details = exception.stackTraceToString()
                )))
            }
 
@@ -365,7 +365,7 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
                 callback.invoke(Result.failure(HssOktaFlutterException(
                     code = "Error",
                     message = exception.message,
-                    details = exception.stackTrace
+                    details = exception.stackTraceToString()
                 )))
             }
 
@@ -392,7 +392,7 @@ class HssOktaFlutterPlugin : HssOktaFlutterPluginApi, FlutterPlugin{
                 callback.invoke(Result.failure(HssOktaFlutterException(
                     code = "Error",
                     message = exception.message,
-                    details = exception.stackTrace
+                    details = exception.stackTraceToString()
                 )))
             }
 
