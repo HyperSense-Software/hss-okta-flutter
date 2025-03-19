@@ -1,13 +1,11 @@
 {
-    "dart.flutterSdkPath": ".fvm/flutter_sdk",
-    "files.exclude": {
-      // Remove .fvm files from search
-      "search.exclude": {
-        "**/.fvm": true
-      },
-      // Remove from file watching
-      "files.watcherExclude": {
-        "**/.fvm": true
-      }
+  "dart.flutterSdkPath": ".fvm/versions/stable",
+  "files.exclude": {
+    "search.exclude": {
+      "**/.fvm": true
     },
+    "files.watcherExclude": {
+      "**/.fvm": true
+    }
   }
+}
