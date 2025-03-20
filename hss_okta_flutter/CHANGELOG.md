@@ -97,3 +97,7 @@
 # 1.4.5
 * Fixed Logout in web
 * Added Logout in example
+
+# 1.4.6
+* Fixed issue with iOS crashing, due to non exhaustive switch
+* Fixed issue with Android crashing due to wrong stack trace call
