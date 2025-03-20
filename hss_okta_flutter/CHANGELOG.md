@@ -99,5 +99,8 @@
 * Added Logout in example
 
 # 1.4.6
+* fixed missing closure
+
+# 1.4.7
 * Fixed issue with iOS crashing, due to non exhaustive switch
 * Fixed issue with Android crashing due to wrong stack trace call
