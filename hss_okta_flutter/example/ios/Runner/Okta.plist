@@ -1,17 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-
 <plist version="1.0">
-   <dict>
-      <key>issuer</key>
-      <string></string>
-      <key>clientId</key>
-      <string></string>
-      <key>redirectUri</key>
-      <string></string>
-      <key>logoutRedirectUri</key>
-      <string></string>
-      <key>scopes</key>
-      <string></string>
-    </dict>
+<dict>
+	<key>issuer</key>
+	<string>https://dev-59121541.okta.com/oauth2/default</string>
+	<key>clientId</key>
+	<string>0oany64boxpzH47nO5d7</string>
+	<key>redirectUri</key>
+	<string>com.okta.dev-59121541:/login</string>
+	<key>logoutRedirectUri</key>
+	<string>com.okta.dev-59121541:/</string>
+	<key>scopes</key>
+	<string>openid email profile offline_access</string>
+</dict>
 </plist>

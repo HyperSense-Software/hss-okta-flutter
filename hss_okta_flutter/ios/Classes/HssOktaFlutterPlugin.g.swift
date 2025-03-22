@@ -352,6 +352,8 @@ protocol HssOktaFlutterPluginApi {
   func getToken(tokenId: String, completion: @escaping (Result<AuthenticationResult?, Error>) -> Void)
   func removeCredential(tokenId: String, completion: @escaping (Result<Bool, Error>) -> Void)
   func setDefaultToken(tokenId: String, completion: @escaping (Result<Bool, Error>) -> Void)
+  func startBrowserSignin(completion: @escaping (Result<AuthenticationResult, Error>) -> Void)
+  func startBrowserSignout(completion: @escaping (Result<Bool, Error>) -> Void)
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -552,6 +554,36 @@ class HssOktaFlutterPluginApiSetup {
       }
     } else {
       setDefaultTokenChannel.setMessageHandler(nil)
+    }
+    let startBrowserSigninChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.startBrowserSignin\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      startBrowserSigninChannel.setMessageHandler { _, reply in
+        api.startBrowserSignin { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      startBrowserSigninChannel.setMessageHandler(nil)
+    }
+    let startBrowserSignoutChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.startBrowserSignout\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      startBrowserSignoutChannel.setMessageHandler { _, reply in
+        api.startBrowserSignout { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      startBrowserSignoutChannel.setMessageHandler(nil)
     }
   }
 }

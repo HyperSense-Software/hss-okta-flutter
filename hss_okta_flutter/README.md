@@ -98,15 +98,16 @@ Create **Okta.plist** in your iOS project
 
     import 'package:hss_okta_flutter/hss_okta_flutter_plugin.dart';
 
-    @override
-    Widget build(BuildContext context){
-    return HssOktaBrowserSignOutWidget(
-    onResult: (success){
-         if(success)
-         Navigator.of(context).pop(success);
-       }
-    builder: (context,child) => Container(child:child)
-      )
+    final _plugin =  HssOktaFlutter();
+    
+    Future<void> startWebRedirectAuthentication() async{
+    
+    try{
+        // returns a token or an exception
+	    await _plugin.startBrowserSignin();
+    }catch(e){
+		    print('$e')
+	    }
     }
 
 Web:
@@ -116,9 +117,10 @@ Web:
     
     void main(){
     await oktaWeb.initializeClient(OktaConfig({
-    issuer: 'com.dev.okta.myApp'
-    clientId: '123456'
-    redirectUri: 'https:localhost:8080/callback'
+    issuer: 'com.dev.okta.myApp',
+    clientId: '123456',
+    redirectUri: 'https:localhost:8080/callback',
+    scopes: ['openid','email','profile]
     }));
     
     final token = await oktaWeb.token.startPopUpAuthentication();

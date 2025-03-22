@@ -125,4 +125,16 @@ class HssOktaFlutter {
     );
     return result;
   }
+
+  Future<AuthenticationResult> startBrowserSignIn() async {
+    var result =
+        await HssOktaFlutterPlatformInterface.instance.startBrowserSignin();
+    return result;
+  }
+
+  Future<bool> startBrowserSignout() async {
+    var result =
+        await HssOktaFlutterPlatformInterface.instance.startBrowserSignout();
+    return result;
+  }
 }
