@@ -53,14 +53,16 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
                             Credential.default = try Credential.store(token)
                             let userInfo = try await Credential.default?.userInfo()
                             completion(.success(constructAuthenticationResult(resultEnum: DirectAuthenticationResult.success, token: token, userInfo: userInfo)))
-                           
+                            break
                             
                         case .mfaRequired(_):
                             completion(.success(AuthenticationResult(result: DirectAuthenticationResult.mfaRequired)))
                     
                             
-//                        case .continuation(_):
-//                            break
+                        default:
+                            completion(.failure(HssOktaFlutterException(
+                                code:"Start Error",message: "Unknown status \(String(describing: status)) ",details: ""
+                            )))
                         }
                     }else{
                         completion(.failure(HssOktaFlutterException(
