@@ -9,6 +9,7 @@ import WebAuthenticationUI
 
 
 public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginApi {
+   
 
     let browserAuth = WebAuthentication.shared
     var flow : (any AuthenticationFlow)?
@@ -20,6 +21,7 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
         
         let messenger : FlutterBinaryMessenger = registrar.messenger()
         let api : HssOktaFlutterPluginApi & NSObjectProtocol = HssOktaFlutterPlugin.init()
+        
         
         
         let signInFactory = WebSignInNativeViewFactory(messenger: registrar.messenger())
@@ -57,8 +59,8 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
                             completion(.success(AuthenticationResult(result: DirectAuthenticationResult.mfaRequired)))
                     
                             
-                        case .continuation(_):
-                            break
+//                        case .continuation(_):
+//                            break
                         }
                     }else{
                         completion(.failure(HssOktaFlutterException(
@@ -321,6 +323,71 @@ public class HssOktaFlutterPlugin: NSObject, FlutterPlugin,HssOktaFlutterPluginA
                 )))
             }
         }}
+    
+    func startBrowserSignin(completion: @escaping (Result<AuthenticationResult, any Error>) -> Void) {
+        
+        Task{
+            do{
+                let auth = WebAuthentication.shared
+                
+                if(auth == nil){
+                    completion(.failure(HssOktaFlutterException(code: "Config Error", message: "Missing or bad Okta.plist", details:"")))
+                    
+                    return;
+                }
+                
+                 await auth?.signIn(from: UIApplication.shared.windows.first, completion: {
+                    result in
+                    do{
+                        
+                        switch result{
+                        case .success(let token):
+                            Credential.default = try Credential.store(token)
+//                            eventSink(true)
+                            
+                        case .failure(let error):
+                            completion(.failure(HssOktaFlutterException(code: "Browser Authentication Failed", message: error.localizedDescription, details: "Failed to start Flow")))
+                            break;
+                            
+                      
+                        }
+                    }catch let error{
+                        completion(.failure(HssOktaFlutterException(code: "Browser Authentication Failed", message: error.localizedDescription.stringValue, details: "Failed to start Flow")))
+                    }
+                })
+                
+            }
+        }
+    }
+    
+    func startBrowserSignout(completion: @escaping (Result<Bool, any Error>) -> Void) {
+        Task{
+            
+            let auth = WebAuthentication.shared
+            
+            if(auth == nil){
+                completion(.failure(HssOktaFlutterException(code: "Config Error", message: "Missing or bad Okta.plist", details:"")))
+                
+                return;
+            }
+            
+            await auth?.signOut(from:UIApplication.shared.windows.first,completion:{
+                result in
+                switch result{
+                case .success():
+                    completion(.success(true))
+                    
+                case .failure(let error):
+                    completion(.failure(HssOktaFlutterException(code: "Signout Error", message: error.localizedDescription, details:"")))
+                    break;
+                    
+               
+                }
+            })
+            
+        }
+    }
+    
 
     
     //    Helper methods
