@@ -361,9 +361,9 @@ class _HomeScreenState extends State<HomeScreen> {
             OutlinedButton(
                 onPressed: () async {
                   try {
-                    var result = await Navigator.of(profileContext).push(
-                        MaterialPageRoute(
-                            builder: (c) => const WebSignOutExample()));
+                    var result = await PluginProvider.of(context)
+                        .plugin
+                        .startBrowserSignout();
 
                     if (result) {
                       _pageController.jumpTo(0);
