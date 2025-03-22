@@ -8,6 +8,7 @@ typedef AuthBrowserLoginBuilder = Widget Function(
 /// Provides the native platform view for the browser signin
 /// returns a [Stream<bool>] which emits true when the user has successfully signed in,
 /// the [Credential] will be saved as teh default
+@deprecated
 class HssOktaBrowserSignInWidget extends StatelessWidget {
   final AuthBrowserLoginBuilder? builder;
   final ValueSetter<bool>? onResult;
@@ -17,9 +18,12 @@ class HssOktaBrowserSignInWidget extends StatelessWidget {
       "dev.hypersense.software.hss_okta.channels.browser_signin");
   final platformViewName =
       'dev.hypersense.software.hss_okta.views.browser.signin';
+
+  @deprecated
   const HssOktaBrowserSignInWidget(
       {super.key, this.builder, this.onResult, this.onError});
 
+  @deprecated
   Stream<bool> get browserSigninStream {
     return channel.receiveBroadcastStream().map((event) => event);
   }
