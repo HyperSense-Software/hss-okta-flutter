@@ -67,6 +67,7 @@ internal class WebSignOutNativeView(private val context: Context,
                         result.exception.localizedMessage,
                      ""
                     )
+                    eventSink?.success(false)
                 }
                 is OidcClientResult.Success -> {
                     eventSink?.success(true)

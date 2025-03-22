@@ -69,6 +69,7 @@ internal class WebSignInNativeView(private val context: Context,
                         result.exception.localizedMessage,
                         ""
                     )
+                    eventSink?.success(false)
                 }
 
                 is OidcClientResult.Success -> {
