@@ -253,7 +253,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 } else {
                   final result = await PluginProvider.of(context)
                       .plugin
-                      .startBrowserSignout();
+                      .startBrowserSignIn();
                 }
               },
               child: const Text('Browser sign in')),
