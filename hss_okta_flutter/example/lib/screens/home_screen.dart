@@ -251,21 +251,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         .setTokens(value.tokens);
                   }
                 } else {
-                  var result = await Navigator.of(formContext).push(
-                      MaterialPageRoute(
-                          builder: (c) => const WebSignInExample()));
-
-                  if (result) {
-                    if (mounted) {
-                      await PluginProvider.of(context)
-                          .plugin
-                          .getCredential()
-                          .then((cred) {
-                        _processResult(cred, formContext);
-                        setState(() {});
-                      });
-                    }
-                  }
+                  final result = await PluginProvider.of(context)
+                      .plugin
+                      .startBrowserSignIn();
                 }
               },
               child: const Text('Browser sign in')),
