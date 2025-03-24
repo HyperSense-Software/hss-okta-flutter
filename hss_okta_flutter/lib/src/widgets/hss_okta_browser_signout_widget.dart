@@ -8,6 +8,7 @@ typedef AuthBrowserLogOutBuilder = Widget Function(
 /// Provides the native platform view for the browser signout
 /// returns a [Stream<bool>] which emits true when the user has successfully signed in,
 /// Deletes the default [Credential] and the [UserInfo] from the device
+@deprecated
 class HssOktaBrowserSignOutWidget extends StatelessWidget {
   final AuthBrowserLogOutBuilder? builder;
   final ValueSetter<bool>? onResult;
@@ -18,9 +19,11 @@ class HssOktaBrowserSignOutWidget extends StatelessWidget {
   final platformViewName =
       'dev.hypersense.software.hss_okta.views.browser.signout';
 
+  @deprecated
   const HssOktaBrowserSignOutWidget(
       {super.key, this.builder, this.onResult, this.onError});
 
+  @deprecated
   Stream<bool> get browserSignOutStream {
     return channel.receiveBroadcastStream().map((event) => event);
   }

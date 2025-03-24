@@ -251,21 +251,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         .setTokens(value.tokens);
                   }
                 } else {
-                  var result = await Navigator.of(formContext).push(
-                      MaterialPageRoute(
-                          builder: (c) => const WebSignInExample()));
-
-                  if (result) {
-                    if (mounted) {
-                      await PluginProvider.of(context)
-                          .plugin
-                          .getCredential()
-                          .then((cred) {
-                        _processResult(cred, formContext);
-                        setState(() {});
-                      });
-                    }
-                  }
+                  final result = await PluginProvider.of(context)
+                      .plugin
+                      .startBrowserSignIn();
                 }
               },
               child: const Text('Browser sign in')),
@@ -373,9 +361,9 @@ class _HomeScreenState extends State<HomeScreen> {
             OutlinedButton(
                 onPressed: () async {
                   try {
-                    var result = await Navigator.of(profileContext).push(
-                        MaterialPageRoute(
-                            builder: (c) => const WebSignOutExample()));
+                    var result = await PluginProvider.of(context)
+                        .plugin
+                        .startBrowserSignout();
 
                     if (result) {
                       _pageController.jumpTo(0);

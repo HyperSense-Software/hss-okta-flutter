@@ -330,6 +330,8 @@ interface HssOktaFlutterPluginApi {
   fun getToken(tokenId: String, callback: (Result<AuthenticationResult?>) -> Unit)
   fun removeCredential(tokenId: String, callback: (Result<Boolean>) -> Unit)
   fun setDefaultToken(tokenId: String, callback: (Result<Boolean>) -> Unit)
+  fun startBrowserSignin(callback: (Result<AuthenticationResult>) -> Unit)
+  fun startBrowserSignout(callback: (Result<Boolean>) -> Unit)
 
   companion object {
     /** The codec used by HssOktaFlutterPluginApi. */
@@ -556,6 +558,42 @@ interface HssOktaFlutterPluginApi {
             val args = message as List<Any?>
             val tokenIdArg = args[0] as String
             api.setDefaultToken(tokenIdArg) { result: Result<Boolean> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(wrapResult(data))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.startBrowserSignin$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            api.startBrowserSignin{ result: Result<AuthenticationResult> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(wrapResult(data))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.hss_okta_flutter.HssOktaFlutterPluginApi.startBrowserSignout$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            api.startBrowserSignout{ result: Result<Boolean> ->
               val error = result.exceptionOrNull()
               if (error != null) {
                 reply.reply(wrapError(error))

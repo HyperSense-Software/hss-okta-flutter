@@ -34,7 +34,7 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
-
+    
     kotlinOptions {
         jvmTarget = '1.8'
     }
@@ -42,20 +42,20 @@ android {
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
     }
-
+    
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId "dev.hypersense.software.hss_okta_flutter_example"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
-        minSdkVersion 23
+        minSdkVersion 24
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
-        manifestPlaceholders = ["webAuthenticationRedirectScheme": "com.okta.dev-88611703"]
+        manifestPlaceholders = ["webAuthenticationRedirectScheme": ""]
         
     }
-
+    
     buildTypes {
         release {
             // TODO: Add your own signing config for the release build.
