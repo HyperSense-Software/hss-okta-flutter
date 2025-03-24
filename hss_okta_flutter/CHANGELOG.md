@@ -108,10 +108,6 @@
 # 1.4.8
 * Deprecated widgets for browser signin
 * Added new web browser signin for android and ios
-
-# 1.4.9
 * Changed continuation to default in direct authentication in switch statement for statuses in ios
-
-# 1.5.0
 * Updated documentation
 * Changed example to the newer web browser authentication
