@@ -3,7 +3,11 @@ import 'dart:async';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:hss_okta_flutter/hss_okta_flutter.dart';
 import 'package:hss_okta_flutter/src/web/hss_okta_flutter_web_platform_interface.dart';
-import 'package:js/js_util.dart';
+import 'dart:js_interop';
+
+Future<T> promiseToFuture<T>(dynamic value) async {
+  return value;
+}
 
 /// Wrapper for Okta Auth JS for Flutter/Dart Web
 ///
@@ -172,13 +176,13 @@ class HssOktaFlutterWeb extends HssOktaFlutterWebPlatformInterface {
   /// event happens.
 
   void subscribe(void Function(AuthState authState) cb) {
-    auth.authStateManager.subscribe(allowInterop(cb));
+    auth.authStateManager.subscribe((cb));
   }
 
   /// Unsubscribes callback for [AuthState] event. It will unregister all
   /// handlers if no callback handler is provided.
   void unsubscribe(void Function(AuthState? authState) cb) {
-    auth.authStateManager.unsubscribe(allowInterop(cb));
+    auth.authStateManager.unsubscribe((cb));
   }
 
   /// The goal of this authentication flow is to set an
@@ -335,11 +339,11 @@ class HssOktaFlutterWeb extends HssOktaFlutterWebPlatformInterface {
 
   ///Can set (or unset) request headers after construction.
   void setHeaders(Map<String, String> headers) {
-    auth.setHeaders(jsify(headers));
+    auth.setHeaders(headers);
   }
 
   Future<bool> isSessionExists() async {
-    return await promiseToFuture(auth.session.exists());
+    return (await auth.session.exists()) ?? false;
   }
 
   Future<SessionObject> getActiveSession() async {

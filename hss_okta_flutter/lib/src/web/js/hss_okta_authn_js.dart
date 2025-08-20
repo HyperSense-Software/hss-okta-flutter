@@ -1,9 +1,7 @@
 @JS()
-library hss_okta_js;
+library;
 
-import 'dart:js';
-
-import 'package:js/js.dart';
+import 'dart:js_interop';
 
 typedef AuthnTransactionFunction = Future<AuthnTransaction> Function(
     dynamic obj);
@@ -20,7 +18,7 @@ class AuthnTransactionState {
   external String? get recoveryType;
   external bool get autoPush;
   external bool get rememberDevice;
-  external JsObject? get profile;
+  external JSObject? get profile;
 }
 
 @JS()

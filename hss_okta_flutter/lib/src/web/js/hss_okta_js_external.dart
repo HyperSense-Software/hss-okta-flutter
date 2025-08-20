@@ -1,11 +1,11 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 @JS()
-library hss_okta_js;
+library;
 
 // import 'package:js/js.dart';
 // import 'dart:js';
 
-import 'package:js/js.dart';
+import 'dart:js_interop';
 
 import 'hss_okta_authn_js.dart';
 
